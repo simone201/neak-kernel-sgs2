@@ -1032,6 +1032,7 @@ struct sched_domain;
 #define ENQUEUE_WAKEUP		1
 #define ENQUEUE_WAKING		2
 #define ENQUEUE_HEAD		4
+#define ENQUEUE_UNTHROTTLE	8
 
 #define DEQUEUE_SLEEP		1
 
@@ -1901,6 +1902,10 @@ extern int sysctl_sched_rt_runtime;
 int sched_rt_handler(struct ctl_table *table, int write,
 		void __user *buffer, size_t *lenp,
 		loff_t *ppos);
+
+#ifdef CONFIG_CFS_BANDWIDTH
+extern unsigned int sysctl_sched_cfs_bandwidth_slice;
+#endif
 
 extern unsigned int sysctl_sched_compat_yield;
 
