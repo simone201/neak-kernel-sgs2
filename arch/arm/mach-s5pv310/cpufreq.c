@@ -1894,8 +1894,18 @@ static int s5pv310_cpufreq_cpu_init(struct cpufreq_policy *policy)
 		cpumask_setall(policy->cpus);
 	}
 
-	return cpufreq_frequency_table_cpuinfo(policy, s5pv310_freq_table);
+	cpufreq_frequency_table_cpuinfo(policy, s5pv310_freq_table);
+	/* set safe default min and max speeds - netarchy */
+	policy->max = 1200000;
+	policy->min = 200000;
+	return 0;
 }
+
+/* Make sure we have the scaling_available_freqs sysfs file */
+static struct freq_attr *ninphetamine_cpufreq_attr[] = {
+	&cpufreq_freq_attr_scaling_available_freqs,
+	NULL,
+};
 
 static struct cpufreq_driver s5pv310_driver = {
 	.flags = CPUFREQ_STICKY,
@@ -1904,6 +1914,7 @@ static struct cpufreq_driver s5pv310_driver = {
 	.get = s5pv310_getspeed,
 	.init = s5pv310_cpufreq_cpu_init,
 	.name = "s5pv310_cpufreq",
+	.attr = ninphetamine_cpufreq_attr,
 #ifdef CONFIG_PM
 	.suspend = s5pv310_cpufreq_suspend,
 	.resume = s5pv310_cpufreq_resume,
