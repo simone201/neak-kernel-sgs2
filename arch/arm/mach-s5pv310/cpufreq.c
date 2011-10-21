@@ -46,6 +46,9 @@
 #include <mach/regs-clock.h>
 #include <mach/pm-core.h>
 
+/* UV */
+extern int exp_UV_mV[5];
+
 static struct clk *arm_clk;
 static struct clk *moutcore;
 static struct clk *mout_mpll;
@@ -1288,7 +1291,8 @@ static int s5pv310_target(struct cpufreq_policy *policy,
 #endif
 
 	/* get the voltage value */
-	arm_volt = s5pv310_volt_table[index].arm_volt;
+//	arm_volt = s5pv310_volt_table[index].arm_volt;
+	arm_volt = exp_UV_mV[index];
 #ifndef CONFIG_S5PV310_BUSFREQ
 	int_volt = s5pv310_volt_table[index].int_volt;
 #endif
@@ -2251,85 +2255,95 @@ static int s5pv310_asv_table_update(void)
 	for (i = 0; i < last_level; i++) {
 		switch (asv_group) {
 		case 0:
-			s5pv310_volt_table[i].arm_volt += (100*1000);
+			/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] += (100*1000);
 			break;
 		case 1:
-			s5pv310_volt_table[i].arm_volt += (50*1000);
+			/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] += (50*1000);
 			break;
 		case 2:
-			s5pv310_volt_table[i].arm_volt += (0*1000);
+			/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] += (0*1000);
 			break;
 		case 3:
-			s5pv310_volt_table[i].arm_volt -= (25*1000);
+			/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (25*1000);
 			break;
 		case 4:
 			if (s5pv310_max_armclk == ARMCLOCK_1200MHZ) {
 				if (i == 3)
-					s5pv310_volt_table[i].arm_volt -= (25*1000);
+					/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (25*1000);
 				else
-					s5pv310_volt_table[i].arm_volt -= (50*1000);
+					/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (50*1000);
 			} else {
 				if (i == 2)
-					s5pv310_volt_table[i].arm_volt -= (25*1000);
+					/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (25*1000);
 				else
-					s5pv310_volt_table[i].arm_volt -= (50*1000);
+					/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (50*1000);
 			}
 			break;
 		case 5:
 			if (s5pv310_max_armclk == ARMCLOCK_1200MHZ) {
 				if (i == 3)
-					s5pv310_volt_table[i].arm_volt -= (25*1000);
+					/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (25*1000);
 				else
-					s5pv310_volt_table[i].arm_volt -= (50*1000);
+					/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (50*1000);
 			} else {
 				if (i == 2)
-					s5pv310_volt_table[i].arm_volt -= (25*1000);
+					/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (25*1000);
 				else
-					s5pv310_volt_table[i].arm_volt -= (50*1000);
+					/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (50*1000);
 			}
 			break;
 		case 6:
-			s5pv310_volt_table[i].arm_volt -= (100*1000);
+			/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (100*1000);
 			break;
 		case 7:
-			s5pv310_volt_table[i].arm_volt -= (125*1000);
+			/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (125*1000);
 			break;
 		}
 		/* Maximum Voltage */
-		if (s5pv310_volt_table[i].arm_volt > 1350000)
+/*		if (s5pv310_volt_table[i].arm_volt > 1350000)
 			s5pv310_volt_table[i].arm_volt = 1350000;
-
+*/
+		if (exp_UV_mV[i] > 1350000)
+			exp_UV_mV[i] = 1350000;
+			
 		/* Minimum Voltage */
-		if (s5pv310_volt_table[i].arm_volt < 925000)
+/*		if (s5pv310_volt_table[i].arm_volt < 925000)
 			s5pv310_volt_table[i].arm_volt = 925000;
-
+*/
+		if (exp_UV_mV[i] < 800000)
+			exp_UV_mV[i] = 800000;
+			
+/*		printk(KERN_INFO "ASV voltage_table[%d].arm_volt = %d\n",
+				i, s5pv310_volt_table[i].arm_volt); */
 		printk(KERN_INFO "ASV voltage_table[%d].arm_volt = %d\n",
-				i, s5pv310_volt_table[i].arm_volt);
+				i, exp_UV_mV[i]);
 	}
 
 	/* The last level of VDD_ARM */
 	switch (asv_group) {
 	case 0:
-		s5pv310_volt_table[last_level].arm_volt += (75*1000);
+		/* s5pv310_volt_table[last_level].arm_volt */ exp_UV_mV[last_level] += (75*1000);
 		break;
 	case 1:
-		s5pv310_volt_table[last_level].arm_volt += (25*1000);
+		/* s5pv310_volt_table[last_level].arm_volt */ exp_UV_mV[last_level] += (25*1000);
 		break;
 	case 2:
-		s5pv310_volt_table[last_level].arm_volt += (0*1000);
+		/* s5pv310_volt_table[last_level].arm_volt */ exp_UV_mV[last_level] += (0*1000);
 		break;
 	case 3:
 	case 4:
-		s5pv310_volt_table[last_level].arm_volt -= (25*1000);
+		/* s5pv310_volt_table[last_level].arm_volt */ exp_UV_mV[last_level] -= (25*1000);
 		break;
 	case 5:
 	case 6:
 	case 7:
-		s5pv310_volt_table[last_level].arm_volt -= (50*1000);
+		/* s5pv310_volt_table[last_level].arm_volt */ exp_UV_mV[last_level] -= (50*1000);
 		break;
 	}
+/*	printk(KERN_INFO "ASV voltage_table[%d].arm_volt = %d\n",
+		last_level, s5pv310_volt_table[last_level].arm_volt); */
 	printk(KERN_INFO "ASV voltage_table[%d].arm_volt = %d\n",
-		last_level, s5pv310_volt_table[last_level].arm_volt);
+		last_level, exp_UV_mV[last_level]);
 
 	/* VDD_INT ASV */
 	for (i = 0; i < INT_LEVEL_END; i++) {
@@ -2399,7 +2413,8 @@ static void s5pv310_asv_set_voltage(void)
 	if (s5pv310_max_armclk != ARMCLOCK_1200MHZ)
 		asv_arm_index -= 1;
 
-	asv_arm_volt = s5pv310_volt_table[asv_arm_index].arm_volt;
+//	asv_arm_volt = s5pv310_volt_table[asv_arm_index].arm_volt;
+	asv_arm_volt = exp_UV_mV[asv_arm_index];
 #if defined(CONFIG_REGULATOR)
 	regulator_set_voltage(arm_regulator, asv_arm_volt, asv_arm_volt);
 #endif
