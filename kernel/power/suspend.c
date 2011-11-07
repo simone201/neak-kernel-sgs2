@@ -166,11 +166,10 @@ static int suspend_enter(suspend_state_t state)
 
 	error = sysdev_suspend(PMSG_SUSPEND);
 	if (!error) {
-		if (!suspend_test(TEST_CORE))
+		if (!suspend_test(TEST_CORE) && pm_check_wakeup_events()) {
 			error = suspend_ops->enter(state);
-		/* Workaround for possible L2 cache coherency issue
-		   where preempt_count remains zero */ 
-		preempt_count() = 0;
+			events_check_enabled = false;
+		}
 		sysdev_resume();
 	}
 
