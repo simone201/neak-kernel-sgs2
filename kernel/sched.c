@@ -4081,10 +4081,22 @@ need_resched_nonpreemptible:
 
 	pre_schedule(rq, prev);
 
+<<<<<<< HEAD
 	if (unlikely(!rq->nr_running))
 		idle_balance(cpu, rq);
 	else
 		trace_sched_load(rq->nr_running, rq->avg_idle);
+=======
+	trace_sched_load(cpu, rq->nr_running, rq->cpu_load[0]);
+
+	if (unlikely(!rq->nr_running)) {
+		idle_balance(cpu, rq);
+	} else if (rq->nr_running >= 2 && rq->cpu_load[0] >= 8192) {
+		extern void fire_hotplug_cpu(void);
+
+		fire_hotplug_cpu();
+	}
+>>>>>>> 9718b0b... pm-hotplug: reduce unnecessary calls to the dynamic hotplug workqueue
 
 	put_prev_task(rq, prev);
 	next = pick_next_task(rq);
