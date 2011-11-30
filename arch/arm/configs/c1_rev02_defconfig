@@ -131,9 +131,13 @@ CONFIG_COMPAT_BRK=y
 CONFIG_SLUB=y
 # CONFIG_SLOB is not set
 <<<<<<< HEAD
+<<<<<<< HEAD
 CONFIG_PROFILING=y
 CONFIG_TRACEPOINTS=y
 CONFIG_OPROFILE=y
+=======
+# CONFIG_PROFILING is not set
+>>>>>>> 9fc26b0... config: disable debugging stuff
 =======
 # CONFIG_PROFILING is not set
 >>>>>>> 9fc26b0... config: disable debugging stuff
@@ -423,6 +427,7 @@ CONFIG_MMC_MSHC_CLOCK_GATING=y
 # Debugging Feature
 #
 <<<<<<< HEAD
+<<<<<<< HEAD
 CONFIG_SEC_DEBUG=y
 CONFIG_SEC_DEBUG_SCHED_LOG=y
 # CONFIG_SEC_DEBUG_SEMAPHORE_LOG is not set
@@ -430,6 +435,9 @@ CONFIG_SEC_DEBUG_USER=y
 # CONFIG_SEC_DEBUG_PM_TEMP is not set
 # CONFIG_SEC_DEBUG_IRQ_EXIT_LOG is not set
 CONFIG_S5PV310_WATCHDOG_RESET=y
+=======
+# CONFIG_SEC_DEBUG is not set
+>>>>>>> 9fc26b0... config: disable debugging stuff
 =======
 # CONFIG_SEC_DEBUG is not set
 >>>>>>> 9fc26b0... config: disable debugging stuff
@@ -2448,12 +2456,15 @@ CONFIG_HAVE_FUNCTION_TRACER=y
 CONFIG_HAVE_DYNAMIC_FTRACE=y
 CONFIG_HAVE_FTRACE_MCOUNT_RECORD=y
 <<<<<<< HEAD
+<<<<<<< HEAD
 CONFIG_RING_BUFFER=y
 CONFIG_EVENT_TRACING=y
 CONFIG_CONTEXT_SWITCH_TRACER=y
 CONFIG_RING_BUFFER_ALLOW_SWAP=y
 CONFIG_TRACING=y
 CONFIG_GENERIC_TRACER=y
+=======
+>>>>>>> 9fc26b0... config: disable debugging stuff
 =======
 >>>>>>> 9fc26b0... config: disable debugging stuff
 CONFIG_TRACING_SUPPORT=y
