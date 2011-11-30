@@ -1,11 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux kernel version: 2.6.35.7
-<<<<<<< HEAD
-# Mon Aug  8 18:04:55 2011
-=======
 # Sun Aug 28 18:00:32 2011
->>>>>>> b42d84c... disable hung task and soft lockups detection
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
