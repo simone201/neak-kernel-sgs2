@@ -764,12 +764,9 @@ enqueue_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
 	 * Update the normalized vruntime before updating min_vruntime
 	 * through callig update_curr().
 	 */
-<<<<<<< HEAD
 	if (!(flags & (ENQUEUE_WAKEUP | ENQUEUE_UNTHROTTLE)) ||
 			(flags & ENQUEUE_WAKING))
-=======
 	if (!(flags & ENQUEUE_WAKEUP) || (flags & ENQUEUE_WAKING))
->>>>>>> parent of 79844f0... cfs: bandwidth throttling
 		se->vruntime += cfs_rq->min_vruntime;
 
 	/*
