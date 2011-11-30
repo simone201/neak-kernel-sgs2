@@ -380,7 +380,6 @@ TRACE_EVENT(sched_stat_runtime,
 			(unsigned long long)__entry->vruntime)
 );
 
-<<<<<<< HEAD
 /*
  * Tracepoint for average load.
  */
@@ -405,9 +404,6 @@ TRACE_EVENT(sched_load,
 	TP_printk("cpu=%d nr_running=%lu avg_idle=%llu",
 		  __entry->cpu, __entry->nr_running, __entry->avg_idle)
 );
-
-=======
->>>>>>> ef4759f... sched: remove the sched load tracepoint
 #endif /* _TRACE_SCHED_H */
 
 /* This part must be outside protection */
