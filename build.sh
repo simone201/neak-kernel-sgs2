@@ -10,7 +10,7 @@ KERNEL_PATH=/home/simone/dawn-kernel
 # TODO: Set toolchain and root filesystem path
 TAR_NAME=zImage.tar
 
-TOOLCHAIN="/home/simone/android/system/prebuilt/linux-x86/toolchain/arm-eabi-4.4.3/bin/arm-eabi-"
+TOOLCHAIN="/home/simone/arm-2011.03/bin/arm-none-eabi-"
 ROOTFS_PATH="/home/simone/dawn-kernel/initramfs"
 
 export KBUILD_BUILD_VERSION="Dawn-Kernel-T1"
