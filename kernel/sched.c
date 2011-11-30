@@ -4096,6 +4096,9 @@ need_resched_nonpreemptible:
 
 		fire_hotplug_cpu();
 	}
+<<<<<<< HEAD
+>>>>>>> 9718b0b... pm-hotplug: reduce unnecessary calls to the dynamic hotplug workqueue
+=======
 >>>>>>> 9718b0b... pm-hotplug: reduce unnecessary calls to the dynamic hotplug workqueue
 
 	put_prev_task(rq, prev);
