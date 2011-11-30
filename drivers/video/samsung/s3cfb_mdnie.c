@@ -1153,6 +1153,11 @@ static int parse_text(char *src, int len)
 		//printk(KERN_INFO "line:%d, [start]%s[end]\n", i, str_line[i]);
 		ret = sscanf(str_line[i], "0x%x,0x%x\n", &data1, &data2);
 		//printk(KERN_INFO "Result => [0x%2x 0x%4x] %s\n", data1, data2, (ret == 2) ? "Ok" : "Not available");
+		//SpeedMod: Bypass DE SHARPNESS, DE TH, CS Gain
+		if (data1 == 0x003b) data2 = 0x0000; //DE SHARPNESS
+		if (data1 == 0x0042) data2 = 0x003f; //DE TH
+		if (data1 == 0x003f) data2 = 0x0000; //CS Gain
+		if (data1 == 0x004d) data2 = 0x0000; //PCC
 		if (ret == 2) {
 			mDNIe_data[index++] = (u16)data1 * 4;
 			mDNIe_data[index++]  = (u16)data2;

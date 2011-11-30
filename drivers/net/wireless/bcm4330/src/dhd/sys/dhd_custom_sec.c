@@ -108,8 +108,12 @@ start_readmac:
 
 	if(ret)
 		sscanf(buf,"%02X:%02X:%02X:%02X:%02X:%02X",
-			   mac->octet[0], mac->octet[1], mac->octet[2], 
-			   mac->octet[3], mac->octet[4], mac->octet[5]);
+			(unsigned int *)&(mac->octet[0]),
+			(unsigned int *)&(mac->octet[1]),
+			(unsigned int *)&(mac->octet[2]),
+			(unsigned int *)&(mac->octet[3]),
+			(unsigned int *)&(mac->octet[4]),
+			(unsigned int *)&(mac->octet[5]));
 	else
 		DHD_ERROR(("dhd_bus_start: Reading from the '%s' returns 0 bytes\n", filepath));
 
@@ -272,8 +276,12 @@ int CheckRDWR_Macaddr(	struct dhd_info *dhd, dhd_pub_t *dhdp, struct ether_addr 
 				g_iMacFlag = MACADDR_MOD_RANDOM;
 			} else {
 				sscanf(buf,"%02X:%02X:%02X:%02X:%02X:%02X",
-				   &(mac->octet[0]), &(mac->octet[1]), &(mac->octet[2]), 
-				   &(mac->octet[3]), &(mac->octet[4]), &(mac->octet[5]));
+					(unsigned int *)&(mac->octet[0]),
+					(unsigned int *)&(mac->octet[1]),
+					(unsigned int *)&(mac->octet[2]),
+					(unsigned int *)&(mac->octet[3]),
+					(unsigned int *)&(mac->octet[4]),
+					(unsigned int *)&(mac->octet[5]));
 				if(memcmp(cur_mac,mac->octet,ETHER_ADDR_LEN) == 0) { // read mac is same
 					g_iMacFlag = MACADDR_NONE;
 				}
@@ -302,8 +310,12 @@ int CheckRDWR_Macaddr(	struct dhd_info *dhd, dhd_pub_t *dhdp, struct ether_addr 
 		}
 		else {
 			sscanf(buf,"%02X:%02X:%02X:%02X:%02X:%02X",
-			   &(mac->octet[0]), &(mac->octet[1]), &(mac->octet[2]), 
-			   &(mac->octet[3]), &(mac->octet[4]), &(mac->octet[5]));
+				(unsigned int *)&(mac->octet[0]),
+				(unsigned int *)&(mac->octet[1]),
+				(unsigned int *)&(mac->octet[2]),
+				(unsigned int *)&(mac->octet[3]),
+				(unsigned int *)&(mac->octet[4]),
+				(unsigned int *)&(mac->octet[5]));
 			/* Writing Newly generated MAC ID to the Dongle */
 			if (0 == _dhd_set_mac_address(dhd, 0, mac)) {
 				DHD_INFO(("dhd_bus_start: MACID is overwritten\n"));
@@ -322,8 +334,12 @@ int CheckRDWR_Macaddr(	struct dhd_info *dhd, dhd_pub_t *dhdp, struct ether_addr 
 				0x60,0xd0,0xa9,randommac[0],randommac[1],randommac[2]);		
 		DHD_ERROR(("[WIFI] The Random Generated MAC ID : %s\n", macbuffer));
 		sscanf(macbuffer,"%02X:%02X:%02X:%02X:%02X:%02X",
-			   &(mac->octet[0]), &(mac->octet[1]), &(mac->octet[2]), 
-			   &(mac->octet[3]), &(mac->octet[4]), &(mac->octet[5]));
+			(unsigned int *)&(mac->octet[0]),
+			(unsigned int *)&(mac->octet[1]),
+			(unsigned int *)&(mac->octet[2]),
+			(unsigned int *)&(mac->octet[3]),
+			(unsigned int *)&(mac->octet[4]),
+			(unsigned int *)&(mac->octet[5]));
 		if (0 == _dhd_set_mac_address(dhd, 0, mac)) {
 			DHD_INFO(("dhd_bus_start: MACID is overwritten\n"));
 			g_iMacFlag = MACADDR_COB;
@@ -391,7 +407,6 @@ int check_module_cid(dhd_pub_t *dhd)
 	unsigned char cis_buf[128] = {0};
 	unsigned char cid_buf[10] = {0};
 	const char* cidfilepath = "/data/.cid.info";
-	int nread;
 
 	/* Try reading out from CIS */
 	cis_rw_t *cish = (cis_rw_t *)&cis_buf[8];
@@ -399,12 +414,14 @@ int check_module_cid(dhd_pub_t *dhd)
 
 	fp_cid = filp_open(cidfilepath, O_RDONLY, 0);
 	if (!IS_ERR(fp_cid)) { 
-		kernel_read(fp_cid, fp_cid->f_pos, &cid_buf, sizeof(cid_buf)); 
-		if(strstr(cid_buf,"samsung")||strstr(cid_buf,"murata")) {
-		/* file does exist, just return */
-		filp_close(fp_cid, NULL);
-		return 0;
-	}
+		kernel_read(fp_cid, fp_cid->f_pos, cid_buf, sizeof(cid_buf));
+		if (strstr(cid_buf, "samsung") ||
+			strstr(cid_buf, "murata") ||
+			strstr(cid_buf, "semcove")) {
+			/* file does exist, just return */
+			filp_close(fp_cid, NULL);
+			return 0;
+		}
 
 		DHD_ERROR(("[WIFI].cid.info file already exists but it contains an unknown id [%s]\n", cid_buf));
 	}
@@ -417,13 +434,17 @@ int check_module_cid(dhd_pub_t *dhd)
 	if (ret < 0) {
 		DHD_ERROR(("%s: CIS reading failed, err=%d\n", __FUNCTION__, ret));
 	} else {
-		unsigned char id[4] = {0x80, 0x06, 0x81, 0x00};
+		unsigned char murata_id[4] = {0x80, 0x06, 0x81, 0x00};
+		unsigned char semco_ve[4] = {0x80, 0x02, 0x81, 0x99};
 #ifdef DUMP_CIS
 		dump_cis(cis_buf, 48);
 #endif
-		if (memcmp(&cis_buf[CIS_CID_OFFSET], id, 4) == 0) {
-			DHD_ERROR(("CID MATCH FOUND\n"));
+		if (memcmp(&cis_buf[CIS_CID_OFFSET], murata_id, 4) == 0) {
+			DHD_ERROR(("CID MATCH FOUND : Murata\n"));
 			write_cid_file(cidfilepath, "murata", 6);
+		} else if (memcmp(&cis_buf[CIS_CID_OFFSET], semco_ve, 4) == 0) {
+			DHD_ERROR(("CID MATCH FOUND : Semco VE\n"));
+			write_cid_file(cidfilepath, "semcove", 7);
 		} else {
 			DHD_ERROR(("CID MISMATCH 0x%02X 0x%02X 0x%02X 0x%02X\n", 
 				cis_buf[CIS_CID_OFFSET], cis_buf[CIS_CID_OFFSET+1], 

@@ -181,6 +181,7 @@ typedef struct dhd_pub {
 #if defined(CONFIG_HAS_WAKELOCK) && (defined(CONFIG_MACH_SAMSUNG_P3) || defined(CONFIG_MACH_N1))
 	struct wake_lock	wow_wakelock;
 #endif
+	bool netdev_registered;
 } dhd_pub_t;
 
 typedef struct dhd_cmn {

@@ -1,3 +1,4 @@
+subdir-ccflags-y += -fno-inline-functions
 #
 # Makefile for USB OTG Host Controller Drivers
 #

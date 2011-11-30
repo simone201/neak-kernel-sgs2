@@ -516,30 +516,17 @@ dhd_enable_keepalive(dhd_pub_t *dhd, uint32 period)
 
 	pkt = (wl_keep_alive_pkt_t *) (buf + str_len + 1);
 	keep_alive_pkt.period_msec = period;
-	buf_len = str_len + 1;
+	keep_alive_pkt.len_bytes = 0;
+	buf_len = str_len + 1 + sizeof(wl_keep_alive_pkt_t);
+	memcpy((char *)pkt, &keep_alive_pkt, WL_KEEP_ALIVE_FIXED_LEN);
 
 	if (0 == period) {
-		keep_alive_pkt.len_bytes = 0;
-		buf_len += sizeof(wl_keep_alive_pkt_t);
 		DHD_TRACE(("Disable Keep Alive\n"));
-		memcpy((char *)pkt, &keep_alive_pkt, WL_KEEP_ALIVE_FIXED_LEN);
 	}
 	else {
-		uint8 contents[16] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0};
-
-		keep_alive_pkt.len_bytes = 16;
-		memcpy((char *)pkt, &keep_alive_pkt, WL_KEEP_ALIVE_FIXED_LEN);
-
-		bcopy(contents, pkt->data, sizeof(contents));
-		/* source address */
-		bcopy(&dhd->mac, &pkt->data[6], 6);
-
-		buf_len += (WL_KEEP_ALIVE_FIXED_LEN + keep_alive_pkt.len_bytes);
 		DHD_TRACE(("Enable Keep Alive\n"));
 	}
-
 	return dhd_wl_ioctl_cmd(dhd, WLC_SET_VAR, buf, buf_len, TRUE, 0);
-	
 }
 #endif /* USE_KEEP_ALIVE */
 
@@ -576,10 +563,10 @@ dhd_preinit_ioctls(dhd_pub_t *dhd)
 	uint32 glom = 0;
 	uint bcn_timeout = 12;
 	int arpoe = 1;
-	int arp_ol = 0xf;
+	int arp_ol = 0xb; /* Set arp_ol 0xb */
 	int scan_assoc_time = 40;
 	int scan_unassoc_time = 80;
-	int assoc_retry = 3;
+	int assoc_retry = 7;
 	char buf[256];
 #ifdef USE_WIFI_DIRECT
 	uint32 apsta = 1; /* Enable APSTA mode */

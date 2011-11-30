@@ -53,6 +53,10 @@ obj-$(CONFIG_WL12XX)	+= wl12xx/
 
 obj-$(CONFIG_IWM)	+= iwmc3200wifi/
 
+ifeq ($(CONFIG_MACH_C1_NA_SPR_REV02),y)
+obj-$(CONFIG_BROADCOM_WIFI)	+= bcm4330hsic/
+endif
+
 ifneq ($(CONFIG_MACH_C1_NA_SPR_REV02),y)
 obj-$(CONFIG_BROADCOM_WIFI)	+= bcm4330/
 endif

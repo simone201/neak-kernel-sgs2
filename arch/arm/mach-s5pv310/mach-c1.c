@@ -3045,7 +3045,7 @@ static u8 t8_config[] = {GEN_ACQUISITIONCONFIG_T8,
 static u8 t9_config[] = {TOUCH_MULTITOUCHSCREEN_T9,
 				131, 0, 0, 19, 11, 0, 32, MXT224_THRESHOLD, 2, 1,
 				0,
-				15,		/* MOVHYSTI */
+				3,		/* MOVHYSTI */
 				1, 11, MXT224_MAX_MT_FINGERS, 5, 40, 10, 31, 3,
 				223, 1, 0, 0, 0, 0, 143, 55, 143, 90, 18};
 
@@ -3135,7 +3135,7 @@ static u8 t8_config_e[] = {GEN_ACQUISITIONCONFIG_T8,
 static u8 t9_config_e[] = {TOUCH_MULTITOUCHSCREEN_T9,
 				131, 0, 0, 19, 11, 0, 32, 50, 2, 1,
 				10,
-				15,		/* MOVHYSTI */
+				3,		/* MOVHYSTI */
 				1, 11, MXT224_MAX_MT_FINGERS, 5, 40, 10, 31, 3,
 				223, 1, 10, 10, 10, 10, 143, 40, 143, 80,
 				18, 15, 50, 50, 0};
@@ -3196,7 +3196,7 @@ static u8 t48_config_e_ta[] = {PROCG_NOISESUPPRESSION_T48,
 				0, 0, 0, 6, 6, 0, 0, 64, 4, 64,
 				10, 0, 20, 5, 0, 38, 0, 20, 0, 0,
 				0, 0, 0, 0, 0, 40, 2,
-				15,		/* MOVHYSTI */
+				3,		/* MOVHYSTI */
 				1, 46,
 				10, 5, 40, 235, 235, 10, 10, 160, 50, 143,
 				80, 18, 10, 0};

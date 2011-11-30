@@ -430,7 +430,7 @@ static void mxt224_ta_probe(int ta_status)
 		calcfg_en = T48_CALCFG_TA | 0x20;
 		noise_threshold = 40;
 		movfilter = 46;
-		blen = 16;
+		blen = 32; //16;
 	} else {
 	    if (boot_or_resume==1)
 			threshold = 55;
@@ -442,7 +442,7 @@ static void mxt224_ta_probe(int ta_status)
 		calcfg_en = T48_CALCFG | 0x20;
 		noise_threshold = 30;
 		movfilter = 11;
-		blen = 32;
+		blen = 48; //32;
 	}
 	
 	if (copy_data->family_id==0x81) {

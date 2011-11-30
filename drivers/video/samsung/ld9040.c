@@ -135,17 +135,95 @@ static int ld9040_panel_send_sequence(struct ld9040 *lcd,
 }
 static int get_gamma_value_from_bl(int bl)
 {
-	int gamma_value =0;
-	int gamma_val_x10 =0;
+	int backlightlevel;
 
-	if(bl >= MIN_BL){
-		gamma_val_x10 = 10 *(MAX_GAMMA_VALUE-1)*bl/(MAX_BL-MIN_BL) + (10 - 10*(MAX_GAMMA_VALUE-1)*(MIN_BL)/(MAX_BL-MIN_BL));
-		gamma_value=(gamma_val_x10 +5)/10;
-	}else{
-		gamma_value =0;
+	/* brightness setting from platform is from 0 to 255
+	 * But in this driver, brightness is only supported from 0 to 24 */
+
+	switch (bl) {
+	case 0:
+		backlightlevel = 0;
+		break;
+	case 1 ... 29:
+		backlightlevel = 0;
+		break;
+	case 30 ... 34:
+		backlightlevel = 1;
+		break;
+	case 35 ... 44:
+		backlightlevel = 2;
+		break;
+	case 45 ... 54:
+		backlightlevel = 3;
+		break;
+	case 55 ... 64:
+		backlightlevel = 4;
+		break;
+	case 65 ... 74:
+		backlightlevel = 5;
+		break;
+	case 75 ... 83:
+		backlightlevel = 6;
+		break;
+	case 84 ... 93:
+		backlightlevel = 7;
+		break;
+	case 94 ... 103:
+		backlightlevel = 8;
+		break;
+	case 104 ... 113:
+		backlightlevel = 9;
+		break;
+	case 114 ... 122:
+		backlightlevel = 10;
+		break;
+	case 123 ... 132:
+		backlightlevel = 11;
+		break;
+	case 133 ... 142:
+		backlightlevel = 12;
+		break;
+	case 143 ... 152:
+		backlightlevel = 13;
+		break;
+	case 153 ... 162:
+		backlightlevel = 14;
+		break;
+	case 163 ... 171:
+		backlightlevel = 15;
+		break;
+	case 172 ... 181:
+		backlightlevel = 16;
+		break;
+	case 182 ... 191:
+		backlightlevel = 17;
+		break;
+	case 192 ... 201:
+		backlightlevel = 18;
+		break;
+	case 202 ... 210:
+		backlightlevel = 19;
+		break;
+	case 211 ... 220:
+		backlightlevel = 20;
+		break;
+	case 221 ... 230:
+		backlightlevel = 21;
+		break;
+	case 231 ... 240:
+		backlightlevel = 22;
+		break;
+	case 241 ... 250:
+		backlightlevel = 23;
+		break;
+	case 251 ... 255:
+		backlightlevel = 24;
+		break;
+	default:
+		backlightlevel = 24;
+		break;
 	}
-
-	return gamma_value;
+	return backlightlevel;
 }
 static int ld9040_gamma_ctl(struct ld9040 *lcd)
 {
@@ -154,19 +232,19 @@ static int ld9040_gamma_ctl(struct ld9040 *lcd)
 	struct ld9040_panel_data *pdata = lcd->lcd_pd->pdata;
 
 	if (get_lcdtype == LCDTYPE_M2) { /* M2 */
-		if (lcd->gamma_mode)
+		/*if (lcd->gamma_mode)
 			gamma = pdata->gamma19_table[lcd->bl];
-		else
+		else*/
 			gamma = pdata->gamma22_table[lcd->bl];
 	} else if (get_lcdtype == LCDTYPE_SM2_A2) { /* SM2 A2 line */
-		if (lcd->gamma_mode)
+		/*if (lcd->gamma_mode)
 			gamma = pdata->gamma_sm2_a2_19_table[lcd->bl];
-		else
+		else*/
 			gamma = pdata->gamma_sm2_a2_22_table[lcd->bl];
 	} else { /* SM2 A1 line*/
-		if (lcd->gamma_mode)
+		/*if (lcd->gamma_mode)
 			gamma = pdata->gamma_sm2_a1_19_table[lcd->bl];
-		else
+		else*/
 			gamma = pdata->gamma_sm2_a1_22_table[lcd->bl];
 	}
 	ret = ld9040_panel_send_sequence(lcd, gamma);

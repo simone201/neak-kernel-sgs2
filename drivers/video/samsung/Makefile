@@ -1,3 +1,4 @@
+subdir-ccflags-y += -fno-inline-functions
 #
 # Makefile for the s3c framebuffer driver
 #
