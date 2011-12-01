@@ -755,10 +755,10 @@ int _mali_dev_platform_register(void)
 #endif
 
 #ifdef CONFIG_GPU_CLOCK_CONTROL
-	gpu_control_start();
+	gpu_clock_control_start();
 	gpu_voltage_control_start();
 #endif
-
+	
 #ifdef CONFIG_PM_RUNTIME
 #ifndef CONFIG_HAS_EARLYSUSPEND
 #if MALI_PMM_RUNTIME_JOB_CONTROL_ON
