@@ -657,11 +657,11 @@ struct cpufreq_voltage_table {
 static struct cpufreq_voltage_table s5pv310_lookup_volt_table[] = {
 	{
 		.index		= L0,
-		.arm_volt	= 1275000,
+		.arm_volt	= 1250000,
 		.int_volt	= 1100000,
 	}, {
 		.index		= L1,
-		.arm_volt	= 1175000,
+		.arm_volt	= 1150000,
 		.int_volt	= 1100000,
 	}, {
 		.index		= L2,
@@ -673,11 +673,11 @@ static struct cpufreq_voltage_table s5pv310_lookup_volt_table[] = {
 		.int_volt	= 1000000,
 	}, {
 		.index		= L4,
-		.arm_volt	= 975000,
+		.arm_volt	= 950000,
 		.int_volt	= 1000000,
 	}, {
 		.index		= L5,
-		.arm_volt	= 950000,
+		.arm_volt	= 925000,
 		.int_volt	= 1000000,
 	},
 };
@@ -735,11 +735,11 @@ static struct cpufreq_voltage_table s5pv310_volt_table[CPUFREQ_LEVEL_END] = {
 static struct cpufreq_voltage_table s5pv310_volt_table[CPUFREQ_LEVEL_END] = {
 	{
 		.index		= L0,
-		.arm_volt	= 1275000,
+		.arm_volt	= 1250000,
 		.int_volt	= 1100000,
 	}, {
 		.index		= L1,
-		.arm_volt	= 1175000,
+		.arm_volt	= 1150000,
 		.int_volt	= 1100000,
 	}, {
 		.index		= L2,
@@ -751,11 +751,11 @@ static struct cpufreq_voltage_table s5pv310_volt_table[CPUFREQ_LEVEL_END] = {
 		.int_volt	= 1000000,
 	}, {
 		.index		= L4,
-		.arm_volt	= 975000,
+		.arm_volt	= 950000,
 		.int_volt	= 1000000,
 	}, {
 		.index		= L5,
-		.arm_volt	= 950000,
+		.arm_volt	= 925000,
 		.int_volt	= 1000000,
 	},
 };
