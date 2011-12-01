@@ -352,7 +352,7 @@ int s5pv310_get_max_speed(void)
 
 			switch (pkg_id & 0x7) {
 			case 5:
-				max_speed = 1400000;
+				max_speed = 1200000;
 				break;
 			case 1:
 			case 7:
