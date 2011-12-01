@@ -47,7 +47,7 @@
 #include <mach/pm-core.h>
 
 /* UV */
-extern int exp_UV_mV[5];
+extern int exp_UV_mV[6];
 static struct clk *arm_clk;
 static struct clk *moutcore;
 static struct clk *mout_mpll;
@@ -439,27 +439,27 @@ static unsigned int asv_int_volt_table[ASV_GROUP_END][LV_END] = {
 static struct cpufreq_voltage_table s5pv310_volt_table[CPUFREQ_LEVEL_END] = {
 	{
 		.index		= L0,
-		.arm_volt	= 1350000, /*1400000,*/
+		.arm_volt	= 1250000, /*1400000,*/
 		.int_volt	= 1100000,
 	}, {
 		.index		= L1,
-		.arm_volt	= 1300000,
+		.arm_volt	= 1150000,
 		.int_volt	= 1100000,
 	}, {
 		.index		= L2,
-		.arm_volt	= 1200000,
-		.int_volt	= 1100000,
-	}, {
-		.index		= L3,
 		.arm_volt	= 1100000,
 		.int_volt	= 1100000,
 	}, {
-		.index		= L4,
+		.index		= L3,
 		.arm_volt	= 1000000,
+		.int_volt	= 1100000,
+	}, {
+		.index		= L4,
+		.arm_volt	= 950000,
 		.int_volt	= 1000000,
 	}, {
 		.index		= L5,
-		.arm_volt	= 975000,
+		.arm_volt	= 925000,
 		.int_volt	= 1000000,
 	},
 };
@@ -467,27 +467,27 @@ static struct cpufreq_voltage_table s5pv310_volt_table[CPUFREQ_LEVEL_END] = {
 static struct cpufreq_voltage_table s5pv310_volt_table[CPUFREQ_LEVEL_END] = {
 	{
 		.index		= L0,
-		.arm_volt	= 1350000, /*1400000,*/
+		.arm_volt	= 1250000, /*1400000,*/
 		.int_volt	= 1100000,
 	}, {
 		.index		= L1,
-		.arm_volt	= 1300000,
+		.arm_volt	= 1150000,
 		.int_volt	= 1100000,
 	}, {
 		.index		= L2,
-		.arm_volt	= 1200000,
-		.int_volt	= 1100000,
-	}, {
-		.index		= L3,
 		.arm_volt	= 1100000,
 		.int_volt	= 1100000,
 	}, {
-		.index		= L4,
+		.index		= L3,
 		.arm_volt	= 1000000,
+		.int_volt	= 1100000,
+	}, {
+		.index		= L4,
+		.arm_volt	= 950000,
 		.int_volt	= 1000000,
 	}, {
 		.index		= L5,
-		.arm_volt	= 950000,
+		.arm_volt	= 925000,
 		.int_volt	= 1000000,
 	},
 };
