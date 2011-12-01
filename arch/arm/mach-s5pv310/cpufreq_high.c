@@ -46,6 +46,8 @@
 #include <mach/regs-clock.h>
 #include <mach/pm-core.h>
 
+/* UV */
+extern int exp_UV_mV[5];
 static struct clk *arm_clk;
 static struct clk *moutcore;
 static struct clk *mout_mpll;
@@ -70,6 +72,9 @@ static DEFINE_MUTEX(set_cpu_freq_lock);
 #define MASK_ONLY_SET_CPUFREQ		0x40
 #define SET_CPU_FREQ_SAMPLING_RATE      100000
 
+#define ARMCLOCK_1200MHZ		1200000
+#define ARMCLOCK_1000MHZ		1000000
+#define ARMCLOCK_500MHZ			 500000
 static int s5pv310_max_armclk;
 
 enum {
