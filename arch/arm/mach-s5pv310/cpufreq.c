@@ -93,7 +93,7 @@ enum s5pv310_memory_type{
 
 #ifdef CONFIG_CPU_S5PV310_EVT1
 enum cpufreq_level_index{
-	L0, L1, L2, L3, L4, L6, CPUFREQ_LEVEL_END,
+	L0, L1, L2, L3, L4, L5, CPUFREQ_LEVEL_END,
 };
 #else
 enum cpufreq_level_index{
