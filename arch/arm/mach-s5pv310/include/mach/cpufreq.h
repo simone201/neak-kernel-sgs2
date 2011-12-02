@@ -29,12 +29,14 @@ enum cpufreq_level_request{
 
 #else
 enum cpufreq_level_request{
-	CPU_L0,	/* 1.2GHz */
-	CPU_L1,	/* 1GHz */
-	CPU_L2,	/* 800MHz */
-	CPU_L3,	/* 500MHz */
-	CPU_L4,	/* 200MHz */
-	CPU_L5,	/* 100MHz */
+	CPU_L0,		/* 1.6GHz */
+	CPU_L1,		/* 1.4GHz */
+	CPU_L2,		/* 1.2GHz */
+	CPU_L3, 	/* 1GHz */
+	CPU_L4, 	/* 800MHz */
+	CPU_L5, 	/* 500MHz */
+	CPU_L6, 	/* 200MHz */
+	CPU_L7, 	/* 100MHz */
 	CPU_LEVEL_END,
 };
 #endif
@@ -58,7 +60,7 @@ enum cpufreq_lock_ID{
 	DVFS_LOCK_ID_END,
 };
 
-#ifdef CONFIG_S5PV310_HI_ARMCLK_THAN_1_2GHZ
+#if 1//def CONFIG_S5PV310_HI_ARMCLK_THAN_1_2GHZ
 #define CHANGE_ONLY_S_VALUE (0x1 << 0)
 #define FREQ_UP (0x1 << 1)
 #define FREQ_DOWN (0x1 << 2)

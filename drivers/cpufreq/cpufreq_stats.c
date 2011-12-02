@@ -281,6 +281,29 @@ static int cpufreq_stat_notifier_policy(struct notifier_block *nb,
 	return 0;
 }
 
+
+static int cpufreq_stats_changefreq(unsigned int cpu)
+{
+	struct cpufreq_frequency_table *table;
+	struct cpufreq_stats *stat;
+	int i, j;
+
+	table = cpufreq_frequency_get_table(cpu);
+	stat = per_cpu(cpufreq_stats_table, cpu);
+	if(!stat) return -1;
+	if(!table) return -1;
+	spin_lock(&cpufreq_stats_lock);
+	for (i = 0; table[i].frequency != CPUFREQ_TABLE_END; i++) {
+		unsigned int freq = table[i].frequency;
+		if (freq == CPUFREQ_ENTRY_INVALID)
+			continue;
+		if (freq_table_get_index(stat, freq) == -1)
+			stat->freq_table[i] = freq;
+	}
+	spin_unlock(&cpufreq_stats_lock);
+	return 0;
+}
+
 static int cpufreq_stat_notifier_trans(struct notifier_block *nb,
 		unsigned long val, void *data)
 {
@@ -295,9 +318,18 @@ static int cpufreq_stat_notifier_trans(struct notifier_block *nb,
 	if (!stat)
 		return 0;
 
-	old_index = stat->last_index;
 	new_index = freq_table_get_index(stat, freq->new);
 
+	if(new_index == -1) {
+		//quick and dirty fix. 
+		//just replace the frequencies if freq->new cannot be found
+		//     which means freq_table is modified-gm
+		cpufreq_stats_changefreq(freq->cpu);
+		new_index = freq_table_get_index(stat, freq->new);
+	}
+
+	old_index = stat->last_index;
+	
 	/* We can't do stat->time_in_state[-1]= .. */
 	if (old_index == -1 || new_index == -1)
 		return 0;
@@ -361,6 +393,7 @@ static int __cpuinit cpufreq_stat_cpu_callback(struct notifier_block *nfb,
 	return NOTIFY_OK;
 }
 
+/* priority=1 so this will get called before cpufreq_remove_dev */
 static struct notifier_block cpufreq_stat_cpu_notifier __refdata =
 {
 	.notifier_call = cpufreq_stat_cpu_callback,

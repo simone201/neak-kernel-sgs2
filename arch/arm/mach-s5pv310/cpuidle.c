@@ -917,14 +917,17 @@ early_wakeup:
 
 static void s5pv310_check_enter(void)
 {
-	unsigned int check = 0;
+	/* unsigned int check = 0; */
 	unsigned int val;
 
 	/* Check UART for console is empty */
 	val = __raw_readl(S5P_VA_UART(CONFIG_S3C_LOWLEVEL_UART_PORT) + 0x18);
 
-	while (check)
-		check = ((val >> 16) & 0xff);
+	/* Never reach below state : check is 0, and it doen't changed */
+	/* FIXME
+	 * while (check)
+	 *	check = ((val >> 16) & 0xff);
+	 */
 }
 
 extern void bt_uart_rts_ctrl(int flag);
