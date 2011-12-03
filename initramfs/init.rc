@@ -732,10 +732,9 @@ service playsound /system/bin/playsound
     disabled
     oneshot
 
-service samsungani /system/bin/samsungani
+service bootanimation /sbin/bootanimation.sh
     user graphics
     group graphics
-    disabled
     oneshot
 
 service wpa_supplicant /system/bin/wpa_supplicant -Dwext -ieth0 -c/data/wifi/bcm_supp.conf
@@ -856,6 +855,10 @@ service rtc_log /system/bin/sh /system/bin/rtc_log.sh
 service post-init /sbin/post-init.sh
     user root
     oneshot
+
+service imports /sbin/dawn/imports.sh
+    user root
+    oneshot
 	 
 on property:encryption.bootmode=remount
     stop tvout
@@ -970,8 +973,10 @@ on property:encryption.bootmode=remount
     mkdir /data/core
     write /proc/sys/kernel/core_pattern /data/core/core_%e_%p
 
-
     start zygote
     start immvibed
     start media
-    start tvout 
+    start tvout
+    
+on property:sys.boot_completed=1
+    stop bootanimation

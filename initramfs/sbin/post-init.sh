@@ -12,15 +12,8 @@ echo $(date) START of post-init.sh
 
 ##### Early-init phase #####
 
-# Android Logger enable tweak
-if /sbin/busybox [ "`/sbin/busybox grep ANDROIDLOGGER /system/etc/tweaks.conf`" ]; then
-  insmod /lib/modules/logger.ko
-fi
-
 # IPv6 privacy tweak
-#if /sbin/busybox [ "`/sbin/busybox grep IPV6PRIVACY /system/etc/tweaks.conf`" ]; then
   echo "2" > /proc/sys/net/ipv6/conf/all/use_tempaddr
-#fi
 
 # Enable CIFS tweak
 #if /sbin/busybox [ "`/sbin/busybox grep CIFS /system/etc/tweaks.conf`" ]; then
@@ -28,18 +21,6 @@ fi
 #else
 #  /sbin/busybox rm /lib/modules/cifs.ko
 #fi
-
-# Tweak cfq io scheduler
-  for i in $(/sbin/busybox find /sys/block/mmc*)
-  do echo "0" > $i/queue/rotational
-    echo "0" > $i/queue/iostats
-    echo "1" > $i/queue/iosched/group_isolation
-    echo "4" > $i/queue/iosched/quantum
-    echo "1" > $i/queue/iosched/low_latency
-    echo "5" > $i/queue/iosched/slice_idle
-    echo "1" > $i/queue/iosched/back_seek_penalty
-    echo "1000000000" > $i/queue/iosched/back_seek_max
-  done
 
 # Remount all partitions with noatime
   for k in $(/sbin/busybox mount | /sbin/busybox grep relatime | /sbin/busybox cut -d " " -f3)
@@ -60,18 +41,61 @@ fi
   echo "200" > /proc/sys/vm/dirty_expire_centisecs
   echo "0" > /proc/sys/vm/swappiness
 
-# Ondemand CPU governor tweaks
-  echo "80" > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
-  echo "120000" > /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate
-
 # SD cards (mmcblk) read ahead tweaks
-  echo "256" > /sys/devices/virtual/bdi/179:0/read_ahead_kb
-  echo "256" > /sys/devices/virtual/bdi/179:16/read_ahead_kb
+  echo "1024" > /sys/devices/virtual/bdi/179:0/read_ahead_kb
+  echo "1024" > /sys/devices/virtual/bdi/179:16/read_ahead_kb
 
 # TCP tweaks
-  echo "2" > /proc/sys/net/ipv4/tcp_syn_retries
-  echo "2" > /proc/sys/net/ipv4/tcp_synack_retries
-  echo "10" > /proc/sys/net/ipv4/tcp_fin_timeout
+echo "0" > /proc/sys/net/ipv4/tcp_timestamps;
+echo "1" > /proc/sys/net/ipv4/tcp_tw_reuse;
+echo "1" > /proc/sys/net/ipv4/tcp_sack;
+echo "1" > /proc/sys/net/ipv4/tcp_tw_recycle;
+echo "1" > /proc/sys/net/ipv4/tcp_window_scaling;
+echo "5" > /proc/sys/net/ipv4/tcp_keepalive_probes;
+echo "30" > /proc/sys/net/ipv4/tcp_keepalive_intvl;
+echo "30" > /proc/sys/net/ipv4/tcp_fin_timeout;
+echo "404480" > /proc/sys/net/core/wmem_max;
+echo "404480" > /proc/sys/net/core/rmem_max;
+echo "256960" > /proc/sys/net/core/rmem_default;
+echo "256960" > /proc/sys/net/core/wmem_default;
+echo "4096,16384,404480" > /proc/sys/net/ipv4/tcp_wmem;
+echo "4096,87380,404480" > /proc/sys/net/ipv4/tcp_rmem;
+
+# UI tweaks
+setprop debug.performance.tuning 1; 
+setprop video.accelerate.hw 1;
+setprop debug.sf.hw 1;
+setprop windowsmgr.max_events_per_sec 60;
+
+# enable SCHED_MC
+echo "1" > /sys/devices/system/cpu/sched_mc_power_savings
+# Enable AFTR
+echo "3" > /sys/module/cpuidle/parameters/enable_mask
+
+# Hotplug thresholds
+echo "20" > /sys/module/pm_hotplug/parameters/loadl
+echo "70" > /sys/module/pm_hotplug/parameters/loadh
+
+# Optimize SQlite databases of apps
+echo "Optimize SQlite" | tee -a $LOG_FILE; 
+for i in \
+`find /data -iname "*.db"`; 
+do \
+	sqlite3 $i 'VACUUM;'; 
+done;
+
+# Renice kswapd0 - kernel thread responsible for managing the memory
+echo "Renice kswapd0" | tee -a $LOG_FILE; 
+sleep 3
+renice 18 `pidof kswapd0`
+
+# Misc Kernel Tweaks
+sysctl -w vm.vfs_cache_pressure=70
+echo "8" > /proc/sys/vm/page-cluster;
+echo "64000" > /proc/sys/kernel/msgmni;
+echo "64000" > /proc/sys/kernel/msgmax;
+echo "10" > /proc/sys/fs/lease-break-time;
+echo "500,512000,64,2048" > /proc/sys/kernel/sem;
 
 ##### Install SU #####
 
@@ -104,12 +128,10 @@ else
 fi
 
 echo $(date) PRE-INIT DONE of post-init.sh
-##### Post-init phase #####
-sleep 15
 
-# Cleanup busybox
-  #/sbin/busybox rm /sbin/busybox
-  #/sbin/busybox mount rootfs -o remount,ro
+##### Post-init phase #####
+
+sleep 10
 
 # init.d support
 echo $(date) USER EARLY INIT START from /system/etc/init.d
