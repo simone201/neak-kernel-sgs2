@@ -1451,13 +1451,6 @@ static int inactive_anon_is_low_global(struct zone *zone)
 static int inactive_anon_is_low(struct zone *zone, struct scan_control *sc)
 {
 	int low;
-	
-	/*
-	 * If we don't have swap space, anonymous page deactivation
-	 * is pointless.
-	 */
-	if (!total_swap_pages)
-			return 0;
 
 	/*
 	 * If we don't have swap space, anonymous page deactivation
@@ -1474,11 +1467,7 @@ static int inactive_anon_is_low(struct zone *zone, struct scan_control *sc)
 }
 #else
 static inline int inactive_anon_is_low(struct zone *zone,
-<<<<<<< HEAD
 					struct scan_control *sc)
-=======
-									   struct scan_control *sc)
->>>>>>> f6c4ced... vmscan: prevent background aging of anon page in no swap system
 {
 	return 0;
 }
