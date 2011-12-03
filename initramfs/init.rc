@@ -732,9 +732,10 @@ service playsound /system/bin/playsound
     disabled
     oneshot
 
-service bootanimation /sbin/bootanimation.sh
+service samsungani /sbin/bootanimation.sh
     user graphics
     group graphics
+    disabled
     oneshot
 
 service wpa_supplicant /system/bin/wpa_supplicant -Dwext -ieth0 -c/data/wifi/bcm_supp.conf
@@ -788,6 +789,9 @@ on property:service.brcm.bt.soft_onoff=1
 # stop btld if soft_onoff is disabled
 on property:service.brcm.bt.soft_onoff=0
     stop btld
+
+# start the bootanimation
+    start samsungani
 
 service bluetoothd /system/bin/bluetoothd -n
     socket bluetooth stream 660 bluetooth bluetooth
@@ -856,9 +860,10 @@ service post-init /sbin/post-init.sh
     user root
     oneshot
 
-service imports /sbin/dawn/imports.sh
+service stopbootanim /sbin/dawn/stopbootanim.sh
     user root
     oneshot
+    disabled
 	 
 on property:encryption.bootmode=remount
     stop tvout
@@ -979,4 +984,4 @@ on property:encryption.bootmode=remount
     start tvout
     
 on property:sys.boot_completed=1
-    stop bootanimation
+    start stopbootanim

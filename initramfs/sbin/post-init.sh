@@ -1,5 +1,8 @@
 #!/sbin/busybox sh
-# Logging
+# thanks to hardcore and nexxx
+# some parameters are taken from http://forum.xda-developers.com/showthread.php?t=1292743 (highly recommended to read)
+# modded by simone201 for Dawn Kernel
+
 /sbin/busybox cp /data/user.log /data/user.log.bak
 /sbin/busybox rm /data/user.log
 exec >>/data/user.log
