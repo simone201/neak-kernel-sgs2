@@ -74,7 +74,7 @@ static unsigned long up_sample_time;
 /*
  * The minimum amount of time to spend at a frequency before we can ramp down.
  */
-#define DEFAULT_DOWN_SAMPLE_TIME 72000;
+#define DEFAULT_DOWN_SAMPLE_TIME 49000 //72000;
 static unsigned long down_sample_time;
 
 /*
@@ -98,7 +98,7 @@ static unsigned long inc_cpu_load;
 /*
  * CPU freq will be decreased if measured load < dec_cpu_load;
  */
-#define DEFAULT_DEC_CPU_LOAD 25
+#define DEFAULT_DEC_CPU_LOAD 30
 static unsigned long dec_cpu_load;
 
 /*
