@@ -424,17 +424,22 @@ static void mxt224_ta_probe(int ta_status)
 	}
 
 	if (ta_status) {
+<<<<<<< HEAD
 		threshold = 70;
 		threshold_e = 70;
 		/*calcfg = 112;*/
 		calcfg_dis = T48_CALCFG_TA;
 		calcfg_en = T48_CALCFG_TA | 0x20;
+=======
+		threshold = 40;
+		calcfg = 112;
+>>>>>>> a39ee44... Resolve an issue with some screen protectors not registering touch input
 		noise_threshold = 40;
 		movfilter = 46;
 		blen = 32; //16;
 	} else {
 	    if (boot_or_resume==1)
-			threshold = 55;
+			threshold = 40;
 		else
 		    threshold = 40;
 		threshold_e = 50;
