@@ -2,7 +2,6 @@
 
 if [ -e zImage ]; then
 	rm zImage
-	rm zImage.tar
 fi
 
 # Set Default Path
