@@ -32,6 +32,7 @@ modules.builtin
 *.patch
 *.gcno
 *.tar
+*.zip
 *zImage
 
 #
