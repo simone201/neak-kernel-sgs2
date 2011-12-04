@@ -1,15 +1,14 @@
 #!/bin/bash
 
-rm zImage
-rm zImage.tar
+if [ -e zImage ]; then
+	rm zImage
+fi
 
 # Set Default Path
 TOP_DIR=$PWD
 KERNEL_PATH=/home/simone/dawn-kernel
 
-# TODO: Set toolchain and root filesystem path
-TAR_NAME=zImage.tar
-
+# Set toolchain and root filesystem path
 TOOLCHAIN="/home/simone/arm-2011.03/bin/arm-none-eabi-"
 ROOTFS_PATH="/home/simone/dawn-kernel/initramfs"
 
@@ -18,7 +17,7 @@ export KBUILD_BUILD_VERSION="Dawn-Kernel-T1"
 echo "Cleaning latest build"
 make ARCH=arm CROSS_COMPILE=$TOOLCHAIN -j`grep 'processor' /proc/cpuinfo | wc -l` mrproper
 
-# cp -f $KERNEL_PATH/arch/arm/configs/c1_rev02_defconfig $KERNEL_PATH/.config
+# Making our .config
 make dawn_defconfig
 
 make -j`grep 'processor' /proc/cpuinfo | wc -l` ARCH=arm CROSS_COMPILE=$TOOLCHAIN CONFIG_INITRAMFS_SOURCE="$ROOTFS_PATH" || exit -1
@@ -29,9 +28,15 @@ make -j`grep 'processor' /proc/cpuinfo | wc -l` ARCH=arm CROSS_COMPILE=$TOOLCHAI
 
 # Copy Kernel Image
 cp -f $KERNEL_PATH/arch/arm/boot/zImage .
+cp -f $KERNEL_PATH/arch/arm/boot/zImage $KERNEL_PATH/releasetools/zip
 
 cd arch/arm/boot
-tar cf $KERNEL_PATH/arch/arm/boot/$TAR_NAME ../../../zImage && ls -lh $TAR_NAME
+tar cf $KERNEL_PATH/arch/arm/boot/$KBUILD_BUILD_VERSION.tar ../../../zImage && ls -lh $KBUILD_BUILD_VERSION.tar
 
-cp $KERNEL_PATH/arch/arm/boot/zImage.tar $KERNEL_PATH/zImage.tar
-rm $KERNEL_PATH/arch/arm/boot/zImage.tar
+cd ../../..
+cd releasetools/zip
+zip -r $KBUILD_BUILD_VERSION *
+
+cp $KERNEL_PATH/arch/arm/boot/$KBUILD_BUILD_VERSION.tar $KERNEL_PATH/releasetools/tar/$KBUILD_BUILD_VERSION.tar
+rm $KERNEL_PATH/arch/arm/boot/$KBUILD_BUILD_VERSION.tar
+rm $KERNEL_PATH/releasetools/zip/zImage
