@@ -27,6 +27,7 @@ find -name '*.ko' -exec cp -av {} $ROOTFS_PATH/lib/modules/ \;
 make -j`grep 'processor' /proc/cpuinfo | wc -l` ARCH=arm CROSS_COMPILE=$TOOLCHAIN CONFIG_INITRAMFS_SOURCE="$ROOTFS_PATH" || exit -1
 
 # Copy Kernel Image
+rm $KERNEL_PATH/releasetools/zip/$KBUILD_BUILD_VERSION.zip
 cp -f $KERNEL_PATH/arch/arm/boot/zImage .
 cp -f $KERNEL_PATH/arch/arm/boot/zImage $KERNEL_PATH/releasetools/zip
 
