@@ -12,7 +12,7 @@ KERNEL_PATH=/home/simone/neak-kernel
 TOOLCHAIN="/home/simone/arm-2011.03/bin/arm-none-eabi-"
 ROOTFS_PATH="/home/simone/neak-kernel/initramfs"
 
-export KBUILD_BUILD_VERSION="N.E.A.K.--1.0"
+export KBUILD_BUILD_VERSION="N.E.A.K-1.0x"
 
 echo "Cleaning latest build"
 make ARCH=arm CROSS_COMPILE=$TOOLCHAIN -j`grep 'processor' /proc/cpuinfo | wc -l` mrproper
