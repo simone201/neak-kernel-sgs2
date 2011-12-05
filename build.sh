@@ -6,13 +6,13 @@ fi
 
 # Set Default Path
 TOP_DIR=$PWD
-KERNEL_PATH=/home/simone/dawn-kernel
+KERNEL_PATH=/home/simone/neak-kernel
 
 # Set toolchain and root filesystem path
 TOOLCHAIN="/home/simone/arm-2011.03/bin/arm-none-eabi-"
-ROOTFS_PATH="/home/simone/dawn-kernel/initramfs"
+ROOTFS_PATH="/home/simone/neak-kernel/initramfs"
 
-export KBUILD_BUILD_VERSION="Dawn-Kernel-T1"
+export KBUILD_BUILD_VERSION="N.E.A.K.--1.0"
 
 echo "Cleaning latest build"
 make ARCH=arm CROSS_COMPILE=$TOOLCHAIN -j`grep 'processor' /proc/cpuinfo | wc -l` mrproper
