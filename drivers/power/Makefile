@@ -20,7 +20,7 @@ obj-$(CONFIG_BATTERY_S3C)	+= s3c_fake_battery.o
 ifeq ($(CONFIG_TARGET_LOCALE_KOR),y)
 obj-$(CONFIG_BATTERY_SEC)	+= sec_battery_kor.o
 else
-obj-$(CONFIG_BATTERY_SEC)	+= sec_battery.o
+obj-$(CONFIG_BATTERY_SEC)	+= sec_battery.o charge_current.o
 endif
 
 obj-$(CONFIG_APM_POWER)		+= apm_power.o
