@@ -14,11 +14,15 @@ ROOTFS_PATH="/home/simone/neak-kernel/initramfs"
 
 export KBUILD_BUILD_VERSION="N.E.A.K-1.0x"
 
+ZIP_NAME="NEAR-1.0.zip"
+
 echo "Cleaning latest build"
 make ARCH=arm CROSS_COMPILE=$TOOLCHAIN -j`grep 'processor' /proc/cpuinfo | wc -l` mrproper
 
 # Making our .config
 make dawn_defconfig
+
+export UTS_RELEASE="2.6.35.14"
 
 make -j`grep 'processor' /proc/cpuinfo | wc -l` ARCH=arm CROSS_COMPILE=$TOOLCHAIN CONFIG_INITRAMFS_SOURCE="$ROOTFS_PATH" || exit -1
 
@@ -27,7 +31,7 @@ find -name '*.ko' -exec cp -av {} $ROOTFS_PATH/lib/modules/ \;
 make -j`grep 'processor' /proc/cpuinfo | wc -l` ARCH=arm CROSS_COMPILE=$TOOLCHAIN CONFIG_INITRAMFS_SOURCE="$ROOTFS_PATH" || exit -1
 
 # Copy Kernel Image
-rm $KERNEL_PATH/releasetools/zip/$KBUILD_BUILD_VERSION.zip
+rm -f $KERNEL_PATH/releasetools/zip/$ZIP_NAME
 cp -f $KERNEL_PATH/arch/arm/boot/zImage .
 cp -f $KERNEL_PATH/arch/arm/boot/zImage $KERNEL_PATH/releasetools/zip
 
@@ -36,7 +40,7 @@ tar cf $KERNEL_PATH/arch/arm/boot/$KBUILD_BUILD_VERSION.tar ../../../zImage && l
 
 cd ../../..
 cd releasetools/zip
-zip -r $KBUILD_BUILD_VERSION *
+zip -r $ZIP_NAME *
 
 cp $KERNEL_PATH/arch/arm/boot/$KBUILD_BUILD_VERSION.tar $KERNEL_PATH/releasetools/tar/$KBUILD_BUILD_VERSION.tar
 rm $KERNEL_PATH/arch/arm/boot/$KBUILD_BUILD_VERSION.tar

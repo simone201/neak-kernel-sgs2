@@ -179,6 +179,7 @@ if cd /data/init.d >/dev/null 2>&1 ; then
         echo "EXIT '$file' ($?)"
     done
 fi
+
 echo $(date) USER INIT DONE from /data/init.d
 
 echo $(date) END of post-init.sh
