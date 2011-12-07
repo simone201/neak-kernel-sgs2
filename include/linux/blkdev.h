@@ -92,6 +92,10 @@ enum rq_flag_bits {
 	__REQ_FAILFAST_DEV,	/* no driver retries of device errors */
 	__REQ_FAILFAST_TRANSPORT, /* no driver retries of transport errors */
 	__REQ_FAILFAST_DRIVER,	/* no driver retries of driver errors */
+	
+	__REQ_SYNC,             /* request is sync (sync write or read) */
+    __REQ_META,             /* metadata io request */
+    
 	/* above flags must match BIO_RW_* */
 	__REQ_DISCARD,		/* request to discard sectors */
 	__REQ_SORTED,		/* elevator knows about this request */
@@ -144,6 +148,8 @@ enum rq_flag_bits {
 #define REQ_NOIDLE	(1 << __REQ_NOIDLE)
 #define REQ_IO_STAT	(1 << __REQ_IO_STAT)
 #define REQ_MIXED_MERGE	(1 << __REQ_MIXED_MERGE)
+#define REQ_SYNC        (1 << __REQ_SYNC)
+#define REQ_META        (1 << __REQ_META)
 
 #define REQ_FAILFAST_MASK	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | \
 				 REQ_FAILFAST_DRIVER)
