@@ -2,6 +2,12 @@
 
 /sbin/busybox mount -o rw /dev/block/mmcblk0p11 /mnt/sdcard
 
+if ! [ -d /sdcard/clockworkmod ]; then
+	mkdir  /sdcard/clockworkmod
+else
+	echo "clockworkmod folder already exists"
+fi;
+
 if ! [ -f /sdcard/clockworkmod/.salted_hash ]; then
 	touch  /sdcard/clockworkmod/.salted_hash
 else
