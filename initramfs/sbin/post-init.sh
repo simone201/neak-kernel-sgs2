@@ -3,6 +3,8 @@
 # some parameters are taken from http://forum.xda-developers.com/showthread.php?t=1292743 (highly recommended to read)
 # modded by simone201 for Dawn Kernel
 
+MMC=`ls -d /sys/block/mmc*`;
+
 /sbin/busybox cp /data/user.log /data/user.log.bak
 /sbin/busybox rm /data/user.log
 exec >>/data/user.log
@@ -84,7 +86,6 @@ echo "20" > /sys/module/pm_hotplug/parameters/loadl
 echo "70" > /sys/module/pm_hotplug/parameters/loadh
 
 # Optimize SQlite databases of apps
-echo "Optimize SQlite" | tee -a $LOG_FILE; 
 for i in \
 `find /data -iname "*.db"`; 
 do \
@@ -92,9 +93,21 @@ do \
 done;
 
 # Renice kswapd0 - kernel thread responsible for managing the memory
-echo "Renice kswapd0" | tee -a $LOG_FILE; 
 sleep 3
 renice 18 `pidof kswapd0`
+
+# New scheduler tweaks + readahead tweaks
+for k in $MMC;
+do
+	if [ -e $i/queue/iostats ];
+	then
+		echo "0" > $k/queue/iostats;
+	fi;
+	if [ -e $i/queue/read_ahead_kb ];
+	then
+		echo "256" >  $i/queue/read_ahead_kb;
+	fi;
+done;
 
 # Misc Kernel Tweaks
 sysctl -w vm.vfs_cache_pressure=70
