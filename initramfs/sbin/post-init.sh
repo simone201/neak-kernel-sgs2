@@ -39,6 +39,10 @@ echo $(date) START of post-init.sh
         /sbin/busybox mount -o remount,commit=15 $k
   done
   
+# EXT4 Speed Tweaks
+/sbin/busybox mount -o noatime,remount,rw,discard,barrier=0,commit=60,noauto_da_alloc,delalloc /cache /cache;
+/sbin/busybox mount -o noatime,remount,rw,discard,barrier=0,commit=60,noauto_da_alloc,delalloc /data /data;
+  
 # Miscellaneous tweaks
   echo "1500" > /proc/sys/vm/dirty_writeback_centisecs
   echo "200" > /proc/sys/vm/dirty_expire_centisecs
