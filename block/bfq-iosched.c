@@ -63,7 +63,7 @@
 #include "bfq.h"
 
 /* Max number of dispatches in one round of service. */
-static const int bfq_quantum = 4;
+static const int bfq_quantum = 8;
 
 /* Expiration time of sync (0) and async (1) requests, in jiffies. */
 static const int bfq_fifo_expire[2] = { HZ / 4, HZ / 8 };
@@ -72,7 +72,7 @@ static const int bfq_fifo_expire[2] = { HZ / 4, HZ / 8 };
 static const int bfq_back_max = 16 * 1024;
 
 /* Penalty of a backwards seek, in number of sectors. */
-static const int bfq_back_penalty = 2;
+static const int bfq_back_penalty = 1;
 
 /* Idling period duration, in jiffies. */
 static int bfq_slice_idle = HZ / 125;
