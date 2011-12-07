@@ -22,8 +22,6 @@ make ARCH=arm CROSS_COMPILE=$TOOLCHAIN -j`grep 'processor' /proc/cpuinfo | wc -l
 # Making our .config
 make dawn_defconfig
 
-export UTS_RELEASE="2.6.35.14"
-
 make -j`grep 'processor' /proc/cpuinfo | wc -l` ARCH=arm CROSS_COMPILE=$TOOLCHAIN CONFIG_INITRAMFS_SOURCE="$ROOTFS_PATH" || exit -1
 
 find -name '*.ko' -exec cp -av {} $ROOTFS_PATH/lib/modules/ \;
