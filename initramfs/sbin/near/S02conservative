@@ -1,0 +1,6 @@
+#!/system/bin/sh
+# N.E.A.K. Kernel
+# Enabling Conservative GOV Module
+# by simone201
+
+insmod /lib/modules/cpufreq_conservative.ko
