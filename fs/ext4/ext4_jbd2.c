@@ -94,7 +94,11 @@ int __ext4_forget(const char *where, unsigned int line, handle_t *handle,
 	if (err) {
 		ext4_journal_abort_handle(where, line, __func__,
 					  bh, handle, err);
+<<<<<<< HEAD
 		__ext4_abort(inode->i_sb, where,
+=======
+		__ext4_abort(inode->i_sb, where, line,
+>>>>>>> 923d250... ADD: ext4: Pass line numbers to ext4_error() and friends
 			   "error %d when attempting revoke", err);
 	}
 	BUFFER_TRACE(bh, "exit");
@@ -134,11 +138,9 @@ int __ext4_handle_dirty_metadata(const char *where, unsigned int line,
 		if (inode && inode_needs_sync(inode)) {
 			sync_dirty_buffer(bh);
 			if (buffer_req(bh) && !buffer_uptodate(bh)) {
-				ext4_error(inode->i_sb,
-					   "IO error syncing inode, "
-					   "inode=%lu, block=%llu",
-					   inode->i_ino,
-					   (unsigned long long) bh->b_blocknr);
+				ext4_error_inode(inode, where, line,
+						 bh->b_blocknr,
+					"IO error syncing itable block");
 				err = -EIO;
 			}
 		}
