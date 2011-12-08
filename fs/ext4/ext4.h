@@ -927,92 +927,106 @@ struct ext4_inode_info {
  * Structure of the super block
  */
 struct ext4_super_block {
-/*00*/	__le32	s_inodes_count;		/* Inodes count */
-	__le32	s_blocks_count_lo;	/* Blocks count */
-	__le32	s_r_blocks_count_lo;	/* Reserved blocks count */
-	__le32	s_free_blocks_count_lo;	/* Free blocks count */
-/*10*/	__le32	s_free_inodes_count;	/* Free inodes count */
-	__le32	s_first_data_block;	/* First Data Block */
-	__le32	s_log_block_size;	/* Block size */
-	__le32	s_obso_log_frag_size;	/* Obsoleted fragment size */
-/*20*/	__le32	s_blocks_per_group;	/* # Blocks per group */
-	__le32	s_obso_frags_per_group;	/* Obsoleted fragments per group */
-	__le32	s_inodes_per_group;	/* # Inodes per group */
-	__le32	s_mtime;		/* Mount time */
-/*30*/	__le32	s_wtime;		/* Write time */
-	__le16	s_mnt_count;		/* Mount count */
-	__le16	s_max_mnt_count;	/* Maximal mount count */
-	__le16	s_magic;		/* Magic signature */
-	__le16	s_state;		/* File system state */
-	__le16	s_errors;		/* Behaviour when detecting errors */
-	__le16	s_minor_rev_level;	/* minor revision level */
-/*40*/	__le32	s_lastcheck;		/* time of last check */
-	__le32	s_checkinterval;	/* max. time between checks */
-	__le32	s_creator_os;		/* OS */
-	__le32	s_rev_level;		/* Revision level */
-/*50*/	__le16	s_def_resuid;		/* Default uid for reserved blocks */
-	__le16	s_def_resgid;		/* Default gid for reserved blocks */
-	/*
-	 * These fields are for EXT4_DYNAMIC_REV superblocks only.
-	 *
-	 * Note: the difference between the compatible feature set and
-	 * the incompatible feature set is that if there is a bit set
-	 * in the incompatible feature set that the kernel doesn't
-	 * know about, it should refuse to mount the filesystem.
-	 *
-	 * e2fsck's requirements are more strict; if it doesn't know
-	 * about a feature in either the compatible or incompatible
-	 * feature set, it must abort and not try to meddle with
-	 * things it doesn't understand...
-	 */
-	__le32	s_first_ino;		/* First non-reserved inode */
-	__le16  s_inode_size;		/* size of inode structure */
-	__le16	s_block_group_nr;	/* block group # of this superblock */
-	__le32	s_feature_compat;	/* compatible feature set */
-/*60*/	__le32	s_feature_incompat;	/* incompatible feature set */
-	__le32	s_feature_ro_compat;	/* readonly-compatible feature set */
-/*68*/	__u8	s_uuid[16];		/* 128-bit uuid for volume */
-/*78*/	char	s_volume_name[16];	/* volume name */
-/*88*/	char	s_last_mounted[64];	/* directory where last mounted */
-/*C8*/	__le32	s_algorithm_usage_bitmap; /* For compression */
-	/*
-	 * Performance hints.  Directory preallocation should only
-	 * happen if the EXT4_FEATURE_COMPAT_DIR_PREALLOC flag is on.
-	 */
-	__u8	s_prealloc_blocks;	/* Nr of blocks to try to preallocate*/
-	__u8	s_prealloc_dir_blocks;	/* Nr to preallocate for dirs */
-	__le16	s_reserved_gdt_blocks;	/* Per group desc for online growth */
-	/*
-	 * Journaling support valid if EXT4_FEATURE_COMPAT_HAS_JOURNAL set.
-	 */
-/*D0*/	__u8	s_journal_uuid[16];	/* uuid of journal superblock */
-/*E0*/	__le32	s_journal_inum;		/* inode number of journal file */
-	__le32	s_journal_dev;		/* device number of journal file */
-	__le32	s_last_orphan;		/* start of list of inodes to delete */
-	__le32	s_hash_seed[4];		/* HTREE hash seed */
-	__u8	s_def_hash_version;	/* Default hash version to use */
-	__u8	s_reserved_char_pad;
-	__le16  s_desc_size;		/* size of group descriptor */
-/*100*/	__le32	s_default_mount_opts;
-	__le32	s_first_meta_bg;	/* First metablock block group */
-	__le32	s_mkfs_time;		/* When the filesystem was created */
-	__le32	s_jnl_blocks[17];	/* Backup of the journal inode */
-	/* 64bit support valid if EXT4_FEATURE_COMPAT_64BIT */
-/*150*/	__le32	s_blocks_count_hi;	/* Blocks count */
-	__le32	s_r_blocks_count_hi;	/* Reserved blocks count */
-	__le32	s_free_blocks_count_hi;	/* Free blocks count */
-	__le16	s_min_extra_isize;	/* All inodes have at least # bytes */
-	__le16	s_want_extra_isize; 	/* New inodes should reserve # bytes */
-	__le32	s_flags;		/* Miscellaneous flags */
-	__le16  s_raid_stride;		/* RAID stride */
-	__le16  s_mmp_interval;         /* # seconds to wait in MMP checking */
-	__le64  s_mmp_block;            /* Block for multi-mount protection */
-	__le32  s_raid_stripe_width;    /* blocks on all data disks (N*stride)*/
-	__u8	s_log_groups_per_flex;  /* FLEX_BG group size */
-	__u8	s_reserved_char_pad2;
-	__le16  s_reserved_pad;
-	__le64	s_kbytes_written;	/* nr of lifetime kilobytes written */
-	__u32   s_reserved[160];        /* Padding to the end of the block */
+/*00*/ __le32 s_inodes_count; /* Inodes count */
+__le32 s_blocks_count_lo; /* Blocks count */
+__le32 s_r_blocks_count_lo; /* Reserved blocks count */
+__le32 s_free_blocks_count_lo; /* Free blocks count */
+/*10*/ __le32 s_free_inodes_count; /* Free inodes count */
+__le32 s_first_data_block; /* First Data Block */
+__le32 s_log_block_size; /* Block size */
+__le32 s_obso_log_frag_size; /* Obsoleted fragment size */
+/*20*/ __le32 s_blocks_per_group; /* # Blocks per group */
+__le32 s_obso_frags_per_group; /* Obsoleted fragments per group */
+__le32 s_inodes_per_group; /* # Inodes per group */
+__le32 s_mtime; /* Mount time */
+/*30*/ __le32 s_wtime; /* Write time */
+__le16 s_mnt_count; /* Mount count */
+__le16 s_max_mnt_count; /* Maximal mount count */
+__le16 s_magic; /* Magic signature */
+__le16 s_state; /* File system state */
+__le16 s_errors; /* Behaviour when detecting errors */
+__le16 s_minor_rev_level; /* minor revision level */
+/*40*/ __le32 s_lastcheck; /* time of last check */
+__le32 s_checkinterval; /* max. time between checks */
+__le32 s_creator_os; /* OS */
+__le32 s_rev_level; /* Revision level */
+/*50*/ __le16 s_def_resuid; /* Default uid for reserved blocks */
+__le16 s_def_resgid; /* Default gid for reserved blocks */
+/*
+* These fields are for EXT4_DYNAMIC_REV superblocks only.
+*
+* Note: the difference between the compatible feature set and
+* the incompatible feature set is that if there is a bit set
+* in the incompatible feature set that the kernel doesn't
+* know about, it should refuse to mount the filesystem.
+*
+* e2fsck's requirements are more strict; if it doesn't know
+* about a feature in either the compatible or incompatible
+* feature set, it must abort and not try to meddle with
+* things it doesn't understand...
+*/
+__le32 s_first_ino; /* First non-reserved inode */
+__le16 s_inode_size; /* size of inode structure */
+__le16 s_block_group_nr; /* block group # of this superblock */
+__le32 s_feature_compat; /* compatible feature set */
+/*60*/ __le32 s_feature_incompat; /* incompatible feature set */
+__le32 s_feature_ro_compat; /* readonly-compatible feature set */
+/*68*/ __u8 s_uuid[16]; /* 128-bit uuid for volume */
+/*78*/ char s_volume_name[16]; /* volume name */
+/*88*/ char s_last_mounted[64]; /* directory where last mounted */
+/*C8*/ __le32 s_algorithm_usage_bitmap; /* For compression */
+/*
+* Performance hints. Directory preallocation should only
+* happen if the EXT4_FEATURE_COMPAT_DIR_PREALLOC flag is on.
+*/
+__u8 s_prealloc_blocks; /* Nr of blocks to try to preallocate*/
+__u8 s_prealloc_dir_blocks; /* Nr to preallocate for dirs */
+__le16 s_reserved_gdt_blocks; /* Per group desc for online growth */
+/*
+* Journaling support valid if EXT4_FEATURE_COMPAT_HAS_JOURNAL set.
+*/
+/*D0*/ __u8 s_journal_uuid[16]; /* uuid of journal superblock */
+/*E0*/ __le32 s_journal_inum; /* inode number of journal file */
+__le32 s_journal_dev; /* device number of journal file */
+__le32 s_last_orphan; /* start of list of inodes to delete */
+__le32 s_hash_seed[4]; /* HTREE hash seed */
+__u8 s_def_hash_version; /* Default hash version to use */
+__u8 s_reserved_char_pad;
+__le16 s_desc_size; /* size of group descriptor */
+/*100*/ __le32 s_default_mount_opts;
+__le32 s_first_meta_bg; /* First metablock block group */
+__le32 s_mkfs_time; /* When the filesystem was created */
+__le32 s_jnl_blocks[17]; /* Backup of the journal inode */
+/* 64bit support valid if EXT4_FEATURE_COMPAT_64BIT */
+/*150*/ __le32 s_blocks_count_hi; /* Blocks count */
+__le32 s_r_blocks_count_hi; /* Reserved blocks count */
+__le32 s_free_blocks_count_hi; /* Free blocks count */
+__le16 s_min_extra_isize; /* All inodes have at least # bytes */
+__le16 s_want_extra_isize; /* New inodes should reserve # bytes */
+__le32 s_flags; /* Miscellaneous flags */
+__le16 s_raid_stride; /* RAID stride */
+__le16 s_mmp_interval; /* # seconds to wait in MMP checking */
+__le64 s_mmp_block; /* Block for multi-mount protection */
+__le32 s_raid_stripe_width; /* blocks on all data disks (N*stride)*/
+__u8 s_log_groups_per_flex; /* FLEX_BG group size */
+__u8 s_reserved_char_pad2;
+__le16 s_reserved_pad;
+__le64 s_kbytes_written; /* nr of lifetime kilobytes written */
+#define EXT4_S_ERR_START offsetof(struct ext4_super_block, s_error_count)
+__le32 s_error_count; /* number of fs errors */
+__le32 s_first_error_time; /* first time an error happened */
+__le32 s_first_error_ino; /* inode involved in first error */
+__le64 s_first_error_block; /* block involved of first error */
+__u8 s_first_error_func[32]; /* function where the error happened */
+__le32 s_first_error_line; /* line number where error happened */
+__le32 s_last_error_time; /* most recent time of an error */
+__le32 s_last_error_ino; /* inode involved in last error */
+__le32 s_last_error_line; /* line number where error happened */
+__le64 s_last_error_block; /* block involved of last error */
+__u8 s_last_error_func[32]; /* function where the error happened */
+#define EXT4_S_ERR_END offsetof(struct ext4_super_block, s_mount_opts)
+__u8 s_mount_opts[64];
+__le32 s_reserved[112]; /* Padding to the end of the block */
 };
 
 #ifdef __KERNEL__
@@ -1643,156 +1657,144 @@ extern int ext4_group_extend(struct super_block *sb,
 				struct ext4_super_block *es,
 				ext4_fsblk_t n_blocks_count);
 
+
 /* super.c */
-extern void __ext4_error(struct super_block *, const char *, const char *, ...)
-	__attribute__ ((format (printf, 3, 4)));
-#define ext4_error(sb, message...)	__ext4_error(sb, __func__, ## message)
-extern void ext4_error_inode(const char *, struct inode *, const char *, ...)
-	__attribute__ ((format (printf, 3, 4)));
-extern void ext4_error_file(const char *, struct file *, const char *, ...)
-	__attribute__ ((format (printf, 3, 4)));
-extern void __ext4_std_error(struct super_block *, const char *, int);
-extern void __ext4_abort(struct super_block *, const char *, const char *, ...)
-	__attribute__ ((format (printf, 3, 4)));
-#define ext4_abort(sb, message...)  __ext4_abort(sb, __func__, \
-					## message)
-extern void __ext4_warning(struct super_block *, const char *,
 extern void __ext4_error(struct super_block *, const char *, unsigned int,
-			 const char *, ...)
-	__attribute__ ((format (printf, 4, 5)));
-#define ext4_error(sb, message...)	__ext4_error(sb, __func__,	\
-						     __LINE__, ## message)
+const char *, ...)
+__attribute__ ((format (printf, 4, 5)));
+#define ext4_error(sb, message...) __ext4_error(sb, __func__, \
+__LINE__, ## message)
 extern void ext4_error_inode(struct inode *, const char *, unsigned int,
-			     ext4_fsblk_t, const char *, ...)
-	__attribute__ ((format (printf, 5, 6)));
+ext4_fsblk_t, const char *, ...)
+__attribute__ ((format (printf, 5, 6)));
 extern void ext4_error_file(struct file *, const char *, unsigned int,
-			    const char *, ...)
-	__attribute__ ((format (printf, 4, 5)));
+const char *, ...)
+__attribute__ ((format (printf, 4, 5)));
 extern void __ext4_std_error(struct super_block *, const char *,
-			     unsigned int, int);
+unsigned int, int);
 extern void __ext4_abort(struct super_block *, const char *, unsigned int,
-		       const char *, ...)
-	__attribute__ ((format (printf, 4, 5)));
-#define ext4_abort(sb, message...)	__ext4_abort(sb, __func__, \
-						       __LINE__, ## message)
+const char *, ...)
+__attribute__ ((format (printf, 4, 5)));
+#define ext4_abort(sb, message...) __ext4_abort(sb, __func__, \
+__LINE__, ## message)
 extern void __ext4_warning(struct super_block *, const char *, unsigned int,
-			  const char *, ...)
-	__attribute__ ((format (printf, 4, 5)));
-#define ext4_warning(sb, message...)	__ext4_warning(sb, __func__, \
-						       __LINE__, ## message)
+const char *, ...)
+__attribute__ ((format (printf, 4, 5)));
+#define ext4_warning(sb, message...) __ext4_warning(sb, __func__, \
+__LINE__, ## message)
 extern void ext4_msg(struct super_block *, const char *, const char *, ...)
-	__attribute__ ((format (printf, 3, 4)));
+__attribute__ ((format (printf, 3, 4)));
 extern void __ext4_grp_locked_error(const char *, unsigned int, \
-				    struct super_block *, ext4_group_t, \
-				    unsigned long, ext4_fsblk_t, \
-				    const char *, ...)
-	__attribute__ ((format (printf, 7, 8)));
+struct super_block *, ext4_group_t, \
+unsigned long, ext4_fsblk_t, \
+const char *, ...)
+__attribute__ ((format (printf, 7, 8)));
 #define ext4_grp_locked_error(sb, grp, message...) \
-	__ext4_grp_locked_error(__func__, __LINE__, (sb), (grp), ## message)
+__ext4_grp_locked_error(__func__, __LINE__, (sb), (grp), ## message)
 extern void ext4_update_dynamic_rev(struct super_block *sb);
 extern int ext4_update_compat_feature(handle_t *handle, struct super_block *sb,
-					__u32 compat);
+__u32 compat);
 extern int ext4_update_rocompat_feature(handle_t *handle,
-					struct super_block *sb,	__u32 rocompat);
+struct super_block *sb, __u32 rocompat);
 extern int ext4_update_incompat_feature(handle_t *handle,
-					struct super_block *sb,	__u32 incompat);
+struct super_block *sb, __u32 incompat);
 extern ext4_fsblk_t ext4_block_bitmap(struct super_block *sb,
-				      struct ext4_group_desc *bg);
+struct ext4_group_desc *bg);
 extern ext4_fsblk_t ext4_inode_bitmap(struct super_block *sb,
-				      struct ext4_group_desc *bg);
+struct ext4_group_desc *bg);
 extern ext4_fsblk_t ext4_inode_table(struct super_block *sb,
-				     struct ext4_group_desc *bg);
+struct ext4_group_desc *bg);
 extern __u32 ext4_free_blks_count(struct super_block *sb,
-				struct ext4_group_desc *bg);
+struct ext4_group_desc *bg);
 extern __u32 ext4_free_inodes_count(struct super_block *sb,
-				 struct ext4_group_desc *bg);
+struct ext4_group_desc *bg);
 extern __u32 ext4_used_dirs_count(struct super_block *sb,
-				struct ext4_group_desc *bg);
+struct ext4_group_desc *bg);
 extern __u32 ext4_itable_unused_count(struct super_block *sb,
-				   struct ext4_group_desc *bg);
+struct ext4_group_desc *bg);
 extern void ext4_block_bitmap_set(struct super_block *sb,
-				  struct ext4_group_desc *bg, ext4_fsblk_t blk);
+struct ext4_group_desc *bg, ext4_fsblk_t blk);
 extern void ext4_inode_bitmap_set(struct super_block *sb,
-				  struct ext4_group_desc *bg, ext4_fsblk_t blk);
+struct ext4_group_desc *bg, ext4_fsblk_t blk);
 extern void ext4_inode_table_set(struct super_block *sb,
-				 struct ext4_group_desc *bg, ext4_fsblk_t blk);
+struct ext4_group_desc *bg, ext4_fsblk_t blk);
 extern void ext4_free_blks_set(struct super_block *sb,
-			       struct ext4_group_desc *bg, __u32 count);
+struct ext4_group_desc *bg, __u32 count);
 extern void ext4_free_inodes_set(struct super_block *sb,
-				struct ext4_group_desc *bg, __u32 count);
+struct ext4_group_desc *bg, __u32 count);
 extern void ext4_used_dirs_set(struct super_block *sb,
-				struct ext4_group_desc *bg, __u32 count);
+struct ext4_group_desc *bg, __u32 count);
 extern void ext4_itable_unused_set(struct super_block *sb,
-				   struct ext4_group_desc *bg, __u32 count);
+struct ext4_group_desc *bg, __u32 count);
 extern __le16 ext4_group_desc_csum(struct ext4_sb_info *sbi, __u32 group,
-				   struct ext4_group_desc *gdp);
+struct ext4_group_desc *gdp);
 extern int ext4_group_desc_csum_verify(struct ext4_sb_info *sbi, __u32 group,
-				       struct ext4_group_desc *gdp);
+struct ext4_group_desc *gdp);
 
 static inline ext4_fsblk_t ext4_blocks_count(struct ext4_super_block *es)
 {
-	return ((ext4_fsblk_t)le32_to_cpu(es->s_blocks_count_hi) << 32) |
-		le32_to_cpu(es->s_blocks_count_lo);
+return ((ext4_fsblk_t)le32_to_cpu(es->s_blocks_count_hi) << 32) |
+le32_to_cpu(es->s_blocks_count_lo);
 }
 
 static inline ext4_fsblk_t ext4_r_blocks_count(struct ext4_super_block *es)
 {
-	return ((ext4_fsblk_t)le32_to_cpu(es->s_r_blocks_count_hi) << 32) |
-		le32_to_cpu(es->s_r_blocks_count_lo);
+return ((ext4_fsblk_t)le32_to_cpu(es->s_r_blocks_count_hi) << 32) |
+le32_to_cpu(es->s_r_blocks_count_lo);
 }
 
 static inline ext4_fsblk_t ext4_free_blocks_count(struct ext4_super_block *es)
 {
-	return ((ext4_fsblk_t)le32_to_cpu(es->s_free_blocks_count_hi) << 32) |
-		le32_to_cpu(es->s_free_blocks_count_lo);
+return ((ext4_fsblk_t)le32_to_cpu(es->s_free_blocks_count_hi) << 32) |
+le32_to_cpu(es->s_free_blocks_count_lo);
 }
 
 static inline void ext4_blocks_count_set(struct ext4_super_block *es,
-					 ext4_fsblk_t blk)
+ext4_fsblk_t blk)
 {
-	es->s_blocks_count_lo = cpu_to_le32((u32)blk);
-	es->s_blocks_count_hi = cpu_to_le32(blk >> 32);
+es->s_blocks_count_lo = cpu_to_le32((u32)blk);
+es->s_blocks_count_hi = cpu_to_le32(blk >> 32);
 }
 
 static inline void ext4_free_blocks_count_set(struct ext4_super_block *es,
-					      ext4_fsblk_t blk)
+ext4_fsblk_t blk)
 {
-	es->s_free_blocks_count_lo = cpu_to_le32((u32)blk);
-	es->s_free_blocks_count_hi = cpu_to_le32(blk >> 32);
+es->s_free_blocks_count_lo = cpu_to_le32((u32)blk);
+es->s_free_blocks_count_hi = cpu_to_le32(blk >> 32);
 }
 
 static inline void ext4_r_blocks_count_set(struct ext4_super_block *es,
-					   ext4_fsblk_t blk)
+ext4_fsblk_t blk)
 {
-	es->s_r_blocks_count_lo = cpu_to_le32((u32)blk);
-	es->s_r_blocks_count_hi = cpu_to_le32(blk >> 32);
+es->s_r_blocks_count_lo = cpu_to_le32((u32)blk);
+es->s_r_blocks_count_hi = cpu_to_le32(blk >> 32);
 }
 
 static inline loff_t ext4_isize(struct ext4_inode *raw_inode)
 {
-	if (S_ISREG(le16_to_cpu(raw_inode->i_mode)))
-		return ((loff_t)le32_to_cpu(raw_inode->i_size_high) << 32) |
-			le32_to_cpu(raw_inode->i_size_lo);
-	else
-		return (loff_t) le32_to_cpu(raw_inode->i_size_lo);
+if (S_ISREG(le16_to_cpu(raw_inode->i_mode)))
+return ((loff_t)le32_to_cpu(raw_inode->i_size_high) << 32) |
+le32_to_cpu(raw_inode->i_size_lo);
+else
+return (loff_t) le32_to_cpu(raw_inode->i_size_lo);
 }
 
 static inline void ext4_isize_set(struct ext4_inode *raw_inode, loff_t i_size)
 {
-	raw_inode->i_size_lo = cpu_to_le32(i_size);
-	raw_inode->i_size_high = cpu_to_le32(i_size >> 32);
+raw_inode->i_size_lo = cpu_to_le32(i_size);
+raw_inode->i_size_high = cpu_to_le32(i_size >> 32);
 }
 
 static inline
 struct ext4_group_info *ext4_get_group_info(struct super_block *sb,
-					    ext4_group_t group)
+ext4_group_t group)
 {
-	 struct ext4_group_info ***grp_info;
-	 long indexv, indexh;
-	 grp_info = EXT4_SB(sb)->s_group_info;
-	 indexv = group >> (EXT4_DESC_PER_BLOCK_BITS(sb));
-	 indexh = group & ((EXT4_DESC_PER_BLOCK(sb)) - 1);
-	 return grp_info[indexv][indexh];
+struct ext4_group_info ***grp_info;
+long indexv, indexh;
+grp_info = EXT4_SB(sb)->s_group_info;
+indexv = group >> (EXT4_DESC_PER_BLOCK_BITS(sb));
+indexh = group & ((EXT4_DESC_PER_BLOCK(sb)) - 1);
+return grp_info[indexv][indexh];
 }
 
 /*
