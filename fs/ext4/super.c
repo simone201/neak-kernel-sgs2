@@ -509,11 +509,7 @@ void __ext4_std_error(struct super_block *sb, const char *function,
  */
 
 void __ext4_abort(struct super_block *sb, const char *function,
-<<<<<<< HEAD
-      const char *fmt, ...)
-=======
 		unsigned int line, const char *fmt, ...)
->>>>>>> 923d250... ADD: ext4: Pass line numbers to ext4_error() and friends
 {
 	va_list args;
 

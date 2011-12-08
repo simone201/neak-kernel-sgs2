@@ -1644,7 +1644,6 @@ extern int ext4_group_extend(struct super_block *sb,
 				ext4_fsblk_t n_blocks_count);
 
 /* super.c */
-<<<<<<< HEAD
 extern void __ext4_error(struct super_block *, const char *, const char *, ...)
 	__attribute__ ((format (printf, 3, 4)));
 #define ext4_error(sb, message...)	__ext4_error(sb, __func__, ## message)
@@ -1658,7 +1657,6 @@ extern void __ext4_abort(struct super_block *, const char *, const char *, ...)
 #define ext4_abort(sb, message...)  __ext4_abort(sb, __func__, \
 					## message)
 extern void __ext4_warning(struct super_block *, const char *,
-=======
 extern void __ext4_error(struct super_block *, const char *, unsigned int,
 			 const char *, ...)
 	__attribute__ ((format (printf, 4, 5)));
@@ -1678,7 +1676,6 @@ extern void __ext4_abort(struct super_block *, const char *, unsigned int,
 #define ext4_abort(sb, message...)	__ext4_abort(sb, __func__, \
 						       __LINE__, ## message)
 extern void __ext4_warning(struct super_block *, const char *, unsigned int,
->>>>>>> 923d250... ADD: ext4: Pass line numbers to ext4_error() and friends
 			  const char *, ...)
 	__attribute__ ((format (printf, 4, 5)));
 #define ext4_warning(sb, message...)	__ext4_warning(sb, __func__, \
