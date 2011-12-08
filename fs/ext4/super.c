@@ -307,8 +307,6 @@ void ext4_journal_abort_handle(const char *caller, const char *err_fn,
 	jbd2_journal_abort_handle(handle);
 }
 
-<<<<<<< HEAD
-=======
 static void __save_error_info(struct super_block *sb, const char *func,
 			    unsigned int line)
 {
@@ -343,8 +341,6 @@ static void save_error_info(struct super_block *sb, const char *func,
 	ext4_commit_super(sb, 1);
 }
 
-
->>>>>>> 0283ca9... ADD: ext4: Once a day, printk file system error information to dmesg
 /* Deal with the reporting of failure conditions on a filesystem such as
  * inconsistencies detected or read IO failures.
  *
