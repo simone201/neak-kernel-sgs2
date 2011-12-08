@@ -282,12 +282,12 @@ extern "C" {
 
 /* ACE_FC_FIFOCTRL */
 #define ACE_FC_SELHASH_MASK		(3 << 0)
-#define ACE_FC_SELHASH_EXOUT		(0 << 0)	// independent source
-#define ACE_FC_SELHASH_BCIN		(1 << 0)	// block cipher input
-#define ACE_FC_SELHASH_BCOUT		(2 << 0)	// block cipher output
+#define ACE_FC_SELHASH_EXOUT		(0 << 0)	/*independent source*/
+#define ACE_FC_SELHASH_BCIN		(1 << 0)	/*block cipher input*/
+#define ACE_FC_SELHASH_BCOUT		(2 << 0)	/*block cipher output*/
 #define ACE_FC_SELBC_MASK		(1 << 2)
-#define ACE_FC_SELBC_AES		(0 << 2)	// AES
-#define ACE_FC_SELBC_DES		(1 << 2)	// DES
+#define ACE_FC_SELBC_AES		(0 << 2)	/* AES */
+#define ACE_FC_SELBC_DES		(1 << 2)	/* DES */
 
 /* ACE_FC_GLOBAL */
 #define ACE_FC_SSS_RESET		(1 << 0)
@@ -345,8 +345,8 @@ extern "C" {
 #define ACE_AES_OPERMODE_CBC		(1 << 1)
 #define ACE_AES_OPERMODE_CTR		(2 << 1)
 #define ACE_AES_FIFO_MASK		(1 << 3)
-#define ACE_AES_FIFO_OFF		(0 << 3)	// CPU mode
-#define ACE_AES_FIFO_ON			(1 << 3)	// FIFO mode
+#define ACE_AES_FIFO_OFF		(0 << 3)	/* CPU mode */
+#define ACE_AES_FIFO_ON			(1 << 3)	/* FIFO mode */
 #define ACE_AES_KEYSIZE_MASK		(3 << 4)
 #define ACE_AES_KEYSIZE_128		(0 << 4)
 #define ACE_AES_KEYSIZE_192		(1 << 4)
@@ -391,11 +391,11 @@ extern "C" {
 #define ACE_TDES_OPERMODE_CBC		(1 << 1)
 #define ACE_TDES_SEL_MASK		(3 << 3)
 #define ACE_TDES_SEL_DES		(0 << 3)
-#define ACE_TDES_SEL_TDESEDE		(1 << 3)	// TDES EDE mode
-#define ACE_TDES_SEL_TDESEEE		(3 << 3)	// TDES EEE mode
+#define ACE_TDES_SEL_TDESEDE		(1 << 3)	/* TDES EDE mode */
+#define ACE_TDES_SEL_TDESEEE		(3 << 3)	/* TDES EEE mode */
 #define ACE_TDES_FIFO_MASK		(1 << 5)
-#define ACE_TDES_FIFO_OFF		(0 << 5)	// CPU mode
-#define ACE_TDES_FIFO_ON		(1 << 5)	// FIFO mode
+#define ACE_TDES_FIFO_OFF		(0 << 5)	/* CPU mode */
+#define ACE_TDES_FIFO_ON		(1 << 5)	/* FIFO mode */
 #define ACE_TDES_SWAP_MASK		(0xF << 6)
 #define ACE_TDES_SWAPKEY_OFF		(0 << 6)
 #define ACE_TDES_SWAPKEY_ON		(1 << 6)
