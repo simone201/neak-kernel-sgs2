@@ -93,7 +93,7 @@ int __ext4_forget(const char *where, handle_t *handle, int is_metadata,
 	err = jbd2_journal_revoke(handle, blocknr, bh);
 	if (err) {
 		ext4_journal_abort_handle(where, __func__, bh, handle, err);
-		ext4_abort(inode->i_sb, __func__,
+		__ext4_abort(inode->i_sb, where,
 			   "error %d when attempting revoke", err);
 	}
 	BUFFER_TRACE(bh, "exit");
