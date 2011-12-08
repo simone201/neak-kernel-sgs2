@@ -60,11 +60,13 @@ struct sec_bat_platform_data {
 	unsigned int adc_sub_arr_size;
 	struct sec_bat_adc_table_data *adc_sub_table;
 	unsigned int adc_sub_channel;
-#if defined(CONFIG_TARGET_LOCALE_NAATT)
-	int adc_vf_channel;
-#endif
 	unsigned int (*get_lpcharging_state) (void);
 	void (*no_bat_cb) (void);
+	void (*initial_check) (void);
+#if defined(CONFIG_TARGET_LOCALE_NAATT)
+	bool (*get_recording_state) (void);
+	int adc_vf_channel;
+#endif
 };
 
 #endif /* __MACH_SEC_BATTERY_H */

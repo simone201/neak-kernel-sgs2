@@ -385,6 +385,8 @@ static int __cpuinit cpufreq_stat_cpu_callback(struct notifier_block *nfb,
 	case CPU_DOWN_PREPARE_FROZEN:
 		cpufreq_stats_free_table(cpu);
 		break;
+	case CPU_DEAD:
+	case CPU_DEAD_FROZEN:
 	case CPU_DOWN_FAILED:
 	case CPU_DOWN_FAILED_FROZEN:
 		cpufreq_stats_create_table_cpu(cpu);

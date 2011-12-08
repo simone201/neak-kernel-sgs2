@@ -30,13 +30,16 @@ void gps_uart_cfg_gpio(int array_size, unsigned int (*gpio_table)[4])
 
 static void __init gps_gpio_init(void)
 {
-	gpio_request(GPIO_GPS_nRST, "GPS_nRST");
+	if (gpio_request(GPIO_GPS_nRST, "GPS_nRST"))
+		WARN(1, "fail to request gpio (GPS_nRST)\n");
+	
 	s3c_gpio_setpull(GPIO_GPS_nRST, S3C_GPIO_PULL_UP);
 	s3c_gpio_cfgpin(GPIO_GPS_nRST, S3C_GPIO_OUTPUT);
 	gpio_direction_output(GPIO_GPS_nRST, 1);
 #ifdef CONFIG_TARGET_LOCALE_NTT
 	if (system_rev >= 11) {
-		gpio_request(GPIO_GPS_PWR_EN, "GPS_PWR_EN");
+		if (gpio_request(GPIO_GPS_PWR_EN, "GPS_PWR_EN"))
+			WARN(1, "fail to request gpio (GPS_PWR_EN)\n");
 		s3c_gpio_setpull(GPIO_GPS_PWR_EN, S3C_GPIO_PULL_NONE);
 		s3c_gpio_cfgpin(GPIO_GPS_PWR_EN, S3C_GPIO_OUTPUT);
 		gpio_direction_output(GPIO_GPS_PWR_EN, 0);
@@ -44,8 +47,10 @@ static void __init gps_gpio_init(void)
 		gpio_export(GPIO_GPS_nRST, 1);
 		gpio_export(GPIO_GPS_PWR_EN, 1);
 	}
-	else {
-		gpio_request(GPIO_GPS_PWR_EN_SPI, "GPS_PWR_EN");
+	else 
+	{
+		if (gpio_request(GPIO_GPS_PWR_EN_SPI, "GPS_PWR_EN"))
+			WARN(1, "fail to request gpio (GPS_PWR_EN)\n");
 		s3c_gpio_setpull(GPIO_GPS_PWR_EN_SPI, S3C_GPIO_PULL_NONE);
 		s3c_gpio_cfgpin(GPIO_GPS_PWR_EN_SPI, S3C_GPIO_OUTPUT);
 		gpio_direction_output(GPIO_GPS_PWR_EN_SPI, 0);
@@ -54,7 +59,8 @@ static void __init gps_gpio_init(void)
 		gpio_export(GPIO_GPS_PWR_EN_SPI, 1);
 	}
 #else
-	gpio_request(GPIO_GPS_PWR_EN, "GPS_PWR_EN");
+	if (gpio_request(GPIO_GPS_PWR_EN, "GPS_PWR_EN"))
+			WARN(1, "fail to request gpio (GPS_PWR_EN)\n");
 	s3c_gpio_setpull(GPIO_GPS_PWR_EN, S3C_GPIO_PULL_NONE);
 	s3c_gpio_cfgpin(GPIO_GPS_PWR_EN, S3C_GPIO_OUTPUT);
 	gpio_direction_output(GPIO_GPS_PWR_EN, 0);
@@ -64,16 +70,18 @@ static void __init gps_gpio_init(void)
 #endif
 
 #ifdef CONFIG_TARGET_LOCALE_KOR
-	if(system_rev >= 7) {
-       gpio_request(GPIO_GPS_RTS, "GPS_RTS");
-       s3c_gpio_setpull(GPIO_GPS_RTS, S3C_GPIO_PULL_UP);
-       s3c_gpio_cfgpin(GPIO_GPS_RTS, S3C_GPIO_OUTPUT);
-       gpio_direction_output(GPIO_GPS_RTS, 1);
+	if (system_rev >= 7) {
+	   if (gpio_request(GPIO_GPS_RTS, "GPS_RTS"))
+			WARN(1, "fail to request gpio (GPS_RTS)\n");
+	   s3c_gpio_setpull(GPIO_GPS_RTS, S3C_GPIO_PULL_UP);
+	   s3c_gpio_cfgpin(GPIO_GPS_RTS, S3C_GPIO_OUTPUT);
+	   gpio_direction_output(GPIO_GPS_RTS, 1);
 
-       gpio_request(GPIO_GPS_CTS, "GPS_CTS");
-       s3c_gpio_setpull(GPIO_GPS_CTS, S3C_GPIO_PULL_UP);
-       s3c_gpio_cfgpin(GPIO_GPS_CTS, S3C_GPIO_OUTPUT);
-       gpio_direction_output(GPIO_GPS_CTS, 1);
+       if (gpio_request(GPIO_GPS_CTS, "GPS_CTS"))
+			WARN(1, "fail to request gpio (GPS_RTS)\n");
+	   s3c_gpio_setpull(GPIO_GPS_CTS, S3C_GPIO_PULL_UP);
+	   s3c_gpio_cfgpin(GPIO_GPS_CTS, S3C_GPIO_OUTPUT);
+	   gpio_direction_output(GPIO_GPS_CTS, 1);
     }
 #endif
 

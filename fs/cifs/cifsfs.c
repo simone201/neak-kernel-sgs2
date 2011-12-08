@@ -65,11 +65,11 @@ unsigned int CIFSMaxBufSize = CIFS_MAX_MSGSIZE;
 module_param(CIFSMaxBufSize, int, 0);
 MODULE_PARM_DESC(CIFSMaxBufSize, "Network buffer size (not including header). "
 				 "Default: 16384 Range: 8192 to 130048");
-unsigned int cifs_min_rcv = CIFS_MIN_RCV_POOL;
+unsigned int cifs_min_rcv = 32; // CIFS_MIN_RCV_POOL
 module_param(cifs_min_rcv, int, 0);
 MODULE_PARM_DESC(cifs_min_rcv, "Network buffers in pool. Default: 4 Range: "
 				"1 to 64");
-unsigned int cifs_min_small = 30;
+unsigned int cifs_min_small = 64; // 30
 module_param(cifs_min_small, int, 0);
 MODULE_PARM_DESC(cifs_min_small, "Small network buffers in pool. Default: 30 "
 				 "Range: 2 to 256");

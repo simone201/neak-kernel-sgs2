@@ -70,7 +70,10 @@ static void combiner_handle_cascade_irq(unsigned int irq, struct irq_desc *desc)
 	status &= chip_data->irq_mask;
 
 	if (status == 0)
+	{
+		do_bad_IRQ(irq, desc);
 		goto out;
+	}
 
 	combiner_irq = __ffs(status);
 

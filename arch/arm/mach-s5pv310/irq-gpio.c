@@ -18,6 +18,7 @@
 #include <linux/io.h>
 
 #include <plat/gpio-core.h>
+#include <asm/mach/irq.h>
 
 #define GPIO_BASE(chip)		(((unsigned long)(chip)->base) & ~(SZ_4K - 1))
 
@@ -178,7 +179,7 @@ static void samsung_irq_gpio_handler(unsigned int irq, struct irq_desc *desc)
 {
 	struct samsung_irq_gpio *gpio;
 	int group, n, offset;
-	int start, end, pend, mask, handled = 0;
+	int start, end, pend, mask, handled = 0, action = 0;
 	struct irq_chip *chip = get_irq_chip(irq);
 
 	gpio = get_irq_data(irq);
@@ -201,11 +202,14 @@ static void samsung_irq_gpio_handler(unsigned int irq, struct irq_desc *desc)
 
 		mask = __raw_readl(gpio->base + MASK_OFFSET + offset);
 		pend &= ~mask;
+		if (!pend)
+			continue;
 
 		while (pend) {
 			n = fls(pend) - 1;
 			generic_handle_irq(IRQ_GPIO_GROUP(start + group) + n);
 			pend &= ~BIT(n);
+			++action;
 		}
 
 		handled = 1;
@@ -228,6 +232,7 @@ static void samsung_irq_gpio_handler(unsigned int irq, struct irq_desc *desc)
 			n = fls(pend) - 1;
 			generic_handle_irq(IRQ_GPIO_GROUP(start + group) + n);
 			pend &= ~BIT(n);
+			++action;
 		}
 
 		/* It found the valid group */
@@ -235,6 +240,9 @@ static void samsung_irq_gpio_handler(unsigned int irq, struct irq_desc *desc)
 	}
 
 out:
+		if (!action)
+			do_bad_IRQ(irq, desc);
+			
 	/* primary controller unmasking */
 	chip->unmask(irq);
 }

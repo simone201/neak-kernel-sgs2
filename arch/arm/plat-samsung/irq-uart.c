@@ -24,6 +24,7 @@
 #include <plat/irq-uart.h>
 #include <plat/regs-serial.h>
 #include <plat/cpu.h>
+#include <asm/mach/irq.h>
 
 /* Note, we make use of the fact that the parent IRQs, IRQ_UART[0..3]
  * are consecutive when looking up the interrupt in the demux routines.
@@ -100,6 +101,9 @@ static void s3c_irq_demux_uart(unsigned int irq, struct irq_desc *desc)
 
 	if (chip->ack)
 		chip->ack(irq);
+
+	if (!(pend & 0xf))
+		do_bad_IRQ(irq, desc);
 
 	if (pend & (1 << 0))
 		generic_handle_irq(base);

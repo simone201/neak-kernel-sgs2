@@ -26,6 +26,8 @@
 #include <plat/gpio-cfg.h>
 #include <mach/regs-gpio.h>
 
+#include <asm/mach/irq.h>
+
 static DEFINE_SPINLOCK(eint_lock);
 
 static unsigned int s5pv310_get_irq_nr(unsigned int number)
@@ -195,12 +197,13 @@ static struct irq_chip s5pv310_irq_eint = {
  *
  * Each EINT pend/mask registers handle eight of them.
  */
-static inline void s5pv310_irq_demux_eint(unsigned int irq, unsigned int start)
+static inline u32 s5pv310_irq_demux_eint(unsigned int irq, unsigned int start)
 {
 	unsigned int cascade_irq;
 
 	u32 status = __raw_readl(S5P_EINT_PEND(s5pv310_irq_split(start)));
 	u32 mask = __raw_readl(S5P_EINT_MASK(s5pv310_irq_split(start)));
+	u32 action = 0;
 
 	status &= ~mask;
 	status &= 0xff;
@@ -209,18 +212,24 @@ static inline void s5pv310_irq_demux_eint(unsigned int irq, unsigned int start)
 		cascade_irq = fls(status) - 1;
 		generic_handle_irq(cascade_irq + start);
 		status &= ~(1 << cascade_irq);
+		++action;
 	}
+	return action;
 }
 
 static void s5pv310_irq_demux_eint16_31(unsigned int irq, struct irq_desc *desc)
 {
 	struct irq_chip *chip = get_irq_chip(irq);
+	u32 a16_23, a24_31;
 
 	if (chip->ack)
 		chip->ack(irq);
 
-	s5pv310_irq_demux_eint(irq, IRQ_EINT(16));
-	s5pv310_irq_demux_eint(irq, IRQ_EINT(24));
+	a16_23 = s5pv310_irq_demux_eint(irq, IRQ_EINT(16));
+	a24_31 = s5pv310_irq_demux_eint(irq, IRQ_EINT(24));
+		
+	if (!a16_23 && !a24_31)
+		do_bad_IRQ(irq, desc);
 
 	chip->unmask(irq);
 }
@@ -233,13 +242,15 @@ static void s5pv310_irq_eint0_15(unsigned int irq, struct irq_desc *desc)
 	if (chip->ack)
 		chip->ack(irq);
 
-	for ( i = 0 ; i <= 15 ; i++){
-		if ( irq == s5pv310_get_irq_nr(i)) {
+	for (i = 0; i <= 15; i++) {
+		if (irq == s5pv310_get_irq_nr(i)) {
 			generic_handle_irq(IRQ_EINT(i));
-			break;
+			goto out;
 		}
 	}
-
+	
+	do_bad_IRQ(irq, desc);
+out:
 	chip->unmask(irq);
 }
 

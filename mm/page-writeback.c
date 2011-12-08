@@ -60,7 +60,7 @@ static inline long sync_writeback_pages(unsigned long dirtied)
 /*
  * Start background writeback (via writeback threads) at this percentage
  */
-int dirty_background_ratio = 10;
+int dirty_background_ratio = 90;
 
 /*
  * dirty_background_bytes starts at 0 (disabled) so that it is a function of
@@ -88,7 +88,7 @@ unsigned long vm_dirty_bytes;
 /*
  * The interval between `kupdate'-style writebacks
  */
-unsigned int dirty_writeback_interval = 5 * 100; /* centiseconds */
+unsigned int dirty_writeback_interval = 20 * 100; /* centiseconds */
 
 /*
  * The longest time for which data is allowed to remain dirty

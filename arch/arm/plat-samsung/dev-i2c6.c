@@ -49,7 +49,11 @@ static struct s3c2410_platform_i2c default_i2c_data6 __initdata = {
 	.flags		= 0,
 	.bus_num	= 6,
 	.slave_addr	= 0x3a,		/* For MC2N1 */
+#ifdef CONFIG_MACH_Q1_REV02
+	.frequency  = 400*1000,
+#else
 	.frequency	= 100*1000,
+#endif
 	.sda_delay	= 100,
 };
 
