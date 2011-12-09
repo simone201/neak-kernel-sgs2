@@ -14,7 +14,7 @@ ROOTFS_PATH="/home/simone/neak-kernel/initramfs"
 
 export KBUILD_BUILD_VERSION="N.E.A.K-1.0x"
 
-ZIP_NAME="N.E.A.K-1.0x.zip"
+ZIP_NAME="NEAR-1.0.zip"
 
 echo "Cleaning latest build"
 make ARCH=arm CROSS_COMPILE=$TOOLCHAIN -j`grep 'processor' /proc/cpuinfo | wc -l` mrproper
