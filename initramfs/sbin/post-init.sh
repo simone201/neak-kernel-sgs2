@@ -12,16 +12,13 @@ exec 2>&1
 
 echo $(date) START of post-init.sh
 
-# Remount rootfs rw
-  #/sbin/busybox mount rootfs -o remount,rw
-
 ##### Early-init phase #####
 
 # IPv6 privacy tweak
   echo "2" > /proc/sys/net/ipv6/conf/all/use_tempaddr
 
-# Enable CIFS tweak
-#if /sbin/busybox [ "`/sbin/busybox grep CIFS /system/etc/tweaks.conf`" ]; then
+# Enable CIFS module
+#if [ -f /data/.near/cifs-enabled ];
 #  /sbin/busybox insmod /lib/modules/cifs.ko
 #else
 #  /sbin/busybox rm /lib/modules/cifs.ko
@@ -49,6 +46,9 @@ echo $(date) START of post-init.sh
   echo "1500" > /proc/sys/vm/dirty_writeback_centisecs
   echo "200" > /proc/sys/vm/dirty_expire_centisecs
   echo "0" > /proc/sys/vm/swappiness
+  echo "750000" > /proc/sys/kernel/sched_latency_ns
+  echo "250000" > /proc/sys/kernel/sched_wakeup_granularity_ns
+  echo "500000" > /proc/sys/kernel/sched_min_granularity_ns
 
 # SD cards (mmcblk) read ahead tweaks
   echo "1024" > /sys/devices/virtual/bdi/179:0/read_ahead_kb
@@ -116,6 +116,7 @@ echo "64000" > /proc/sys/kernel/msgmni;
 echo "64000" > /proc/sys/kernel/msgmax;
 echo "10" > /proc/sys/fs/lease-break-time;
 echo "500,512000,64,2048" > /proc/sys/kernel/sem;
+echo "NO_GENTLE_FAIR_SLEEPERS" > /sys/kernel/debug/sched_features
 
 ##### Install SU #####
 

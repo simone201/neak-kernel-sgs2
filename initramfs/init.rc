@@ -427,11 +427,6 @@ on boot
     write /sys/class/mdnieset_ui/switch_mdnieset_ui/mdnieset_init_file_cmd  0
 #    write /sys/class/mdnieset_ui/switch_mdnieset_ui/mdnieset_ui_file_cmd  0
 
-	# NEAK Tweaks - UI Smoothness Tweaks
-	setprop debug.sf.hw 1
-	setprop debug.performance.tuning 1
-	setprop video.accelerate.hw 1
-
 # permissions for NFC
     setprop ro.nfc.port "I2C"
     chmod 0600 /dev/pn544
