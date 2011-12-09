@@ -20,4 +20,4 @@ else
 	echo ".one_confirm already exists"
 fi;
 
-/sbin/busybox umount /mnt/sdcard
+#/sbin/busybox umount /mnt/sdcard
