@@ -20,4 +20,9 @@ else
 	echo ".one_confirm already exists"
 fi;
 
-#/sbin/busybox umount /mnt/sdcard
+# Configuration folder for NEAK kernel
+if ! [ -d /data/.near ]; then
+	mkdir  /data/.near
+else
+	echo "near folder already exists"
+fi;

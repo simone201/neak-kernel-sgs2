@@ -18,11 +18,9 @@ echo $(date) START of post-init.sh
   echo "2" > /proc/sys/net/ipv6/conf/all/use_tempaddr
 
 # Enable CIFS module
-#if [ -f /data/.near/cifs-enabled ];
-#  /sbin/busybox insmod /lib/modules/cifs.ko
-#else
-#  /sbin/busybox rm /lib/modules/cifs.ko
-#fi
+if [ -f /data/.near/cifsmod ];
+  /sbin/busybox insmod /lib/modules/cifs.ko
+fi;
 
 # Remount all partitions with noatime
   for k in $(/sbin/busybox mount | /sbin/busybox grep relatime | /sbin/busybox cut -d " " -f3)
