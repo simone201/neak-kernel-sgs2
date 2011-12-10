@@ -65,17 +65,26 @@ static spinlock_t up_cpumask_lock;
 static cpumask_t down_cpumask;
 static spinlock_t down_cpumask_lock;
 
+
+#define DEFAULT_DESIRED_FREQ 500000
+
 /*
  * The minimum amount of time to spend at a frequency before we can ramp up.
  */
-#define DEFAULT_UP_SAMPLE_TIME 24000
+#define DEFAULT_UP_SAMPLE_TIME1 48000
+#define DEFAULT_UP_SAMPLE_TIME2 24000
+static unsigned long up_sample_time1;
+static unsigned long up_sample_time2;
 static unsigned long up_sample_time;
 
 /*
  * The minimum amount of time to spend at a frequency before we can ramp down.
  */
-#define DEFAULT_DOWN_SAMPLE_TIME 49000 //72000;
+#define DEFAULT_DOWN_SAMPLE_TIME1 49000;
+#define DEFAULT_DOWN_SAMPLE_TIME2 120000;
 static unsigned long down_sample_time;
+static unsigned long down_sample_time1;
+static unsigned long down_sample_time2;
 
 /*
  * DEBUG print flags
@@ -98,7 +107,7 @@ static unsigned long inc_cpu_load;
 /*
  * CPU freq will be decreased if measured load < dec_cpu_load;
  */
-#define DEFAULT_DEC_CPU_LOAD 30
+#define DEFAULT_DEC_CPU_LOAD 25
 static unsigned long dec_cpu_load;
 
 /*
@@ -402,6 +411,8 @@ static void cpufreq_lulzactive_timer(unsigned long data)
 	 * minimum sample time.
 	 */
 	if (new_freq < pcpu->target_freq) {
+		if(new_freq < DEFAULT_DESIRED_FREQ) down_sample_time = down_sample_time1;
+		else down_sample_time = down_sample_time2;
 		if (cputime64_sub(pcpu->timer_run_time, pcpu->freq_change_time) <
 		    down_sample_time) {
 			dbgpr("timer %d: load=%d cur=%d tgt=%d not yet\n", (int) data, cpu_load, pcpu->target_freq, new_freq);
@@ -409,6 +420,8 @@ static void cpufreq_lulzactive_timer(unsigned long data)
 		}
 	}
 	else {
+		if(new_freq >= DEFAULT_DESIRED_FREQ) up_sample_time = up_sample_time1;
+		else up_sample_time = up_sample_time2;
 		if (cputime64_sub(pcpu->timer_run_time, pcpu->freq_change_time) <
 		    up_sample_time) {
 			dbgpr("timer %d: load=%d cur=%d tgt=%d not yet\n", (int) data, cpu_load, pcpu->target_freq, new_freq);
@@ -666,35 +679,35 @@ static void cpufreq_lulzactive_freq_down(struct work_struct *work)
 	}
 }
 
-static ssize_t show_down_sample_time(struct kobject *kobj,
+static ssize_t show_down_sample_time1(struct kobject *kobj,
 				struct attribute *attr, char *buf)
 {
-	return sprintf(buf, "%lu\n", down_sample_time);
+	return sprintf(buf, "%lu\n", down_sample_time1);
 }
 
-static ssize_t store_down_sample_time(struct kobject *kobj,
+static ssize_t store_down_sample_time1(struct kobject *kobj,
 			struct attribute *attr, const char *buf, size_t count)
 {
-	return strict_strtoul(buf, 0, &down_sample_time);
+	return strict_strtoul(buf, 0, &down_sample_time1);
 }
 
-static struct global_attr down_sample_time_attr = __ATTR(down_sample_time, 0644,
-		show_down_sample_time, store_down_sample_time);
+static struct global_attr down_sample_time1_attr = __ATTR(down_sample_time1, 0644,
+		show_down_sample_time1, store_down_sample_time1);
 
-static ssize_t show_up_sample_time(struct kobject *kobj,
+static ssize_t show_up_sample_time1(struct kobject *kobj,
 				struct attribute *attr, char *buf)
 {
-	return sprintf(buf, "%lu\n", up_sample_time);
+	return sprintf(buf, "%lu\n", up_sample_time1);
 }
 
-static ssize_t store_up_sample_time(struct kobject *kobj,
+static ssize_t store_up_sample_time1(struct kobject *kobj,
 			struct attribute *attr, const char *buf, size_t count)
 {
-	return strict_strtoul(buf, 0, &up_sample_time);
+	return strict_strtoul(buf, 0, &up_sample_time1);
 }
 
-static struct global_attr up_sample_time_attr = __ATTR(up_sample_time, 0644,
-		show_up_sample_time, store_up_sample_time);
+static struct global_attr up_sample_time1_attr = __ATTR(up_sample_time1, 0644,
+		show_up_sample_time1, store_up_sample_time1);
 
 static ssize_t show_debug_mode(struct kobject *kobj,
 				     struct attribute *attr, char *buf)
@@ -712,8 +725,8 @@ static struct global_attr debug_mode_attr = __ATTR(debug_mode, 0644,
 		show_debug_mode, store_debug_mode);
 
 static struct attribute *lulzactive_attributes[] = {
-	&up_sample_time_attr.attr,
-	&down_sample_time_attr.attr,
+	&up_sample_time1_attr.attr,
+	&down_sample_time1_attr.attr,
 	&debug_mode_attr.attr,
 	NULL,
 };
@@ -869,8 +882,9 @@ static int __init cpufreq_lulzactive_init(void)
 	struct cpufreq_lulzactive_cpuinfo *pcpu;
 	struct sched_param param = { .sched_priority = MAX_RT_PRIO-1 };
 
-	up_sample_time = DEFAULT_UP_SAMPLE_TIME;
-	down_sample_time = DEFAULT_DOWN_SAMPLE_TIME;
+	up_sample_time1 = DEFAULT_UP_SAMPLE_TIME1;
+	down_sample_time1 = DEFAULT_DOWN_SAMPLE_TIME1;
+	down_sample_time2 = DEFAULT_DOWN_SAMPLE_TIME2;
 	debug_mode = DEFAULT_DEBUG_MODE;
 	inc_cpu_load = DEFAULT_INC_CPU_LOAD;
 	dec_cpu_load = DEFAULT_DEC_CPU_LOAD;
