@@ -4668,7 +4668,6 @@ static struct platform_device ram_console_device = {
 static void __init setup_ram_console_mem(char *str)
 	{
 		unsigned size = memparse(str, &str);
-		unsigned long flags;
 		if (size && (*str == '@')) {
 			unsigned long long base = 0;
 

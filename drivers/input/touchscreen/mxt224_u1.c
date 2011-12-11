@@ -416,8 +416,6 @@ static void mxt224_ta_probe(int ta_status)
 	u8 blen;
 	u8 calcfg_dis;
 	u8 calcfg_en;
-	u16 i;
-	u8 size;
 	if (!mxt224_enabled) {
 		printk(KERN_ERR"[TSP] mxt224_enabled is 0\n");
 		return;
@@ -1458,28 +1456,13 @@ static ssize_t store_mov_hysti(struct device *dev,
 					char *buf, size_t count)
 {
 	unsigned int register_value;
-	u8 **tsp_config;
-	int i;
 	
-	//struct i2c_client *client = to_i2c_client(dev);
 	struct mxt224_data *data = dev_get_drvdata(dev);
-	//struct mxt224_platform_data *pdata = data->client->dev.platform_data;
 	
 	sscanf(buf, "%u", &register_value);
 	
 	// store value in global variable
 	mov_hysti = register_value;
-	
-	/*
-	tsp_config = pdata->config;
-	for (i = 0; tsp_config[i][0] != RESERVED_T255; i++) {
-		if (tsp_config[i][0] == TOUCH_MULTITOUCHSCREEN_T9) {
-			printk(KERN_ERR "[TSP] T9[12]=%u\n", tsp_config[i][12]);
-			tsp_config[i][12] = (u8)register_value;
-			break;
-		}
-	}
-	*/
 	
 	count = sprintf(buf, "%u %u %u", TOUCH_MULTITOUCHSCREEN_T9, 11, register_value);
 	return qt602240_object_setting(dev, attr, buf, count);

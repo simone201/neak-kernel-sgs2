@@ -2392,6 +2392,8 @@ bool SiiMhlTxReadDevcap( byte offset )
 	//
 	req.command     = mhlTxConfig.mscLastCommand = MHL_READ_DEVCAP;
 	req.offsetData  = mhlTxConfig.mscLastOffset  = offset;
+	req.msgData[0]  = 0U;
+	req.msgData[1]  = 0U;
 	return(SiiMhlTxDrvSendCbusCommand( &req  ));
 }
 
@@ -2417,7 +2419,7 @@ static bool MhlTxSendMscMsg ( byte command, byte cmdData )
 	req.command     = MHL_MSC_MSG;
 	req.msgData[0]  = mhlTxConfig.mscMsgLastCommand = command;
 	req.msgData[1]  = mhlTxConfig.mscMsgLastData    = cmdData;
-
+	req.offsetData  = 0U;
 
 
 	ccode = SiiMhlTxDrvSendCbusCommand( &req  );

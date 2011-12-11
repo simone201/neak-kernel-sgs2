@@ -33,6 +33,7 @@ modules.builtin
 *.gcno
 *.tar
 *.zip
+*.log
 *zImage
 
 #

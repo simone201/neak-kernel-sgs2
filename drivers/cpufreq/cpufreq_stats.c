@@ -286,7 +286,7 @@ static int cpufreq_stats_changefreq(unsigned int cpu)
 {
 	struct cpufreq_frequency_table *table;
 	struct cpufreq_stats *stat;
-	int i, j;
+	int i;
 
 	table = cpufreq_frequency_get_table(cpu);
 	stat = per_cpu(cpufreq_stats_table, cpu);

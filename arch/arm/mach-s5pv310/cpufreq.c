@@ -1304,19 +1304,14 @@ static DEFINE_MUTEX(suspend_mutex);
 static int s5pv310_cpufreq_notifier_event(struct notifier_block *this,
 		unsigned long event, void *ptr)
 {
-	static int max, min, oldstep4freq, oldstep5freq;
+	static int max, min;
 	struct cpufreq_policy *policy = cpufreq_cpu_get(0);
-	unsigned int cpu = 0;
 	int ret = 0;
 
 	switch (event) {
 	case PM_SUSPEND_PREPARE:
 		max = policy->max;
 		min = policy->min;
-//		oldstep4freq = s5pv310_freq_table[4].frequency/1000;
-//		oldstep5freq = s5pv310_freq_table[5].frequency/1000;
-//		set_freq_table(4,500);
-//		set_freq_table(5,498);
 		policy->max = policy->min = s5pv310_freq_table[L2].frequency;
 		ret = cpufreq_driver_target(policy,
 		s5pv310_freq_table[L2].frequency, DISABLE_FURTHER_CPUFREQ);
@@ -1330,9 +1325,6 @@ static int s5pv310_cpufreq_notifier_event(struct notifier_block *this,
 	case PM_POST_RESTORE:
 	case PM_POST_SUSPEND:
 		printk(KERN_DEBUG "PM_POST_SUSPEND for CPUFREQ: %d\n", ret);
-//		set_freq_table(5,oldstep5freq);
-//		set_freq_table(4,oldstep4freq);
-//		printk(KERN_DEBUG "PM_POST_SUSPEND old4 old5: %d %d\n", oldstep4freq, oldstep5freq);
 		ret = cpufreq_driver_target(policy,
 		s5pv310_freq_table[L2].frequency, ENABLE_FURTHER_CPUFREQ);
 		policy->max = max;
@@ -1465,8 +1457,6 @@ static int iem_clock_init(void)
 	struct clk *clk_hpm;
 	struct clk *clk_copy;
 	struct clk *clk_parent;
-	struct clk *clk_iec;
-	struct clk *clk_apc;
 
 	/* PWI clock setting */
 	clk_copy = clk_get(NULL, "sclk_pwi");
@@ -1970,7 +1960,6 @@ static void s5pv310_asv_set_voltage(void)
 
 static int s5pv310_update_dvfs_table(void)
 {
-	unsigned int i, j;
 	int ret = 0;
 
 	/* Get the maximum arm clock */
@@ -1982,10 +1971,6 @@ static int s5pv310_update_dvfs_table(void)
 		s5pv310_max_armclk  = 0; /* 1000MHz as default value */
 		ret = -EINVAL;
 	}
-
-	/* logout the selected dvfs table value for debugging */
-//	if (debug_mask & DEBUG_CPUFREQ)
-//		print_dvfs_table();
 
 	return ret;
 }
@@ -2361,7 +2346,7 @@ ssize_t store_freq_table(struct cpufreq_policy *policy,
                                       const char *buf, size_t count) {
 
 	unsigned int ret = -EINVAL;
-	int i = 0,max,min,u[6], p[6];
+	int i = 0,max,min,u[6];
 	ret = sscanf(buf, "%d %d %d %d %d %d", 
 		&u[0], &u[1], &u[2], &u[3], &u[4], &u[5]);
 	if(ret != 8)
@@ -2379,8 +2364,6 @@ ssize_t store_freq_table(struct cpufreq_policy *policy,
 	for(i=0;i<6;i++) if(s5pv310_freq_table[i].frequency==policy->min) break;
 	min = i;
 	policy->max = policy->min = s5pv310_freq_table[L2].frequency;
-//	ret = cpufreq_driver_target(policy,
-//		s5pv310_freq_table[L4].frequency, DISABLE_FURTHER_CPUFREQ);
 
 	for(i=0;i<8;i++) {
 		if(set_freq_table(i, u[i])!=-EINVAL) 
@@ -2390,9 +2373,7 @@ ssize_t store_freq_table(struct cpufreq_policy *policy,
 	policy->max = s5pv310_freq_table[max].frequency;
 	policy->min = s5pv310_freq_table[min].frequency;
 	policy->cpuinfo.max_freq = s5pv310_freq_table[0].frequency;
-	policy->cpuinfo.min_freq = s5pv310_freq_table[7].frequency;
-//	ret = cpufreq_driver_target(policy,
-//		s5pv310_freq_table[L4].frequency, ENABLE_FURTHER_CPUFREQ);	
+	policy->cpuinfo.min_freq = s5pv310_freq_table[5].frequency;
 
 	return count;
 }
@@ -2478,7 +2459,7 @@ ssize_t store_busfreq_static(struct cpufreq_policy *policy,
                                       const char *buf, size_t count) {
 
 	unsigned int ret = -EINVAL;
-	int i = 0,max,min,u[6], p[6];
+	int i = 0,u[6];
 	
 	if(!strncmp(buf,"enabled",5)) {
 		is_busfreq_static = 1;
