@@ -18,9 +18,9 @@ echo $(date) START of post-init.sh
   echo "2" > /proc/sys/net/ipv6/conf/all/use_tempaddr
 
 # Enable CIFS module
-if [ -f /data/.near/cifsmod ];
-  /sbin/busybox insmod /lib/modules/cifs.ko
-fi;
+#if [ -f /data/.near/cifsmod ];
+#  /sbin/busybox insmod /lib/modules/cifs.ko
+#fi;
 
 # Remount all partitions with noatime
   for k in $(/sbin/busybox mount | /sbin/busybox grep relatime | /sbin/busybox cut -d " " -f3)
@@ -195,9 +195,8 @@ if cd /data/init.d >/dev/null 2>&1 ; then
         echo "EXIT '$file' ($?)"
     done
 fi
+echo $(date) USER INIT DONE from /data/init.d
 
 /sbin/busybox sh /sbin/near/cwmconfig.sh
-
-echo $(date) USER INIT DONE from /data/init.d
 
 echo $(date) END of post-init.sh
