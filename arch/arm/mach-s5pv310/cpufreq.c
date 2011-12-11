@@ -158,9 +158,9 @@ static struct cpufreq_frequency_table s5pv310_freq_table[] = {
 
 #define MAX_LOAD	100
 #ifdef CONFIG_BUSFREQ_L2_160M
-#define UP_THRESHOLD_DEFAULT	25
-#else
 #define UP_THRESHOLD_DEFAULT	23
+#else
+#define UP_THRESHOLD_DEFAULT	21
 #endif
 
 static unsigned int up_threshold;
@@ -360,15 +360,14 @@ struct cpufreq_voltage_table {
 
 /* ASV table to work 1.2GHz in DVFS has 6 asv level. */
 static unsigned int s5pv310_asv_cpu_volt_table[6][CPUFREQ_LEVEL_END] = {
-	{ 1450000, 1350000, 1300000, 1200000, 1100000, 1000000,  975000,  975000 },	/* 0 */
-	{ 1425000, 1325000, 1275000, 1175000, 1075000,  975000,  950000,  950000 },	/* 1 */
-	{ 1400000, 1300000, 1250000, 1150000, 1050000,  975000,  950000,  950000 },	/* 2 */
-	{ 1400000, 1300000, 1250000, 1150000, 1050000,  975000,  925000,  925000 },	/* 3 */
-	{ 1350000, 1250000, 1200000, 1100000, 1000000,  975000,  925000,  925000 },	/* 4 */
-	{ 1325000, 1225000, 1175000, 1075000,  975000,  950000,  925000,  925000 },	/* 5 */
+	{ 1300000, 1200000, 1100000, 1000000,  975000,  950000 },	/* 0 */
+	{ 1275000, 1175000, 1075000,  975000,  950000,  950000 },	/* 1 */
+	{ 1250000, 1150000, 1050000,  975000,  950000,  925000 },	/* 2 */
+	{ 1250000, 1150000, 1050000,  975000,  925000,  925000 },	/* 3 */
+	{ 1200000, 1100000, 1000000,  975000,  925000,  900000 },	/* 4 */
+	{ 1175000, 1075000,  975000,  950000,  925000,  900000 },	/* 5 */
 };
 
-/* level 1 and 2 of vdd_int uses the same voltage value in U1 project */
 static unsigned int asv_int_volt_table[6][LV_END] = {
 	{ 1125000, 1025000, 1025000 },	/* 0 */
 	{ 1100000, 1000000, 1000000 },	/* 1 */
@@ -381,11 +380,11 @@ static unsigned int asv_int_volt_table[6][LV_END] = {
 static struct cpufreq_voltage_table s5pv310_volt_table[CPUFREQ_LEVEL_END] = {
 	{
 		.index		= L0,
-		.arm_volt	= 1300000,
+		.arm_volt	= 1275000,
 		.int_volt	= 1100000,
 	}, {
 		.index		= L1,
-		.arm_volt	= 1200000,
+		.arm_volt	= 1175000,
 		.int_volt	= 1100000,
 	}, {
 		.index		= L2,
@@ -401,7 +400,7 @@ static struct cpufreq_voltage_table s5pv310_volt_table[CPUFREQ_LEVEL_END] = {
 		.int_volt	= 1000000,
 	}, {
 		.index		= L5,
-		.arm_volt	= 975000,
+		.arm_volt	= 950000,
 		.int_volt	= 1000000,
 	},
 };
