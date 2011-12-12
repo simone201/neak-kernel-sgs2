@@ -120,7 +120,7 @@ config CPU_FREQ_DEFAULT_GOV_INTERACTIVE
 	  loading your cpufreq low-level hardware driver, using the
 	  'interactive' governor for latency-sensitive workloads.
 	  
-config CPU_FREQ_GOV_LAZY
+config CPU_FREQ_DEFAULT_GOV_LAZY
         tristate "'lazy' cpufreq governor"
         depends on CPU_FREQ
 
@@ -229,13 +229,9 @@ config CPU_FREQ_GOV_CONSERVATIVE
 
 	  If in doubt, say N.
 	  
-config CPU_FREQ_GOV_BRAZILIANWAX
-	tristate "'brazilianwax' cpufreq governor"
+config CPU_FREQ_GOV_LAZY
+	tristate "'lazy' cpufreq governor"
 	depends on CPU_FREQ
-	help
-          brazilianwax' - a "slightly more agressive smart" optimized governor!
- 
-	  If in doubt, say Y.
 
 config CPU_FREQ_GOV_LAGFREE
         tristate "'lagfree' cpufreq governor"
