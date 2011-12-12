@@ -16,15 +16,10 @@
 
 #include "gpu_clock_control.h"
 
-#ifndef CONFIG_SIYAH_SAFE_FEATURES
 #define GPU_MAX_CLOCK 450
 #define GPU_MIN_CLOCK 10
-#else
-#define GPU_MAX_CLOCK 300
-#define GPU_MIN_CLOCK 100
-#endif
 
-int gpu_clock_control[2] = { 160, 267 };
+int gpu_clock_control[2] = { 133, 267 };
 static ssize_t gpu_clock_show(struct device *dev, struct device_attribute *attr, char *buf) {
 	return sprintf(buf, "Step0: %d\nStep1: %d\n", gpu_clock_control[0], gpu_clock_control[1]);
 }
