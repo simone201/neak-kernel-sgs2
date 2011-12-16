@@ -1,9 +1,13 @@
 ui_print(" ");
+ui_print("* Welcome to NEAK Kernel! *");
+ui_print(" ");
+ui_print("* Version 1.0.1b *");
+ui_print(" ");
 ui_print(" ");
 show_progress(0.100000, 0);
 show_progress(0.100000, 40);
 
-ui_print("* Flashing Dawn kernel *");
+ui_print("* Flashing NEAK kernel *");
 
 assert(package_extract_file("zImage", "/tmp/zImage"),
 show_progress(0.100000, 70);
