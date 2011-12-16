@@ -5,7 +5,6 @@ if [ -e zImage ]; then
 fi
 
 rm compile.log
-rm compile2.log
 
 # Set Default Path
 TOP_DIR=$PWD
@@ -29,7 +28,7 @@ make -j`grep 'processor' /proc/cpuinfo | wc -l` ARCH=arm CROSS_COMPILE=$TOOLCHAI
 
 find -name '*.ko' -exec cp -av {} $ROOTFS_PATH/lib/modules/ \;
 
-make -j`grep 'processor' /proc/cpuinfo | wc -l` ARCH=arm CROSS_COMPILE=$TOOLCHAIN CONFIG_INITRAMFS_SOURCE="$ROOTFS_PATH" >> compile2.log 2>&1 || exit -1
+make -j`grep 'processor' /proc/cpuinfo | wc -l` ARCH=arm CROSS_COMPILE=$TOOLCHAIN CONFIG_INITRAMFS_SOURCE="$ROOTFS_PATH" || exit -1
 
 # Copy Kernel Image
 rm -f $KERNEL_PATH/releasetools/zip/$ZIP_NAME
