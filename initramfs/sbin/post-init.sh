@@ -80,7 +80,7 @@ echo "1" > /sys/devices/system/cpu/sched_mc_power_savings
 echo "3" > /sys/module/cpuidle/parameters/enable_mask
 
 # Hotplug thresholds
-echo "25" > /sys/module/pm_hotplug/parameters/loadl
+echo "35" > /sys/module/pm_hotplug/parameters/loadl
 echo "75" > /sys/module/pm_hotplug/parameters/loadh
 
 # Optimize SQlite databases of apps
