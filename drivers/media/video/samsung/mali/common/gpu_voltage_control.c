@@ -5,7 +5,7 @@
  *  twitter - @xdanetarchy
  *  XDA-developers - netarchy
  *
- *  Modified for SiyahKernel
+ *  Modified for NEAK Kernel
  *
  *  This program is free software; you can redistribute  it and/or modify it
  *  under  the terms of the GNU General Public License as published by the
@@ -18,13 +18,8 @@
 
 #include "gpu_voltage_control.h"
 
-#ifndef CONFIG_SIYAH_SAFE_FEATURES
 #define MIN_VOLTAGE_GPU  800000
 #define MAX_VOLTAGE_GPU 1200000
-#else
-#define MIN_VOLTAGE_GPU  900000
-#define MAX_VOLTAGE_GPU 1100000
-#endif
 
 #if defined(CONFIG_GPU_UNDERVOLTING)
 int gpu_voltage_control[2] = { 900000, 950000 };
