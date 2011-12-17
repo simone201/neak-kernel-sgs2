@@ -75,9 +75,9 @@ setprop debug.sf.hw 1;
 setprop windowsmgr.max_events_per_sec 60;
 
 # enable SCHED_MC
-echo "1" > /sys/devices/system/cpu/sched_mc_power_savings
+# echo "1" > /sys/devices/system/cpu/sched_mc_power_savings
 # Enable AFTR
-echo "3" > /sys/module/cpuidle/parameters/enable_mask
+# echo "3" > /sys/module/cpuidle/parameters/enable_mask
 
 # Hotplug thresholds
 echo "35" > /sys/module/pm_hotplug/parameters/loadl
