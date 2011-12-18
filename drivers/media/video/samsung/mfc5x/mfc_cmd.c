@@ -12,6 +12,7 @@
  */
 
 #include <linux/jiffies.h>
+#include <linux/sched.h>
 
 #if defined(CONFIG_ARCH_S5PV310)
 #include <mach/regs-mfc.h>

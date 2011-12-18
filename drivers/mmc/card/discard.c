@@ -8,6 +8,7 @@
 
 #include <linux/moduleparam.h>
 #include <linux/module.h>
+#include <linux/sched.h>
 
 #include <linux/mmc/card.h>
 #include <linux/mmc/discard.h>

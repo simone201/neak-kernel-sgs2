@@ -32,6 +32,7 @@
 #include <linux/semaphore.h>
 #include <linux/vmalloc.h>
 #include <asm/page.h>
+#include <linux/sched.h>
 
 #include <plat/regs_jpeg.h>
 #include <mach/irqs.h>

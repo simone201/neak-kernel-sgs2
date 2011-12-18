@@ -331,7 +331,11 @@ CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-DAWN_FLAGS   = -marm -mtune=cortex-a9 -march=armv7-a
+DAWN_FLAGS   = 	-marm -mtune=cortex-a9 -march=armv7-a \
+				-mfpu=neon -mfloat-abi=softfp \
+				-ffast-math -ftree-vectorize -funroll-loops \
+				-floop-interchange -floop-strip-mine -floop-block \
+				-pipe
 MODFLAGS	= -DMODULE
 CFLAGS_MODULE   = $(MODFLAGS)
 AFLAGS_MODULE   = $(MODFLAGS)

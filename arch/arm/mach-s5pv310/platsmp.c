@@ -26,6 +26,7 @@
 #include <asm/smp_scu.h>
 #include <asm/unified.h>
 #include <asm/mmu_context.h>
+#include <asm/topology.h>
 
 #include <plat/s5pv310.h>
 
@@ -213,6 +214,7 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
 	int i;
 
 	init_new_context(current, &init_mm);
+	init_cpu_topology();
 	smp_store_cpu_info(cpu);
 
 	/*

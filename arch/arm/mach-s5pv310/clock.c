@@ -672,11 +672,13 @@ static struct clk init_clocks_disable[] = {
 		.enable		= s5pv310_clk_ip_peril_ctrl,
 		.ctrlbit	= (1 << 15),
 	}, {
+#ifndef CONFIG_S5PV310_WATCHDOG_RESET
 		.name		= "watchdog",
 		.id		= -1,
 		.enable		= s5pv310_clk_ip_perir_ctrl,
 		.ctrlbit	= (1 << 14),
 	}, {
+#endif
 		.name		= "rtc",
 		.id		= -1,
 		.enable		= s5pv310_clk_ip_perir_ctrl,
@@ -1032,6 +1034,13 @@ static struct clk init_clocks[] = {
 		.enable		= s5pv310_clk_ip_peril_ctrl,
 		.ctrlbit	= (1 << 0),
 	}, {
+#ifdef CONFIG_S5PV310_WATCHDOG_RESET
+		.name		= "watchdog",
+		.id		= -1,
+		.enable		= s5pv310_clk_ip_perir_ctrl,
+		.ctrlbit	= (1 << 14),
+	}, {
+#endif
 		.name		= "uart",
 		.id		= 1,
 		.enable		= s5pv310_clk_ip_peril_ctrl,

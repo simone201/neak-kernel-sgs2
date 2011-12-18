@@ -15,6 +15,7 @@
 #include <linux/poll.h>
 #include <linux/miscdevice.h>
 #include <linux/clk.h>
+#include <linux/sched.h>
 
 #include <plat/tvout.h>
 

@@ -15,6 +15,7 @@
 #include <linux/kernel.h>
 #include <linux/string.h>
 #include <linux/delay.h>
+#include <linux/sched.h>
 
 #if defined(CONFIG_ARCH_S5PV310)
 #include <mach/regs-mfc.h>
