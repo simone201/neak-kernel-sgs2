@@ -14,7 +14,6 @@
  */
 
 #include <linux/slab.h>	/* For memory allocation */
-#include <linux/sched.h>
 
 #include "mali_osk.h"
 #include "mali_kernel_core.h"

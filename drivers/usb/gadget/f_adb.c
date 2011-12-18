@@ -25,7 +25,6 @@
 #include <linux/wait.h>
 #include <linux/err.h>
 #include <linux/interrupt.h>
-#include <linux/sched.h>
 
 #include <linux/types.h>
 #include <linux/device.h>

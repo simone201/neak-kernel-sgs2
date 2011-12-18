@@ -777,30 +777,17 @@ enum cpu_idle_type {
 };
 
 /*
- * Increase resolution of nice-level calculations for 64-bit architectures.
- */
-#if BITS_PER_LONG > 32
-#define SCHED_LOAD_RESOLUTION	10
-#define scale_load(w)		(w << SCHED_LOAD_RESOLUTION)
-#define scale_load_down(w)	(w >> SCHED_LOAD_RESOLUTION)
-#else
-#define SCHED_LOAD_RESOLUTION	0
-#define scale_load(w)		w
-#define scale_load_down(w)	w
-#endif
-
-#define SCHED_LOAD_SHIFT	(10 + (SCHED_LOAD_RESOLUTION))
-#define SCHED_LOAD_SCALE	(1L << SCHED_LOAD_SHIFT)
-
-/*
- * Increase resolution of cpu_power calculations
- */
-#define SCHED_POWER_SHIFT	10
-#define SCHED_POWER_SCALE	(1L << SCHED_POWER_SHIFT)
-
-/*
  * sched-domains (multiprocessor balancing) declarations:
  */
+
+/*
+ * Increase resolution of nice-level calculations:
+ */
+#define SCHED_LOAD_SHIFT	10
+#define SCHED_LOAD_SCALE	(1L << SCHED_LOAD_SHIFT)
+
+#define SCHED_LOAD_SCALE_FUZZ	SCHED_LOAD_SCALE
+
 #ifdef CONFIG_SMP
 #define SD_LOAD_BALANCE		0x0001	/* Do load balancing on this domain. */
 #define SD_BALANCE_NEWIDLE	0x0002	/* Balance when about to become idle */
@@ -813,7 +800,7 @@ enum cpu_idle_type {
 #define SD_POWERSAVINGS_BALANCE	0x0100	/* Balance for power savings */
 #define SD_SHARE_PKG_RESOURCES	0x0200	/* Domain members share cpu pkg resources */
 #define SD_SERIALIZE		0x0400	/* Only a single load balancing instance */
-#define SD_ASYM_PACKING		0x0800  /* Place busy groups earlier in the domain */
+
 #define SD_PREFER_SIBLING	0x1000	/* Prefer to place tasks in a sibling domain */
 
 enum powersavings_balance_level {
@@ -848,8 +835,6 @@ static inline int sd_balance_for_package_power(void)
 	return SD_PREFER_SIBLING;
 }
 
-extern int __weak arch_sd_sibling_asym_packing(void);
-
 /*
  * Optimise SD flags for power savings:
  * SD_BALANCE_NEWIDLE helps agressive task consolidation and power savings.
@@ -872,7 +857,6 @@ struct sched_group {
 	 * single CPU.
 	 */
 	unsigned int cpu_power;
-	unsigned long next_update;
 	unsigned int group_weight;
 
 	/*

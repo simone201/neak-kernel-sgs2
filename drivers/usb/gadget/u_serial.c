@@ -24,7 +24,6 @@
 #include <linux/tty.h>
 #include <linux/tty_flip.h>
 #include <linux/slab.h>
-#include <linux/sched.h>
 
 #include "u_serial.h"
 
