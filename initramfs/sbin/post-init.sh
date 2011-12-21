@@ -72,12 +72,12 @@ echo "4096,87380,404480" > /proc/sys/net/ipv4/tcp_rmem;
 setprop debug.performance.tuning 1; 
 setprop video.accelerate.hw 1;
 setprop debug.sf.hw 1;
-setprop windowsmgr.max_events_per_sec 60;
+setprop windowsmgr.max_events_per_sec 80;
 
 # enable SCHED_MC
 # echo "1" > /sys/devices/system/cpu/sched_mc_power_savings
-# Enable AFTR
-# echo "3" > /sys/module/cpuidle/parameters/enable_mask
+Enable AFTR
+echo "3" > /sys/module/cpuidle/parameters/enable_mask
 
 # Hotplug thresholds
 echo "35" > /sys/module/pm_hotplug/parameters/loadl
