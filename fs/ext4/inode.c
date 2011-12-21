@@ -3810,11 +3810,12 @@ static void ext4_end_io_dio(struct kiocb *iocb, loff_t offset,
 		  "for inode %lu, iocb 0x%p, offset %llu, size %llu\n",
  		  iocb->private, io_end->inode->i_ino, iocb, offset,
 		  size);
+		  
+	iocb->private = NULL;
 
 	/* if not aio dio with unwritten extents, just free io and return */
 	if (io_end->flag != EXT4_IO_UNWRITTEN){
 		ext4_free_io_end(io_end);
-		iocb->private = NULL;
 out:
 		if (is_async)
 			aio_complete(iocb, ret, 0);
