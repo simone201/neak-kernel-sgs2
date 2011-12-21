@@ -25,13 +25,8 @@
 #define CPUFREQ_NAME_LEN 16
 
 /* CPU UV DEFINES */
-#ifdef CONFIG_SIYAH_SAFE_FEATURES
-	#define CPU_UV_MV_MAX 1450000
-	#define CPU_UV_MV_MIN 900000
-#else
-	#define CPU_UV_MV_MAX 1500000
-	#define CPU_UV_MV_MIN 750000
-#endif
+#define CPU_UV_MV_MAX 1400000
+#define CPU_UV_MV_MIN 750000
 
 
 /*********************************************************************
