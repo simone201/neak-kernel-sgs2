@@ -681,7 +681,6 @@ static void hub_activate(struct usb_hub *hub, enum hub_activation_type type)
 {
 	struct usb_device *hdev = hub->hdev;
 	struct usb_hcd *hcd;
-	int ret;
 	int port1;
 	int status;
 	bool need_debounce_delay = false;
