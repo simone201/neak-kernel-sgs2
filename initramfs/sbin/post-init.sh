@@ -114,7 +114,6 @@ echo "64000" > /proc/sys/kernel/msgmni;
 echo "64000" > /proc/sys/kernel/msgmax;
 echo "10" > /proc/sys/fs/lease-break-time;
 echo "500,512000,64,2048" > /proc/sys/kernel/sem;
-echo "NO_GENTLE_FAIR_SLEEPERS" > /sys/kernel/debug/sched_features
 
 ##### Install SU #####
 
