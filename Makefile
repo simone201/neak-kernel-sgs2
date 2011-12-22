@@ -331,7 +331,10 @@ CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-DAWN_FLAGS   = -marm -mtune=cortex-a9 -march=armv7-a
+NEAK_FLAGS   = -marm -mtune=cortex-a9 -march=armv7-a \
+			   -fsched-spec-load -floop-interchange -floop-strip-mine -floop-block \
+			   -funswitch-loops -fpredictive-commoning -fgcse-after-reload -fno-tree-vectorize \
+			   -fipa-cp-clone -pipe
 MODFLAGS	= -DMODULE
 CFLAGS_MODULE   = $(MODFLAGS)
 AFLAGS_MODULE   = $(MODFLAGS)
@@ -353,7 +356,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
-		   -fno-delete-null-pointer-checks -mno-unaligned-access $(DAWN_FLAGS)
+		   -fno-delete-null-pointer-checks -mno-unaligned-access $(NEAK_FLAGS)
 #change@wtl.kSingh - enabling FIPS mode - starts
 ifeq ($(USE_SEC_FIPS_MODE),true)
 KBUILD_CFLAGS += -DSEC_FIPS_ENABLED
