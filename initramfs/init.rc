@@ -377,6 +377,8 @@ on post-fs
     chmod 0770 /dev/snd/hwC0D0
 #-----------------------------------------------------------------------
 
+start bootlogo
+
 on boot
 # basic network init
     ifup lo
@@ -862,6 +864,11 @@ service rtc_log /system/bin/sh /system/bin/rtc_log.sh
 service post-init /sbin/post-init.sh
     user root
     oneshot
+    
+service bootlogo /sbin/near/logo.sh
+	user root
+    oneshot
+    disabled
 
 service stopbootanim /sbin/near/stopbootanim.sh
     user root

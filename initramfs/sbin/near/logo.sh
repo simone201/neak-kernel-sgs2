@@ -1,8 +1,9 @@
 #!/sbin/busybox sh
 #### install boot logo ####
 # import/install custom boot logo if one exists
-# sdcard isn't mounted at this point, mount it for now
 # thx to Hellcat
+
+# sdcard isn't mounted at this point, mount it for now
 /sbin/busybox mount -o rw /dev/block/mmcblk0p11 /mnt/sdcard
 
 # import/install custom boot logo if one exists
@@ -36,3 +37,6 @@ if [ -f /mnt/sdcard/logo/logo.jpg ]; then
   /sbin/busybox umount /mnt/sdcard
   reboot
 fi;
+
+# remove sdcard mount again
+/sbin/busybox umount /mnt/sdcard
