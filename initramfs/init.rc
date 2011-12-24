@@ -123,6 +123,7 @@ loglevel 3
 
 # ko file for Voodoo Mods
 	insmod /lib/modules/mc1n2_voodoo.ko
+	insmod /lib/modules/ld9040_voodoo.ko
 
 on fs
     # mount mtd partitions
