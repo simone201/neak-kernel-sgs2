@@ -2416,13 +2416,6 @@ ssize_t store_UV_mV_table(struct cpufreq_policy *policy,
 			{
 				u[i] = CPU_UV_MV_MIN / 1000;
 			}
-#ifdef CONFIG_SIYAH_SAFE_FEATURES
-			//allow max +- 100 mV modification per step
-			if(u[i] > stock_UV_mV[i] + 100)
-				u[i] = stock_UV_mV[i] + 100;
-			else if(u[i] < stock_UV_mV[i] - 100)
-				u[i] = stock_UV_mV[i] - 100;
-#endif
 		}
 		if(ret >= 5) exp_UV_mV[0] = u[0] * 1000;
 			exp_UV_mV[1] = u[1] * 1000; 
