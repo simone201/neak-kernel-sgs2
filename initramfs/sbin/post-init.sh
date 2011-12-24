@@ -197,5 +197,6 @@ fi
 echo $(date) USER INIT DONE from /data/init.d
 
 /sbin/busybox sh /sbin/near/cwmconfig.sh
+/sbin/busybox sh /sbin/near/logo.sh
 
 echo $(date) END of post-init.sh
