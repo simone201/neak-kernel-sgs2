@@ -1,7 +1,5 @@
 #!/sbin/busybox sh
 
-/sbin/busybox mount -o rw /dev/block/mmcblk0p11 /mnt/sdcard
-
 if ! [ -d /sdcard/clockworkmod ]; then
 	mkdir  /sdcard/clockworkmod
 else
