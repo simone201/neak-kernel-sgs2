@@ -9,7 +9,7 @@ rm compile.log
 # Set Default Path
 TOP_DIR=$PWD
 KERNEL_PATH="/home/simone/neak-kernel"
-VOODOO_PATH="/home/simone/voodoo-mods"
+VOODOO_PATH="/home/simone/neak-kernel/voodoo-mods"
 
 # Set toolchain and root filesystem path
 TOOLCHAIN="/home/simone/arm-2011.03/bin/arm-none-eabi-"
