@@ -17,11 +17,6 @@ echo $(date) START of post-init.sh
 # IPv6 privacy tweak
   echo "2" > /proc/sys/net/ipv6/conf/all/use_tempaddr
 
-# Enable CIFS module
-#if [ -f /data/.near/cifsmod ];
-#  /sbin/busybox insmod /lib/modules/cifs.ko
-#fi;
-
 # Remount all partitions with noatime
   for k in $(/sbin/busybox mount | /sbin/busybox grep relatime | /sbin/busybox cut -d " " -f3)
   do
@@ -114,6 +109,11 @@ echo "64000" > /proc/sys/kernel/msgmni;
 echo "64000" > /proc/sys/kernel/msgmax;
 echo "10" > /proc/sys/fs/lease-break-time;
 echo "500,512000,64,2048" > /proc/sys/kernel/sem;
+
+# Lionheart tweaks - if enabled
+if [ -f /system/etc/lionheart ]; then
+	/sbin/busybox sh /sbin/near/lionheart.sh
+fi;
 
 ##### Install SU #####
 
