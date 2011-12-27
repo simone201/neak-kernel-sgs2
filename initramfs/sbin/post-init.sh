@@ -39,9 +39,9 @@ echo $(date) START of post-init.sh
   echo "1500" > /proc/sys/vm/dirty_writeback_centisecs
   echo "200" > /proc/sys/vm/dirty_expire_centisecs
   echo "0" > /proc/sys/vm/swappiness
-  sysctl -w kernel.sched_min_granularity_ns=200000;
-  sysctl -w kernel.sched_latency_ns=400000;
-  sysctl -w kernel.sched_wakeup_granularity_ns=100000;
+  echo 200000 > /proc/sys/kernel/sched_min_granularity_ns;
+  echo 400000 > /proc/sys/kernel/sched_latency_ns;
+  echo 100000 > /proc/sys/kernel/sched_wakeup_granularity_ns;
 
 # SD cards (mmcblk) read ahead tweaks
   echo "1024" > /sys/devices/virtual/bdi/179:0/read_ahead_kb
@@ -60,8 +60,8 @@ echo "404480" > /proc/sys/net/core/wmem_max;
 echo "404480" > /proc/sys/net/core/rmem_max;
 echo "256960" > /proc/sys/net/core/rmem_default;
 echo "256960" > /proc/sys/net/core/wmem_default;
-echo "4096,16384,404480" > /proc/sys/net/ipv4/tcp_wmem;
-echo "4096,87380,404480" > /proc/sys/net/ipv4/tcp_rmem;
+echo "4096 16384 404480" > /proc/sys/net/ipv4/tcp_wmem;
+echo "4096 87380 404480" > /proc/sys/net/ipv4/tcp_rmem;
 
 # UI tweaks
 setprop debug.performance.tuning 1; 
@@ -82,7 +82,7 @@ echo "75" > /sys/module/pm_hotplug/parameters/loadh
 for i in \
 `find /data -iname "*.db"`; 
 do \
-	sqlite3 $i 'VACUUM;'; 
+	/sbin/sqlite3 $i 'VACUUM;';
 done;
 
 # Renice kswapd0 - kernel thread responsible for managing the memory
@@ -108,7 +108,7 @@ echo "8" > /proc/sys/vm/page-cluster;
 echo "64000" > /proc/sys/kernel/msgmni;
 echo "64000" > /proc/sys/kernel/msgmax;
 echo "10" > /proc/sys/fs/lease-break-time;
-echo "500,512000,64,2048" > /proc/sys/kernel/sem;
+echo "500 512000 64 2048" > /proc/sys/kernel/sem;
 
 # Lionheart tweaks - if enabled
 if [ -f /system/etc/lionheart ]; then
