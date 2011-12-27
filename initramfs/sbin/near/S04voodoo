@@ -1,0 +1,7 @@
+#!/system/bin/sh
+# N.E.A.K. Kernel
+# Enabling Voodoo Modules
+# by simone201
+
+insmod /lib/modules/ld9040_voodoo.ko
+insmod /lib/modules/mc1n2_voodoo.ko

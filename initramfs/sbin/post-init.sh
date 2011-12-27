@@ -196,6 +196,4 @@ if cd /data/init.d >/dev/null 2>&1 ; then
 fi
 echo $(date) USER INIT DONE from /data/init.d
 
-/sbin/busybox sh /sbin/near/cwmconfig.sh
-
 echo $(date) END of post-init.sh
