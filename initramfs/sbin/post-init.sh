@@ -39,29 +39,29 @@ echo $(date) START of post-init.sh
   echo "1500" > /proc/sys/vm/dirty_writeback_centisecs
   echo "200" > /proc/sys/vm/dirty_expire_centisecs
   echo "0" > /proc/sys/vm/swappiness
-  echo 200000 > /proc/sys/kernel/sched_min_granularity_ns;
-  echo 400000 > /proc/sys/kernel/sched_latency_ns;
-  echo 100000 > /proc/sys/kernel/sched_wakeup_granularity_ns;
+  echo "200000" > /proc/sys/kernel/sched_min_granularity_ns;
+  echo "400000" > /proc/sys/kernel/sched_latency_ns;
+  echo "100000" > /proc/sys/kernel/sched_wakeup_granularity_ns;
 
 # SD cards (mmcblk) read ahead tweaks
   echo "1024" > /sys/devices/virtual/bdi/179:0/read_ahead_kb
   echo "1024" > /sys/devices/virtual/bdi/179:16/read_ahead_kb
 
 # TCP tweaks
-echo "0" > /proc/sys/net/ipv4/tcp_timestamps;
-echo "1" > /proc/sys/net/ipv4/tcp_tw_reuse;
-echo "1" > /proc/sys/net/ipv4/tcp_sack;
-echo "1" > /proc/sys/net/ipv4/tcp_tw_recycle;
-echo "1" > /proc/sys/net/ipv4/tcp_window_scaling;
-echo "5" > /proc/sys/net/ipv4/tcp_keepalive_probes;
-echo "30" > /proc/sys/net/ipv4/tcp_keepalive_intvl;
-echo "30" > /proc/sys/net/ipv4/tcp_fin_timeout;
-echo "404480" > /proc/sys/net/core/wmem_max;
-echo "404480" > /proc/sys/net/core/rmem_max;
-echo "256960" > /proc/sys/net/core/rmem_default;
-echo "256960" > /proc/sys/net/core/wmem_default;
-echo "4096 16384 404480" > /proc/sys/net/ipv4/tcp_wmem;
-echo "4096 87380 404480" > /proc/sys/net/ipv4/tcp_rmem;
+  echo "0" > /proc/sys/net/ipv4/tcp_timestamps;
+  echo "1" > /proc/sys/net/ipv4/tcp_tw_reuse;
+  echo "1" > /proc/sys/net/ipv4/tcp_sack;
+  echo "1" > /proc/sys/net/ipv4/tcp_tw_recycle;
+  echo "1" > /proc/sys/net/ipv4/tcp_window_scaling;
+  echo "5" > /proc/sys/net/ipv4/tcp_keepalive_probes;
+  echo "30" > /proc/sys/net/ipv4/tcp_keepalive_intvl;
+  echo "30" > /proc/sys/net/ipv4/tcp_fin_timeout;
+  echo "404480" > /proc/sys/net/core/wmem_max;
+  echo "404480" > /proc/sys/net/core/rmem_max;
+  echo "256960" > /proc/sys/net/core/rmem_default;
+  echo "256960" > /proc/sys/net/core/wmem_default;
+  echo "4096 16384 404480" > /proc/sys/net/ipv4/tcp_wmem;
+  echo "4096 87380 404480" > /proc/sys/net/ipv4/tcp_rmem;
 
 # UI tweaks
 setprop debug.performance.tuning 1; 
@@ -69,9 +69,9 @@ setprop video.accelerate.hw 1;
 setprop debug.sf.hw 1;
 setprop windowsmgr.max_events_per_sec 80;
 
-# enable SCHED_MC
+# Enable SCHED_MC - will introduce with ARM Topology
 # echo "1" > /sys/devices/system/cpu/sched_mc_power_savings
-Enable AFTR
+# Enable AFTR
 echo "3" > /sys/module/cpuidle/parameters/enable_mask
 
 # Hotplug thresholds
@@ -86,7 +86,6 @@ do \
 done;
 
 # Renice kswapd0 - kernel thread responsible for managing the memory
-sleep 3
 renice 18 `pidof kswapd0`
 
 # New scheduler tweaks + readahead tweaks
