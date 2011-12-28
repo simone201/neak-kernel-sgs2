@@ -1315,26 +1315,36 @@ static int s5pv310_cpufreq_notifier_event(struct notifier_block *this,
 		policy->max = policy->min = s5pv310_freq_table[L2].frequency;
 		ret = cpufreq_driver_target(policy,
 		s5pv310_freq_table[L2].frequency, DISABLE_FURTHER_CPUFREQ);
-		if (WARN_ON(ret < 0))
+		if (WARN_ON(ret < 0)) {
 			return NOTIFY_BAD;
+			goto out;
+		}
 #ifdef CONFIG_S5PV310_BUSFREQ
 		s5pv310_busfreq_lock(DVFS_LOCK_ID_PM, BUS_L0);
 #endif
 		printk(KERN_DEBUG "PM_SUSPEND_PREPARE for CPUFREQ\n");
 		return NOTIFY_OK;
+		break;
 	case PM_POST_RESTORE:
 	case PM_POST_SUSPEND:
 		printk(KERN_DEBUG "PM_POST_SUSPEND for CPUFREQ: %d\n", ret);
 		ret = cpufreq_driver_target(policy,
-		s5pv310_freq_table[L2].frequency, ENABLE_FURTHER_CPUFREQ);
+			s5pv310_freq_table[L2].frequency,
+			ENABLE_FURTHER_CPUFREQ);
 		policy->max = max;
 		policy->min = min;
 #ifdef CONFIG_S5PV310_BUSFREQ
 		s5pv310_busfreq_lock_free(DVFS_LOCK_ID_PM);
 #endif
-		return NOTIFY_OK;
+		ret = NOTIFY_OK;
+		break;
+	default:
+		ret = NOTIFY_DONE;
+		break;
 	}
-	return NOTIFY_DONE;
+out:
+	cpufreq_cpu_put(policy);
+	return ret;
 }
 
 static struct notifier_block s5pv310_cpufreq_notifier = {
