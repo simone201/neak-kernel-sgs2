@@ -73,6 +73,7 @@
 #include <linux/ftrace.h>
 #include <linux/slab.h>
 #include <linux/cpuacct.h>
+#include <linux/sched.h>
 
 #include <asm/tlb.h>
 #include <asm/irq_regs.h>

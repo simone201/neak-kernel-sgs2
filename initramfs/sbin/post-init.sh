@@ -70,7 +70,7 @@ setprop debug.sf.hw 1;
 setprop windowsmgr.max_events_per_sec 80;
 
 # Enable SCHED_MC - will introduce with ARM Topology
-# echo "1" > /sys/devices/system/cpu/sched_mc_power_savings
+echo "1" > /sys/devices/system/cpu/sched_mc_power_savings
 # Enable AFTR
 echo "3" > /sys/module/cpuidle/parameters/enable_mask
 
