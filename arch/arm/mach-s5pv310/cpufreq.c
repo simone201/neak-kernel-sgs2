@@ -250,7 +250,7 @@ static unsigned int asv_int_volt_table[6][LV_END] = {
 	{ 1050000, 950000, 950000 },	/* 5 */
 };
 
-static unsigned int clkdiv_cpu0[CPUFREQ_LEVEL_END][5] = {
+static unsigned int clkdiv_cpu0[CPUFREQ_LEVEL_END][7] = {
 	/*
 	 * Clock divider value for following
 	 * { DIVCORE, DIVCOREM0, DIVCOREM1, DIVPERIPH,
@@ -1728,7 +1728,6 @@ static int s5pv310_cpufreq_notifier_event(struct notifier_block *this,
 {
         static int max, min;
 	struct cpufreq_policy *policy = cpufreq_cpu_get(0);
-	unsigned int cpu = 0;
 	int ret = 0;
 
 	switch (event) {
@@ -1879,8 +1878,6 @@ static int iem_clock_init(void)
 	struct clk *clk_hpm;
 	struct clk *clk_copy;
 	struct clk *clk_parent;
-	struct clk *clk_iec;
-	struct clk *clk_apc;
 
 	/* PWI clock setting */
 	clk_copy = clk_get(NULL, "sclk_pwi");
@@ -2922,7 +2919,7 @@ ssize_t store_busfreq_static(struct cpufreq_policy *policy,
                                       const char *buf, size_t count) {
 
 	unsigned int ret = -EINVAL;
-	int i = 0,max,min,u[6];
+	int i = 0,u[6];
 	
 	if(!strncmp(buf,"enabled",5)) {
 		is_busfreq_static = 1;
