@@ -46,23 +46,13 @@
 #include <mach/regs-clock.h>
 #include <mach/pm-core.h>
 
-/* UV */
-int stock_UV_mV[6] = {
-	1300000, //1200Mhz
-	1200000, //1000Mhz
-	1100000, // 800Mhz
-	1000000, // 500Mhz
-	975000,  // 200Mhz
-	950000,  // 100Mhz
-};
-
-int exp_UV_mV[6] = {
-	1300000, //1200Mhz
-	1200000, //1000Mhz
-	1100000, // 800Mhz
-	1000000, // 500Mhz
-	975000,  // 200Mhz
-	950000,  // 100Mhz
+int exp_UV_mV[6] = { 
+	1275000, // 1200Mhz
+	1175000, // 1000Mhz
+	1075000, // 800Mhz
+	975000,  // 500Mhz
+	950000,  // 200Mhz
+	925000,  // 100Mhz
 };
 
 static struct clk *arm_clk;
@@ -82,12 +72,22 @@ static bool s5pv310_cpufreq_init_done;
 static DEFINE_MUTEX(set_cpu_freq_change);
 static DEFINE_MUTEX(set_cpu_freq_lock);
 
+#undef HAVE_DAC
+
+#ifdef HAVE_DAC
+void __iomem *dac_base;
+#endif
+
 /* temperary define for additional symantics for relation */
 #define DISABLE_FURTHER_CPUFREQ         0x10
 #define ENABLE_FURTHER_CPUFREQ          0x20
 #define MASK_FURTHER_CPUFREQ            0x30
 #define MASK_ONLY_SET_CPUFREQ		0x40
 #define SET_CPU_FREQ_SAMPLING_RATE      100000
+
+#define printk(args...)
+#define SMOOTH_SCALING
+#define ARIGHI_SMOOTH_SCALING
 
 #define ARMCLOCK_1200MHZ		1200000
 #define ARMCLOCK_1000MHZ		1000000
@@ -103,10 +103,15 @@ enum s5pv310_memory_type{
 	DDR3 = 0x6,
 };
 
+#ifdef CONFIG_CPU_S5PV310_EVT1
 enum cpufreq_level_index{
 	L0, L1, L2, L3, L4, L5, CPUFREQ_LEVEL_END,
 };
-
+#else
+enum cpufreq_level_index{
+	L0, L1, L2, L3, CPUFREQ_LEVEL_END,
+};
+#endif
 
 //don't ask me why we have another table. this is just an easy solution
 static unsigned int siyah_freq_table[] = {
@@ -127,14 +132,13 @@ static unsigned int freq_trans_table[CPUFREQ_LEVEL_END][CPUFREQ_LEVEL_END] = {
 	 *  The value 5 means to be set both type1 and type4.
 	 *
 	 * (for example)
-	 * from\to 1400/1200/1000/800/500/200 (old_idex, new_index)
-	 * 1400
+	 * from\to 1200/1000/800/500/200 (old_idex, new_index)
 	 * 1200
 	 * 1000
 	 *  800
 	 *  500
 	 *  200
-	*/
+	 */
 	{ 0, 4, 4, 4, 4, 4 },
 	{ 2, 0, 4, 4, 4, 4 },
 	{ 2, 2, 0, 4, 4, 4 },
@@ -157,11 +161,7 @@ static struct cpufreq_frequency_table s5pv310_freq_table[] = {
 #undef SYSFS_DEBUG_BUSFREQ
 
 #define MAX_LOAD	100
-#ifdef CONFIG_BUSFREQ_L2_160M
 #define UP_THRESHOLD_DEFAULT	23
-#else
-#define UP_THRESHOLD_DEFAULT	21
-#endif
 
 static unsigned int up_threshold;
 static struct s5pv310_dmc_ppmu_hw dmc[2];
@@ -173,7 +173,7 @@ static unsigned int fix_busfreq_level;
 static unsigned int pre_fix_busfreq_level;
 
 static unsigned int calc_bus_utilization(struct s5pv310_dmc_ppmu_hw *ppmu);
-static void busfreq_target(void);
+static void busfreq_target(unsigned int);
 
 static DEFINE_MUTEX(set_bus_freq_change);
 static DEFINE_MUTEX(set_bus_freq_lock);
@@ -229,12 +229,33 @@ unsigned int g_busfreq_lock_id;
 unsigned int g_busfreq_lock_val[DVFS_LOCK_ID_END];
 unsigned int g_busfreq_lock_level = BUSFREQ_MIN_LEVEL;
 
-static unsigned int clkdiv_cpu0[CPUFREQ_LEVEL_END][7] = {
+
+
+/* ASV table to work 1.2GHz in DVFS has 6 asv level. */
+static unsigned int s5pv310_asv_cpu_volt_table[6][CPUFREQ_LEVEL_END] = {
+	{ 1300000, 1200000, 1100000, 1000000,  975000,  975000 },	/* 0 */
+	{ 1275000, 1175000, 1075000,  975000,  950000,  950000 },	/* 1 */
+	{ 1250000, 1150000, 1050000,  975000,  950000,  950000 },	/* 2 */
+	{ 1250000, 1150000, 1050000,  975000,  925000,  925000 },	/* 3 */
+	{ 1200000, 1100000, 1000000,  975000,  925000,  925000 },	/* 4 */
+	{ 1175000, 1075000,  975000,  950000,  925000,  925000 },	/* 5 */
+};
+
+static unsigned int asv_int_volt_table[6][LV_END] = {
+	{ 1125000, 1025000, 1025000 },	/* 0 */
+	{ 1100000, 1000000, 1000000 },	/* 1 */
+	{ 1100000, 1000000, 1000000 },	/* 2 */
+	{ 1075000, 975000, 975000 },	/* 3 */
+	{ 1075000, 975000, 975000 },	/* 4 */
+	{ 1050000, 950000, 950000 },	/* 5 */
+};
+
+static unsigned int clkdiv_cpu0[CPUFREQ_LEVEL_END][5] = {
 	/*
 	 * Clock divider value for following
 	 * { DIVCORE, DIVCOREM0, DIVCOREM1, DIVPERIPH,
 	 *		DIVATB, DIVPCLK_DBG, DIVAPLL }
-	 */
+	 */	
 	/* ARM L0: 1200MHz */
 	{ 0, 3, 7, 3, 4, 1, 7 },
 
@@ -257,7 +278,7 @@ static unsigned int clkdiv_cpu0[CPUFREQ_LEVEL_END][7] = {
 static unsigned int clkdiv_cpu1[CPUFREQ_LEVEL_END][2] = {
 	/* Clock divider value for following
 	 * { DIVCOPY, DIVHPM }
-	 */	
+	 */
 	/* ARM L0: 1200MHz */
 	{ 5, 0 },
 
@@ -277,7 +298,89 @@ static unsigned int clkdiv_cpu1[CPUFREQ_LEVEL_END][2] = {
 	{ 3, 0 },
 };
 
+#ifdef CONFIG_CPU_S5PV310_EVT1
+#ifndef CONFIG_S5PV310_BUSFREQ
+static unsigned int clkdiv_dmc0[CPUFREQ_LEVEL_END][8] = {
+	/*
+	 * Clock divider value for following
+	 * { DIVACP, DIVACP_PCLK, DIVDPHY, DIVDMC, DIVDMCD
+	 *		DIVDMCP, DIVCOPY2, DIVCORE_TIMERS }
+	 */
 
+	/* DMC L0: 400MHz */
+	{ 3, 2, 1, 1, 1, 1, 3, 1 },
+
+	/* DMC L1: 400MHz */
+	{ 3, 2, 1, 1, 1, 1, 3, 1 },
+
+	/* DMC L2: 266.7MHz */
+	{ 4, 1, 1, 2, 1, 1, 3, 1 },
+
+	/* DMC L3: 133MHz */
+	{ 5, 1, 1, 5, 1, 1, 3, 1 },
+};
+
+
+static unsigned int clkdiv_top[CPUFREQ_LEVEL_END][5] = {
+	/*
+	 * Clock divider value for following
+	 * { DIVACLK200, DIVACLK100, DIVACLK160, DIVACLK133, DIVONENAND }
+	 */
+
+	/* ACLK200 L0: 200MHz */
+	{ 3, 7, 4, 5, 1 },
+
+	/* ACLK200 L1: 200MHz */
+	{ 3, 7, 4, 5, 1 },
+
+	/* ACLK200 L2: 160MHz */
+	{ 4, 7, 5, 6, 1 },
+
+	/* ACLK200 L3: 133MHz */
+	{ 5, 7, 7, 7, 1 },
+};
+
+static unsigned int clkdiv_lr_bus[CPUFREQ_LEVEL_END][2] = {
+	/*
+	 * Clock divider value for following
+	 * { DIVGDL/R, DIVGPL/R }
+	 */
+
+	/* ACLK_GDL/R L0: 200MHz */
+	{ 3, 1 },
+
+	/* ACLK_GDL/R L1: 200MHz */
+	{ 3, 1 },
+
+	/* ACLK_GDL/R L2: 160MHz */
+	{ 4, 1 },
+
+	/* ACLK_GDL/R L3: 133MHz */
+	{ 5, 1 },
+};
+
+static unsigned int clkdiv_ip_bus[CPUFREQ_LEVEL_END][3] = {
+	/*
+	 * Clock divider value for following
+	 * { DIV_MFC, DIV_G2D, DIV_FIMC }
+	 */
+
+	/* L0: MFC 200MHz G2D 266MHz FIMC 160MHz */
+	{ 3, 2, 4 },
+
+	/* L1: MFC 200MHz G2D 266MHz FIMC 160MHz */
+	{ 3, 2, 4 },
+
+	/* L2: MFC/G2D 160MHz FIMC 133MHz */
+	/* { 4, 4, 5 },*/
+	{ 3, 4, 5 },
+
+	/* L3: MFC/G2D 133MHz FIMC 100MHz */
+	/* { 5, 5, 7 },*/
+	{ 3, 5, 7 },
+};
+
+#else
 static unsigned int clkdiv_dmc0[LV_END][8] = {
 	/*
 	 * Clock divider value for following
@@ -351,6 +454,159 @@ static unsigned int clkdiv_ip_bus[LV_END][3] = {
 	{ 3, 5, 7 },
 };
 
+#endif
+#else
+#ifndef CONFIG_S5PV310_BUSFREQ
+static unsigned int clkdiv_dmc0[CPUFREQ_LEVEL_END][8] = {
+	/*
+	 * Clock divider value for following
+	 * { DIVACP, DIVACP_PCLK, DIVDPHY, DIVDMC, DIVDMCD
+	 *		DIVDMCP, DIVCOPY2, DIVCORE_TIMERS }
+	 */
+
+	/* DMC L0: 400MHz */
+	{ 3, 2, 1, 1, 1, 1, 3, 1 },
+
+	/* DMC L1: 400MHz */
+	{ 3, 2, 1, 1, 1, 1, 3, 1 },
+
+	/* DMC L2: 266.7MHz */
+	{ 7, 1, 1, 2, 1, 1, 3, 1 },
+
+	/* DMC L3: 200MHz */
+	{ 7, 1, 1, 3, 1, 1, 3, 1 },
+};
+
+
+static unsigned int clkdiv_top[CPUFREQ_LEVEL_END][5] = {
+	/*
+	 * Clock divider value for following
+	 * { DIVACLK200, DIVACLK100, DIVACLK160, DIVACLK133, DIVONENAND }
+	 */
+
+	/* ACLK200 L0: 200MHz */
+	{ 3, 7, 4, 5, 1 },
+
+	/* ACLK200 L1: 200MHz */
+	{ 3, 7, 4, 5, 1 },
+
+	/* ACLK200 L2: 160MHz */
+	{ 4, 7, 5, 7, 1 },
+
+	/* ACLK200 L3: 133.3MHz */
+	{ 5, 7, 7, 7, 1 },
+};
+
+static unsigned int clkdiv_lr_bus[CPUFREQ_LEVEL_END][2] = {
+	/*
+	 * Clock divider value for following
+	 * { DIVGDL/R, DIVGPL/R }
+	 */
+
+	/* ACLK_GDL/R L0: 200MHz */
+	{ 3, 1 },
+
+	/* ACLK_GDL/R L1: 200MHz */
+	{ 3, 1 },
+
+	/* ACLK_GDL/R L2: 160MHz */
+	{ 4, 1 },
+
+	/* ACLK_GDL/R L3: 133.3MHz */
+	{ 5, 1 },
+};
+
+static unsigned int clkdiv_ip_bus[CPUFREQ_LEVEL_END][3] = {
+	/*
+	 * Clock divider value for following
+	 * { DIV_MFC, DIV_G2D, DIV_FIMC }
+	 */
+
+	/* L0: MFC 200MHz G2D 266MHz FIMC 160MHz */
+	{ 3, 2, 4 },
+
+	/* L1: MFC 200MHz G2D 266MHz FIMC 160MHz */
+	{ 3, 2, 4 },
+
+	/* L2: MFC/G2D 160MHz FIMC 133MHz */
+	/* { 4, 4, 5 },*/
+	{ 3, 4, 5 },
+
+	/* L3: MFC/G2D 133MHz FIMC 100MHz */
+	/* { 5, 5, 7 },*/
+	{ 3, 5, 7 },
+};
+
+#else
+static unsigned int clkdiv_dmc0[CPUFREQ_LEVEL_END][8] = {
+	/*
+	 * Clock divider value for following
+	 * { DIVACP, DIVACP_PCLK, DIVDPHY, DIVDMC, DIVDMCD
+	 *		DIVDMCP, DIVCOPY2, DIVCORE_TIMERS }
+	 */
+
+	/* DMC L0: 400MHz */
+	{ 3, 2, 1, 1, 1, 1, 3, 1 },
+
+	/* DMC L1: 266.7MHz */
+	{ 7, 1, 1, 2, 1, 1, 3, 1 },
+
+	/* DMC L2: 200MHz */
+	{ 7, 1, 1, 3, 1, 1, 3, 1 },
+};
+
+static unsigned int clkdiv_top[CPUFREQ_LEVEL_END][5] = {
+	/*
+	 * Clock divider value for following
+	 * { DIVACLK200, DIVACLK100, DIVACLK160, DIVACLK133, DIVONENAND }
+	 */
+
+	/* ACLK200 L0: 200MHz */
+	{ 3, 7, 4, 5, 1 },
+
+	/* ACLK200 L1: 160MHz */
+	{ 4, 7, 5, 7, 1 },
+
+	/* ACLK200 L2: 133.3MHz */
+	{ 5, 7, 7, 7, 1 },
+};
+
+static unsigned int clkdiv_lr_bus[CPUFREQ_LEVEL_END][2] = {
+	/*
+	 * Clock divider value for following
+	 * { DIVGDL/R, DIVGPL/R }
+	 */
+
+	/* ACLK_GDL/R L0: 200MHz */
+	{ 3, 1 },
+
+	/* ACLK_GDL/R L1: 160MHz */
+	{ 4, 1 },
+
+	/* ACLK_GDL/R L2: 133.3MHz */
+	{ 5, 1 },
+};
+
+static unsigned int clkdiv_ip_bus[LV_END][3] = {
+	/*
+	 * Clock divider value for following
+	 * { DIV_MFC, DIV_G2D, DIV_FIMC }
+	 */
+
+	/* L0: MFC 200MHz G2D 266MHz FIMC 160MHz */
+	{ 3, 2, 4 },
+
+	/* L1: MFC/G2D 160MHz FIMC 133MHz */
+	/* { 4, 4, 5 },*/
+	{ 3, 4, 5 },
+
+	/* L2: MFC/G2D 133MHz FIMC 100MHz */
+	/* { 5, 5, 7 }, */
+	{ 3, 5, 7 },
+};
+
+#endif
+#endif
 
 struct cpufreq_voltage_table {
 	unsigned int	index;		/* any */
@@ -358,33 +614,15 @@ struct cpufreq_voltage_table {
 	unsigned int	int_volt;
 };
 
-/* ASV table to work 1.2GHz in DVFS has 6 asv level. */
-static unsigned int s5pv310_asv_cpu_volt_table[6][CPUFREQ_LEVEL_END] = {
-	{ 1300000, 1200000, 1100000, 1000000,  975000,  950000 },	/* 0 */
-	{ 1275000, 1175000, 1075000,  975000,  950000,  950000 },	/* 1 */
-	{ 1250000, 1150000, 1050000,  975000,  950000,  925000 },	/* 2 */
-	{ 1250000, 1150000, 1050000,  975000,  925000,  925000 },	/* 3 */
-	{ 1200000, 1100000, 1000000,  975000,  925000,  900000 },	/* 4 */
-	{ 1175000, 1075000,  975000,  950000,  925000,  900000 },	/* 5 */
-};
-
-static unsigned int asv_int_volt_table[6][LV_END] = {
-	{ 1125000, 1025000, 1025000 },	/* 0 */
-	{ 1100000, 1000000, 1000000 },	/* 1 */
-	{ 1100000, 1000000, 1000000 },	/* 2 */
-	{ 1075000, 975000, 975000 },	/* 3 */
-	{ 1075000, 975000, 975000 },	/* 4 */
-	{ 1050000, 950000, 950000 },	/* 5 */
-};
-
-static struct cpufreq_voltage_table s5pv310_volt_table[CPUFREQ_LEVEL_END] = {
+/* Using lookup table to support 1200MHz/1000MHz by reading chip id */
+static struct cpufreq_voltage_table s5pv310_lookup_volt_table[] = {
 	{
 		.index		= L0,
-		.arm_volt	= 1275000,
+		.arm_volt	= 1300000,
 		.int_volt	= 1100000,
 	}, {
 		.index		= L1,
-		.arm_volt	= 1175000,
+		.arm_volt	= 1200000,
 		.int_volt	= 1100000,
 	}, {
 		.index		= L2,
@@ -404,12 +642,61 @@ static struct cpufreq_voltage_table s5pv310_volt_table[CPUFREQ_LEVEL_END] = {
 		.int_volt	= 1000000,
 	},
 };
-static unsigned int s5pv310_apll_pms_table[CPUFREQ_LEVEL_END] = {
-	
+
+static unsigned int s5pv310_lookup_apll_pms_table[CPUFREQ_LEVEL_END] = {
 	/* APLL FOUT L0: 1200MHz */
 	((150<<16)|(3<<8)|(0x1)),
 
 	/* APLL FOUT L1: 1000MHz */
+	((250<<16)|(6<<8)|(0x1)),
+
+	/* APLL FOUT L2: 800MHz */
+	((200<<16)|(6<<8)|(0x1)),
+
+	/* APLL FOUT L3: 500MHz */
+	((250<<16)|(6<<8)|(0x2)),
+
+	/* APLL FOUT L4: 200MHz */
+	((200<<16)|(6<<8)|(0x3)),
+	
+	/* APLL FOUT L5: 100MHz */
+	((200<<16)|(6<<8)|(0x3)),
+};
+
+#ifdef CONFIG_S5PV310_ASV
+static struct cpufreq_voltage_table s5pv310_volt_table[CPUFREQ_LEVEL_END] = {
+	{
+		.index		= L0,
+		.arm_volt	= 1275000,
+		.int_volt	= 1100000,
+	}, {
+		.index		= L1,
+		.arm_volt	= 1175000,
+		.int_volt	= 1100000,
+	}, {
+		.index		= L2,
+		.arm_volt	= 1075000,
+		.int_volt	= 1100000,
+	}, {
+		.index		= L3,
+		.arm_volt	= 975000,
+		.int_volt	= 1000000,
+	}, {
+		.index		= L4,
+		.arm_volt	= 950000,
+		.int_volt	= 1000000,
+	}, {
+		.index		= L5,
+		.arm_volt	= 925000,
+		.int_volt	= 1000000,
+	},
+};
+#endif
+static unsigned int s5pv310_apll_pms_table[CPUFREQ_LEVEL_END] = {
+	/* APLL FOUT L0: 1200MHz */
+	((150<<16)|(3<<8)|(0x1)),
+
+	/* APLL FOUT L1 1000MHz */
 	((250<<16)|(6<<8)|(0x1)),
 
 	/* APLL FOUT L2: 800MHz */
@@ -674,6 +961,7 @@ void s5pv310_set_frequency(unsigned int old_index, unsigned int new_index)
 		is_curfreq_table = 1;
 
 	if (freqs.old < freqs.new) {
+#ifdef CONFIG_CPU_S5PV310_EVT1
 		/* 500->1000 & 200->800 change require to only change s value */
 		if (is_curfreq_table &&
 			(s5pv310_apll_pms_table[old_index]&CHANGE_S_MASK == s5pv310_apll_pms_table[new_index]&CHANGE_S_MASK)) {
@@ -695,12 +983,35 @@ void s5pv310_set_frequency(unsigned int old_index, unsigned int new_index)
 			/* 2. Change the apll m,p,s value */
 			if (freqs.new == ARMCLOCK_500MHZ) {
 				regulator_set_voltage(arm_regulator,
-					s5pv310_volt_table[4].arm_volt,
-					s5pv310_volt_table[4].arm_volt);
+					s5pv310_volt_table[3].arm_volt,
+					s5pv310_volt_table[3].arm_volt);
 			}
 			s5pv310_set_apll(new_index);
 		}
+#else
+		/* The frequency change to L0 needs to change apll */
+		if (is_curfreq_table &&
+			(freqs.new == s5pv310_freq_table[L0].frequency)) {
+			/* Clock Configuration Procedure */
+
+			/* 1. Change the system clock divider values */
+			s5pv310_set_clkdiv(new_index);
+
+			/* 2. Change the apll m,p,s value */
+			s5pv310_set_apll(new_index);
+		} else {
+			/* 1. Change the system clock divider values */
+			s5pv310_set_clkdiv(new_index);
+
+			/* 2. Change just s value in apll m,p,s value */
+			tmp = __raw_readl(S5P_APLL_CON0);
+			tmp &= ~(0x7 << 0);
+			tmp |= (s5pv310_apll_pms_table[new_index] & 0x7);
+			__raw_writel(tmp, S5P_APLL_CON0);
+		}
+#endif
 	} else if (freqs.old > freqs.new) {
+#ifdef CONFIG_CPU_S5PV310_EVT1
 			/* L1/L3, L2/L4 Level change require to only change s value */
 		if (is_curfreq_table &&
 			(s5pv310_apll_pms_table[old_index]&CHANGE_S_MASK == s5pv310_apll_pms_table[new_index]&CHANGE_S_MASK)) {					change_s_value = 1;
@@ -717,8 +1028,8 @@ void s5pv310_set_frequency(unsigned int old_index, unsigned int new_index)
 			/* Clock Configuration Procedure */
 			if (freqs.old == ARMCLOCK_500MHZ) {
 				regulator_set_voltage(arm_regulator,
-					s5pv310_volt_table[4].arm_volt,
-					s5pv310_volt_table[4].arm_volt);
+					s5pv310_volt_table[3].arm_volt,
+					s5pv310_volt_table[3].arm_volt);
 			}
 
 			/* 1. Change the apll m,p,s value */
@@ -727,15 +1038,67 @@ void s5pv310_set_frequency(unsigned int old_index, unsigned int new_index)
 			/* 2. Change the system clock divider values */
 			s5pv310_set_clkdiv(new_index);
 		}
+#else
+		/* The frequency change from L0 needs to change apll */
+		if (is_cpufreq_table &&
+			(freqs.old == s5pv310_freq_table[L0].frequency)) {
+			/* Clock Configuration Procedure */
+
+			/* 1. Change the apll m,p,s value */
+			s5pv310_set_apll(new_index);
+
+			/* 2. Change the system clock divider values */
+			s5pv310_set_clkdiv(new_index);
+		} else {
+			/* 1. Change just s value in apll m,p,s value */
+			tmp = __raw_readl(S5P_APLL_CON0);
+			tmp &= ~(0x7 << 0);
+			tmp |= (s5pv310_apll_pms_table[new_index] & 0x7);
+			__raw_writel(tmp, S5P_APLL_CON0);
+
+			/* 2. Change the system clock divider values */
+			s5pv310_set_clkdiv(new_index);
+		}
+#endif
 	}
 }
+
+#ifdef ARIGHI_SMOOTH_SCALING
+unsigned int target_freq_smooth;
+
+static void do_smooth_freq(struct work_struct *work)
+{
+	unsigned int target_freq;
+
+	mutex_lock(&set_cpu_freq_change);
+	target_freq = target_freq_smooth;
+	mutex_unlock(&set_cpu_freq_change);
+
+	if (likely(target_freq)) {
+		struct cpufreq_policy *policy = cpufreq_cpu_get(0);
+		int ret;
+
+		printk(KERN_INFO "%s: cpu%d: freq set to %u\n",
+			__func__, policy->cpu, target_freq_smooth);
+		ret = cpufreq_driver_target(policy,
+				target_freq_smooth, CPUFREQ_RELATION_H);
+		WARN_ON(ret < 0);
+	}
+}
+
+static DECLARE_DELAYED_WORK(smooth_freq_work, do_smooth_freq);
+#endif
+
+int smooth_target = L2;
+int smooth_offset = 2;
+int smooth_step = 2;
 
 static int s5pv310_target(struct cpufreq_policy *policy,
 		unsigned int target_freq,
 		unsigned int relation)
 {
 	int ret = 0;
-	unsigned int index, old_index;
+	unsigned int index, old_index, target_index;
 	unsigned int arm_volt;
 #ifndef CONFIG_S5PV310_BUSFREQ
 	unsigned int int_volt;
@@ -755,6 +1118,8 @@ static int s5pv310_target(struct cpufreq_policy *policy,
 				__FILE__, __LINE__);
 	}
 
+//string compare here?? you gotta be kidding.. - gm
+	if(policy->governor->disableScalingDuringSuspend) {
 		check_gov = 1;
 		if (relation & ENABLE_FURTHER_CPUFREQ)
 			s5pv310_dvs_locking = 0;
@@ -766,6 +1131,12 @@ static int s5pv310_target(struct cpufreq_policy *policy,
 			s5pv310_dvs_locking = 1;
 
 		relation &= ~(MASK_FURTHER_CPUFREQ | MASK_ONLY_SET_CPUFREQ);
+	} else {  //disable this part later, maybe... - gm
+		if ((relation & ENABLE_FURTHER_CPUFREQ) ||
+			(relation & DISABLE_FURTHER_CPUFREQ) ||
+			(relation & MASK_ONLY_SET_CPUFREQ))
+			goto cpufreq_out;
+	}
 
 	freqs.old = s5pv310_getspeed(policy->cpu);
 
@@ -787,19 +1158,29 @@ static int s5pv310_target(struct cpufreq_policy *policy,
 	if ((index < g_cpufreq_limit_level) && check_gov)
 		index = g_cpufreq_limit_level;
 
+#ifdef ARIGHI_SMOOTH_SCALING
+	target_index = index;
+#endif
+
+#ifdef SMOOTH_SCALING
 #ifdef CONFIG_FREQ_STEP_UP_L2_L0
 		/* change L2 -> L0 */
 		if ((index <= L2) && (old_index > L4))
 			index = L4;
 #else
 		/* change L2 -> L1 and change L1 -> L0 */
-		if (index == L0) {
-			if (old_index > L1)
-				index = L1;
+		if (index <= L2) {
+			if (old_index > L3)
+				index = L3;
 
-			if (old_index > L2)
-				index = L2;
+			if (old_index > L4)
+				index = L4;
 		}
+#endif
+#else
+//reach 1200MHz step by step starting from 800MHz -gm
+if(policy->governor->enableSmoothScaling && index <= smooth_target)
+  if(index < old_index) index = min(smooth_target + smooth_offset, old_index - smooth_step);
 #endif
 
 /* prevent freqs going above max policy - netarchy */
@@ -811,7 +1192,13 @@ static int s5pv310_target(struct cpufreq_policy *policy,
 
 	freqs.new = s5pv310_freq_table[index].frequency;
 	freqs.cpu = policy->cpu;
-
+#ifdef ARIGHI_SMOOTH_SCALING
+	if (index != target_index) {
+		target_freq_smooth = target_freq;
+		schedule_delayed_work_on(0, &smooth_freq_work, HZ >> 1);
+	} else
+		target_freq_smooth = 0;
+#endif
 	/* If the new frequency is same with previous frequency, skip */
 	if (freqs.new == freqs.old)
 		goto bus_freq;
@@ -854,10 +1241,27 @@ static int s5pv310_target(struct cpufreq_policy *policy,
 
 	cpufreq_notify_transition(&freqs, CPUFREQ_POSTCHANGE);
 
+#ifdef HAVE_DAC
+	switch (index) {
+	case L0:
+		__raw_writeb(0xff, dac_base);
+		break;
+	case L1:
+		__raw_writeb(0xaa, dac_base);
+		break;
+	case L2:
+		__raw_writeb(0x55, dac_base);
+		break;
+	case L3:
+		__raw_writeb(0x00, dac_base);
+		break;
+	}
+#endif
+
 bus_freq:
 	mutex_unlock(&set_cpu_freq_change);
 #ifdef CONFIG_S5PV310_BUSFREQ
-	busfreq_target();
+	busfreq_target(index);
 #endif
 	return ret;
 
@@ -952,7 +1356,7 @@ int busfreq_static_level[6] = {
 	0, //1200Mhz
 	0, //1000Mhz
 	1, // 800Mhz
-	1, // 500Mhz
+	2, // 500Mhz
 	2,  // 200Mhz
 	2,  // 100Mhz
 };
@@ -960,16 +1364,14 @@ int busfreq_static_level[6] = {
 static int busload_observor(struct busfreq_table *freq_table,
 			unsigned int bus_load,
 			unsigned int cpu_bus_load,
-			unsigned int pre_idx,
+			unsigned int pre_idx, unsigned int freqindex,
 			unsigned int *index)
 {
 	unsigned int i, target_freq, idx = 0;
 
 	if(is_busfreq_static)
 	{
-		//find the step
-		for(i=0;freqs.new < s5pv310_freq_table[i].frequency;i++);
-		idx = busfreq_static_level[i];
+		*index = busfreq_static_level[freqindex];
 		goto observerout;
 	}
 	
@@ -1034,7 +1436,7 @@ observerout:
 	return 0;
 }
 
-static void busfreq_target(void)
+static void busfreq_target(unsigned int freqindex)
 {
 	unsigned int i, index = 0, ret, voltage;
 	unsigned int bus_load, cpu_bus_load;
@@ -1071,7 +1473,7 @@ static void busfreq_target(void)
 
 	/* Change bus frequency */
 	ret = busload_observor(s5pv310_busfreq_table,
-				bus_load, cpu_bus_load, p_idx, &index);
+				bus_load, cpu_bus_load, p_idx, freqindex, &index);
 	if (ret < 0)
 		printk(KERN_ERR "%s:fail to check load (%d)\n", __func__, ret);
 
@@ -1134,7 +1536,16 @@ int s5pv310_cpufreq_lock(unsigned int nId,
 
 	if (!s5pv310_cpufreq_init_done)
 		return 0;
-
+#if 0
+	if (s5pv310_max_armclk != ARMCLOCK_1200MHZ) {
+		if (cpufreq_level != CPU_L0) {
+			cpufreq_level -= 1;
+		} else {
+			printk(KERN_WARNING
+				"[CPUFREQ]cpufreq lock to 1GHz in place of 1.2GHz\n");
+		}
+	}
+#endif
 	if (g_cpufreq_lock_id & (1 << nId)) {
 		printk(KERN_ERR
 		"[CPUFREQ]This device [%d] already locked cpufreq\n", nId);
@@ -1189,7 +1600,16 @@ int s5pv310_cpufreq_upper_limit(unsigned int nId, enum cpufreq_level_request cpu
 
 	if (!s5pv310_cpufreq_init_done)
 		return 0;
-
+#if 0
+	if (s5pv310_max_armclk != ARMCLOCK_1200MHZ) {
+		if (cpufreq_level != CPU_L0) {
+			cpufreq_level -= 1;
+		} else {
+			printk(KERN_DEBUG
+				"[CPUFREQ]cpufreq lock to 1GHz in place of 1.2GHz\n");
+		}
+	}
+#endif
 	if (g_cpufreq_limit_id & (1 << nId)) {
 		printk(KERN_ERR "[CPUFREQ]This device [%d] already limited cpufreq\n", nId);
 		return 0;
@@ -1253,7 +1673,7 @@ int s5pv310_busfreq_lock(unsigned int nId,
 	if (busfreq_level < g_busfreq_lock_level) {
 		g_busfreq_lock_level = busfreq_level;
 		mutex_unlock(&set_bus_freq_lock);
-		busfreq_target();
+		busfreq_target(0);
 	} else
 		mutex_unlock(&set_bus_freq_lock);
 
@@ -1300,25 +1720,28 @@ static int s5pv310_cpufreq_resume(struct cpufreq_policy *policy)
 
 ssize_t set_freq_table(unsigned char step, unsigned int freq);
 static DEFINE_MUTEX(suspend_mutex);
+int deepsleep_cpulevel = L2;
+int deepsleep_buslevel = BUS_L0;
 
 static int s5pv310_cpufreq_notifier_event(struct notifier_block *this,
 		unsigned long event, void *ptr)
 {
-	static int max, min;
+        static int max, min;
 	struct cpufreq_policy *policy = cpufreq_cpu_get(0);
+	unsigned int cpu = 0;
 	int ret = 0;
 
 	switch (event) {
 	case PM_SUSPEND_PREPARE:
 		max = policy->max;
 		min = policy->min;
-		policy->max = policy->min = s5pv310_freq_table[L2].frequency;
+		policy->max = policy->min = s5pv310_freq_table[deepsleep_cpulevel].frequency;
 		ret = cpufreq_driver_target(policy,
-		s5pv310_freq_table[L2].frequency, DISABLE_FURTHER_CPUFREQ);
+		s5pv310_freq_table[deepsleep_cpulevel].frequency, DISABLE_FURTHER_CPUFREQ);
 		if (WARN_ON(ret < 0))
 			return NOTIFY_BAD;
 #ifdef CONFIG_S5PV310_BUSFREQ
-		s5pv310_busfreq_lock(DVFS_LOCK_ID_PM, BUS_L0);
+		s5pv310_busfreq_lock(DVFS_LOCK_ID_PM, deepsleep_buslevel);
 #endif
 		printk(KERN_DEBUG "PM_SUSPEND_PREPARE for CPUFREQ\n");
 		return NOTIFY_OK;
@@ -1326,7 +1749,7 @@ static int s5pv310_cpufreq_notifier_event(struct notifier_block *this,
 	case PM_POST_SUSPEND:
 		printk(KERN_DEBUG "PM_POST_SUSPEND for CPUFREQ: %d\n", ret);
 		ret = cpufreq_driver_target(policy,
-		s5pv310_freq_table[L2].frequency, ENABLE_FURTHER_CPUFREQ);
+		s5pv310_freq_table[deepsleep_cpulevel].frequency, ENABLE_FURTHER_CPUFREQ);
 		policy->max = max;
 		policy->min = min;
 #ifdef CONFIG_S5PV310_BUSFREQ
@@ -1339,6 +1762,7 @@ static int s5pv310_cpufreq_notifier_event(struct notifier_block *this,
 
 static struct notifier_block s5pv310_cpufreq_notifier = {
 	.notifier_call = s5pv310_cpufreq_notifier_event,
+	.priority = INT_MIN, /* done last */
 };
 
 static int s5pv310_cpufreq_reboot_notifier_call(struct notifier_block *this,
@@ -1389,8 +1813,6 @@ static int s5pv310_cpufreq_cpu_init(struct cpufreq_policy *policy)
 
 	cpufreq_frequency_table_cpuinfo(policy, s5pv310_freq_table);
 	/* set safe default min and max speeds - netarchy */
-	// policy->max = CONFIG_DEFAULT_CLOCK_HIGH * 1000;
-	// policy->min = CONFIG_DEFAULT_CLOCK_LOW * 1000;
 	policy->max = 1200 * 1000;
 	policy->min = 200 * 1000;
 	return 0;
@@ -1457,6 +1879,8 @@ static int iem_clock_init(void)
 	struct clk *clk_hpm;
 	struct clk *clk_copy;
 	struct clk *clk_parent;
+	struct clk *clk_iec;
+	struct clk *clk_apc;
 
 	/* PWI clock setting */
 	clk_copy = clk_get(NULL, "sclk_pwi");
@@ -1736,32 +2160,32 @@ static int s5pv310_asv_table_update(void)
 	printk(KERN_INFO "ASV ids_group = %d hpm_group = %d asv_group = %d\n",
 		ids_group, hpm_group, asv_group);
 
-//	if (s5pv310_max_armclk == ARMCLOCK_1200MHZ)
-//		last_level = CPUFREQ_LEVEL_END - 1;
-//	else
+	if (true) //(s5pv310_max_armclk == ARMCLOCK_1200MHZ)
+		last_level = CPUFREQ_LEVEL_END - 1;
+	else
 		last_level = CPUFREQ_LEVEL_END - 2;
 
 	/* VDD_ARM level except the last level  */
 	for (i = 0; i < last_level; i++) {
 		switch (asv_group) {
 		case 0:
-			/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] += (100*1000);
+			s5pv310_volt_table[i].arm_volt += (100*1000);
 			break;
 		case 1:
-			/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] += (50*1000);
+			s5pv310_volt_table[i].arm_volt += (50*1000);
 			break;
 		case 2:
-			/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] += (0*1000);
+			s5pv310_volt_table[i].arm_volt += (0*1000);
 			break;
 		case 3:
-			/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (25*1000);
+			s5pv310_volt_table[i].arm_volt -= (25*1000);
 			break;
 		case 4:
-			if (true) { //s5pv310_max_armclk == ARMCLOCK_1200MHZ) {
+			if (s5pv310_max_armclk == ARMCLOCK_1200MHZ) {
 				if (i == 3)
-					/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (25*1000);
+					s5pv310_volt_table[i].arm_volt -= (25*1000);
 				else
-					/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (50*1000);
+					s5pv310_volt_table[i].arm_volt -= (50*1000);
 			} else {
 				if (i == 2)
 					s5pv310_volt_table[i].arm_volt -= (25*1000);
@@ -1772,9 +2196,9 @@ static int s5pv310_asv_table_update(void)
 		case 5:
 			if (true) { //s5pv310_max_armclk == ARMCLOCK_1200MHZ) {
 				if (i == 3)
-					/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (25*1000);
+					s5pv310_volt_table[i].arm_volt -= (25*1000);
 				else
-					/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (50*1000);
+					s5pv310_volt_table[i].arm_volt -= (50*1000);
 			} else {
 				if (i == 2)
 					s5pv310_volt_table[i].arm_volt -= (25*1000);
@@ -1783,61 +2207,56 @@ static int s5pv310_asv_table_update(void)
 			}
 			break;
 		case 6:
-			/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (100*1000);
+			s5pv310_volt_table[i].arm_volt -= (100*1000);
 			break;
 		case 7:
-			/* s5pv310_volt_table[i].arm_volt */ exp_UV_mV[i] -= (125*1000);
+			s5pv310_volt_table[i].arm_volt -= (125*1000);
 			break;
 		}
 		/* Maximum Voltage */
-/*		if (s5pv310_volt_table[i].arm_volt > 1450000)
-			s5pv310_volt_table[i].arm_volt = 1450000;
-*/
-		if (exp_UV_mV[i] > CPU_UV_MV_MAX)
-			exp_UV_mV[i] = CPU_UV_MV_MAX;
-		
+		if (s5pv310_volt_table[i].arm_volt > CPU_UV_MV_MAX)
+			s5pv310_volt_table[i].arm_volt = CPU_UV_MV_MAX;
 
 		/* Minimum Voltage */
-/*		if (s5pv310_volt_table[i].arm_volt < 925000)
-			s5pv310_volt_table[i].arm_volt = 925000;
-*/
-		if (exp_UV_mV[i] < CPU_UV_MV_MIN)
-			exp_UV_mV[i] = CPU_UV_MV_MIN;
+		if (s5pv310_volt_table[i].arm_volt < CPU_UV_MV_MIN)
+			s5pv310_volt_table[i].arm_volt = CPU_UV_MV_MIN;
 
 		printk(KERN_INFO "ASV voltage_table[%d].arm_volt = %d\n",
-				i, exp_UV_mV[i]);
+				i, s5pv310_volt_table[i].arm_volt);
 	}
 
 	/* The last level of VDD_ARM */
 	switch (asv_group) {
 	case 0:
-		/* s5pv310_volt_table[last_level].arm_volt */ exp_UV_mV[last_level] += (75*1000);
-		/* s5pv310_volt_table[last_level].arm_volt */ exp_UV_mV[last_level+1] += (75*1000);
+		s5pv310_volt_table[last_level].arm_volt += (75*1000);
 		break;
 	case 1:
-		/* s5pv310_volt_table[last_level].arm_volt */ exp_UV_mV[last_level] += (25*1000);
-		/* s5pv310_volt_table[last_level].arm_volt */ exp_UV_mV[last_level+1] += (25*1000);
+		s5pv310_volt_table[last_level].arm_volt += (25*1000);
 		break;
 	case 2:
-		/* s5pv310_volt_table[last_level].arm_volt */ exp_UV_mV[last_level] += (0*1000);
-		/* s5pv310_volt_table[last_level].arm_volt */ exp_UV_mV[last_level+1] += (0*1000);
+		s5pv310_volt_table[last_level].arm_volt += (0*1000);
 		break;
 	case 3:
 	case 4:
-		/* s5pv310_volt_table[last_level].arm_volt */ exp_UV_mV[last_level] -= (25*1000);
-		/* s5pv310_volt_table[last_level].arm_volt */ exp_UV_mV[last_level+1] -= (25*1000);
+		s5pv310_volt_table[last_level].arm_volt -= (25*1000);
 		break;
 	case 5:
 	case 6:
 	case 7:
-		/* s5pv310_volt_table[last_level].arm_volt */ exp_UV_mV[last_level] -= (50*1000);
-		/* s5pv310_volt_table[last_level].arm_volt */ exp_UV_mV[last_level+1] -= (50*1000);
+		s5pv310_volt_table[last_level].arm_volt -= (50*1000);
 		break;
 	}
 	printk(KERN_INFO "ASV voltage_table[%d].arm_volt = %d\n",
-		last_level, exp_UV_mV[last_level]);
+		last_level, s5pv310_volt_table[last_level].arm_volt);
 
-	for(i=0;i<CPUFREQ_LEVEL_END;i++) stock_UV_mV[i]=exp_UV_mV[i];
+	//this one is to correct 200MHz voltage
+	s5pv310_volt_table[last_level-1].arm_volt =
+				s5pv310_volt_table[last_level].arm_volt;
+	
+	for(i=0;i<CPUFREQ_LEVEL_END;i++) {
+		exp_UV_mV[i] = s5pv310_volt_table[i].arm_volt;
+	}
+
 
 	/* VDD_INT ASV */
 	for (i = 0; i < INT_LEVEL_END; i++) {
@@ -1886,6 +2305,7 @@ static void s5pv310_asv_set_voltage(void)
 
 	freqs.old = s5pv310_getspeed(0);
 
+#if 0
 	switch (freqs.old) {
 	case 1200000:
 		asv_arm_index = 0;
@@ -1902,21 +2322,18 @@ static void s5pv310_asv_set_voltage(void)
 	case 200000:
 		asv_arm_index = 4;
 		break;
-	case 100000:
-		asv_arm_index = 5;
-		break;
-	default:
-		//optimize here. if the user modified the freq. table
-		for(asv_arm_index=7;asv_arm_index>0;asv_arm_index--)
-			if(freqs.old == s5pv310_freq_table[asv_arm_index].frequency) break;
-		break;
 	}
 
-//	if (s5pv310_max_armclk != ARMCLOCK_1600MHZ)
-//		asv_arm_index -= 1;
+	if (s5pv310_max_armclk != ARMCLOCK_1200MHZ)
+		asv_arm_index -= 1;
 
-//	asv_arm_volt = s5pv310_volt_table[asv_arm_index].arm_volt;
+	asv_arm_volt = s5pv310_volt_table[asv_arm_index].arm_volt;
+#endif
+
+	for(asv_arm_index=7;asv_arm_index>0;asv_arm_index--)
+		if(freqs.old == s5pv310_freq_table[asv_arm_index].frequency) break;
 	asv_arm_volt = exp_UV_mV[asv_arm_index];
+
 #if defined(CONFIG_REGULATOR)
 	regulator_set_voltage(arm_regulator, asv_arm_volt, asv_arm_volt);
 #endif
@@ -1939,9 +2356,6 @@ static void s5pv310_asv_set_voltage(void)
 	case 133333:
 		asv_int_index = 2;
 		break;
-	default:
-		asv_int_index = 0;
-		break;
 	}
 	asv_int_volt = s5pv310_busfreq_table[asv_int_index].volt;
 #if defined(CONFIG_REGULATOR)
@@ -1960,6 +2374,7 @@ static void s5pv310_asv_set_voltage(void)
 
 static int s5pv310_update_dvfs_table(void)
 {
+	unsigned int i, j;
 	int ret = 0;
 
 	/* Get the maximum arm clock */
@@ -1971,7 +2386,61 @@ static int s5pv310_update_dvfs_table(void)
 		s5pv310_max_armclk  = 0; /* 1000MHz as default value */
 		ret = -EINVAL;
 	}
+#if 0
+	switch (s5pv310_max_armclk) {
+	case 1200000:
+		printk(KERN_INFO "armclk set max 1200MHz as default@@@@@\n");
+		break;
 
+	case 0:
+	case 1000000:
+	default:
+		s5pv310_max_armclk = ARMCLOCK_1000MHZ;
+		printk(KERN_INFO "@@@@@ armclk set max 1000MHz @@@@@\n");
+		/*
+		 *  Prepare to dvfs table to work maximum 1000MHz
+		 *
+		 *  Copy freq_table, volt_table, apll_pms_table, clk_div0_table,
+		 * and clk_div1_table from lists of lookup table.
+		*/
+		for (i = 1; i < CPUFREQ_LEVEL_END; i++) {
+			s5pv310_freq_table[i-1].index = s5pv310_lookup_freq_table[i].index - 1;
+			s5pv310_freq_table[i-1].frequency = s5pv310_lookup_freq_table[i].frequency;
+			printk(KERN_INFO "index = %d, frequency = %d\n",
+				s5pv310_freq_table[i-1].index, s5pv310_freq_table[i-1].frequency);
+		}
+
+		for (i = 1; i < CPUFREQ_LEVEL_END; i++) {
+			s5pv310_volt_table[i-1].index = s5pv310_lookup_volt_table[i].index - 1;
+			s5pv310_volt_table[i-1].arm_volt = s5pv310_lookup_volt_table[i].arm_volt;
+			printk(KERN_INFO "index = %d, arm_volt = %d\n",
+				 s5pv310_volt_table[i-1].index, s5pv310_volt_table[i-1].arm_volt);
+		}
+
+		for (i = 1; i < CPUFREQ_LEVEL_END; i++) {
+			s5pv310_apll_pms_table[i-1] = s5pv310_lookup_apll_pms_table[i];
+			printk(KERN_INFO "apll pms_table = 0x%08x\n", s5pv310_apll_pms_table[i-1]);
+		}
+
+		for (i = 1; i < CPUFREQ_LEVEL_END; i++) {
+			for (j = 0; j < 7; j++) {
+				clkdiv_cpu0[i-1][j] = clkdiv_cpu0_lookup[i][j];
+				printk("%d, ", clkdiv_cpu0[i-1][j]);
+			}
+			printk("\n");
+		}
+
+		for (i = 1; i < CPUFREQ_LEVEL_END; i++) {
+			for (j = 0; j < 2; j++) {
+				clkdiv_cpu1[i-1][j] = clkdiv_cpu1_lookup[i][j];
+				printk("%d, ", clkdiv_cpu1[i-1][j]);
+			}
+			printk("\n");
+		}
+		printk(KERN_INFO "@@@@@ updated dvfs table @@@@@@\n");
+		break;
+	}
+#endif
 	return ret;
 }
 
@@ -2013,6 +2482,9 @@ static int __init s5pv310_cpufreq_init(void)
 		goto out;
 	}
 	s5pv310_dvs_locking = 0;
+#ifdef HAVE_DAC
+	s5pv310_dac_init();
+#endif
 #endif
 
 #ifdef CONFIG_CPU_S5PV310_EVT1
@@ -2349,7 +2821,7 @@ ssize_t store_freq_table(struct cpufreq_policy *policy,
 	int i = 0,max,min,u[6];
 	ret = sscanf(buf, "%d %d %d %d %d %d", 
 		&u[0], &u[1], &u[2], &u[3], &u[4], &u[5]);
-	if(ret != 8)
+	if(ret != 6)
 		return -EINVAL;
 	for(i=0;i<5;i++)
 		if(u[i]<=u[i+1]) return -EINVAL;
@@ -2402,8 +2874,7 @@ ssize_t store_UV_mV_table(struct cpufreq_policy *policy,
 	      ret = sscanf(buf, "%d %d %d %d %d", &u[0], &u[1], &u[2], &u[3], &u[4]);
 		  if(ret != 5) {
 		      ret = sscanf(buf, "%d %d %d %d", &u[1], &u[2], &u[3], &u[4]);
-			  if( ret != 4)
-			   return -EINVAL;
+			  if( ret != 4) return -EINVAL;
 		  }
 	  }
 		for( i = 0; i < CPUFREQ_LEVEL_END; i++ )
@@ -2418,12 +2889,11 @@ ssize_t store_UV_mV_table(struct cpufreq_policy *policy,
 			}
 		}
 		if(ret >= 5) exp_UV_mV[0] = u[0] * 1000;
-			exp_UV_mV[1] = u[1] * 1000; 
-			exp_UV_mV[2] = u[2] * 1000;
-			exp_UV_mV[3] = u[3] * 1000; 
-			exp_UV_mV[4] = u[4] * 1000;
-		if(ret == 6) 
-			exp_UV_mV[5] = u[5] * 1000;
+		exp_UV_mV[1] = u[1] * 1000; 
+		exp_UV_mV[2] = u[2] * 1000;
+		exp_UV_mV[3] = u[3] * 1000; 
+		exp_UV_mV[4] = u[4] * 1000;
+		if(ret == 6) exp_UV_mV[5] = u[5] * 1000;
 		return count;
 }
 
@@ -2433,8 +2903,8 @@ ssize_t show_cpu_class(struct cpufreq_policy *policy, char *buf) {
 
 ssize_t show_busfreq_static(struct cpufreq_policy *policy, char *buf) {
       return sprintf(buf, 
-"%dmhz: %d mV\n%dmhz: %d mV\n%dmhz: %d mV\n%dmhz: %d mV\n\
-%dmhz: %d mV\n%dmhz: %d mV\n\n\
+"%dmhz: %d\n%dmhz: %d\n%dmhz: %d\n%dmhz: %d\n\
+%dmhz: %d\n%dmhz: %d\n\n\
 bus frequency static mode: %s\n\
 You can echo the frequency step values to this file or 'enable'/'disable' status.\n\
 Valid frequency step values are: 0 (400MHz), 1 (266MHz), 2 (133MHz)", 
@@ -2452,7 +2922,7 @@ ssize_t store_busfreq_static(struct cpufreq_policy *policy,
                                       const char *buf, size_t count) {
 
 	unsigned int ret = -EINVAL;
-	int i = 0,u[6];
+	int i = 0,max,min,u[6];
 	
 	if(!strncmp(buf,"enabled",5)) {
 		is_busfreq_static = 1;
@@ -2473,5 +2943,75 @@ ssize_t store_busfreq_static(struct cpufreq_policy *policy,
 	for(i=0;i<6;i++) {
 		busfreq_static_level[i] = u[i];
 	}
+	return count;
+}
+
+extern int deepsleep_cpulevel;
+ssize_t show_deepsleep_cpulevel(struct cpufreq_policy *policy, char *buf) {
+      return sprintf(buf, "%d\n", deepsleep_cpulevel);
+}
+
+ssize_t store_deepsleep_cpulevel(struct cpufreq_policy *policy,
+                                      const char *buf, size_t count) {
+
+	unsigned int ret = -EINVAL, level;
+
+	ret = sscanf(buf, "%d", &level);
+	if(ret!=1) return -EINVAL;
+	if(level <L2 || level>L5) return -EINVAL;
+	deepsleep_cpulevel = level;
+	return count;
+}
+extern int deepsleep_buslevel;
+ssize_t show_deepsleep_buslevel(struct cpufreq_policy *policy, char *buf) {
+      return sprintf(buf, "%d\n", deepsleep_buslevel);
+}
+ssize_t store_deepsleep_buslevel(struct cpufreq_policy *policy,
+                                      const char *buf, size_t count) {
+	unsigned int ret = -EINVAL, level;
+	ret = sscanf(buf, "%d", &level);
+	if(ret!=1) return -EINVAL;
+	if(level<0 || level>2) return -EINVAL;
+	deepsleep_buslevel = level;
+	return count;
+}
+
+extern int smooth_step;
+ssize_t show_smooth_step(struct cpufreq_policy *policy, char *buf) {
+      return sprintf(buf, "%d\n", smooth_step);
+}
+ssize_t store_smooth_step(struct cpufreq_policy *policy,
+                                      const char *buf, size_t count) {
+	unsigned int ret = -EINVAL, level;
+	ret = sscanf(buf, "%d", &level);
+	if(ret!=1) return -EINVAL;
+	if(level<0 || level>4) return -EINVAL;
+	smooth_step = level;
+	return count;
+}
+extern int smooth_target;
+ssize_t show_smooth_target(struct cpufreq_policy *policy, char *buf) {
+      return sprintf(buf, "%d\n", smooth_target);
+}
+ssize_t store_smooth_target(struct cpufreq_policy *policy,
+                                      const char *buf, size_t count) {
+	unsigned int ret = -EINVAL, level;
+	ret = sscanf(buf, "%d", &level);
+	if(ret!=1) return -EINVAL;
+	if(level<0 || level>5) return -EINVAL;
+	smooth_target = level;
+	return count;
+}
+extern int smooth_offset;
+ssize_t show_smooth_offset(struct cpufreq_policy *policy, char *buf) {
+      return sprintf(buf, "%d\n", smooth_offset);
+}
+ssize_t store_smooth_offset(struct cpufreq_policy *policy,
+                                      const char *buf, size_t count) {
+	unsigned int ret = -EINVAL, level;
+	ret = sscanf(buf, "%d", &level);
+	if(ret!=1) return -EINVAL;
+	if(level<0 || level>4) return -EINVAL;
+	smooth_offset = level;
 	return count;
 }
