@@ -39,6 +39,11 @@ echo $(date) START of post-init.sh
   echo "1500" > /proc/sys/vm/dirty_writeback_centisecs
   echo "200" > /proc/sys/vm/dirty_expire_centisecs
   echo "0" > /proc/sys/vm/swappiness
+  
+# Thunderbolt! CFS Tweaks - by pikachu01
+  sysctl -w kernel.sched_min_granularity_ns=200000;
+  sysctl -w kernel.sched_latency_ns=400000;
+  sysctl -w kernel.sched_wakeup_granularity_ns=100000;
 
 # SD cards (mmcblk) read ahead tweaks
   echo "1024" > /sys/devices/virtual/bdi/179:0/read_ahead_kb
@@ -74,6 +79,7 @@ echo "3" > /sys/module/cpuidle/parameters/enable_mask
 # Hotplug thresholds
 echo "35" > /sys/module/pm_hotplug/parameters/loadl
 echo "75" > /sys/module/pm_hotplug/parameters/loadh
+echo "200" > /sys/module/pm_hotplug/parameters/rate
 
 # Renice kswapd0 - kernel thread responsible for managing the memory
 renice 18 `pidof kswapd0`
