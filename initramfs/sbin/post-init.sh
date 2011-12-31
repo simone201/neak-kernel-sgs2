@@ -39,9 +39,9 @@ echo $(date) START of post-init.sh
   echo "1500" > /proc/sys/vm/dirty_writeback_centisecs
   echo "200" > /proc/sys/vm/dirty_expire_centisecs
   echo "0" > /proc/sys/vm/swappiness
-  echo "200000" > /proc/sys/kernel/sched_min_granularity_ns;
-  echo "400000" > /proc/sys/kernel/sched_latency_ns;
-  echo "100000" > /proc/sys/kernel/sched_wakeup_granularity_ns;
+ # echo "200000" > /proc/sys/kernel/sched_min_granularity_ns;
+ # echo "400000" > /proc/sys/kernel/sched_latency_ns;
+ # echo "100000" > /proc/sys/kernel/sched_wakeup_granularity_ns;
 
 # SD cards (mmcblk) read ahead tweaks
   echo "1024" > /sys/devices/virtual/bdi/179:0/read_ahead_kb
