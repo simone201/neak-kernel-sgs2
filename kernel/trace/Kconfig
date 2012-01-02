@@ -106,7 +106,7 @@ config TRACING_SUPPORT
 	# irqflags tracing for your architecture.
 	depends on TRACE_IRQFLAGS_SUPPORT || PPC32
 	depends on STACKTRACE_SUPPORT
-	default y
+	default n
 
 if TRACING_SUPPORT
 
@@ -448,7 +448,7 @@ config DYNAMIC_FTRACE
 	bool "enable/disable ftrace tracepoints dynamically"
 	depends on FUNCTION_TRACER
 	depends on HAVE_DYNAMIC_FTRACE
-	default y
+	default n
 	help
           This option will modify all the calls to ftrace dynamically
 	  (will patch them out of the binary image and replace them
