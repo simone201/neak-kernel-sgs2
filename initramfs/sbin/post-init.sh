@@ -73,8 +73,10 @@ setprop debug.sf.hw 1;
 # Enable SCHED_MC
 if [ -f /system/etc/schedmc ]; then
 	echo "1" > /sys/devices/system/cpu/sched_mc_power_savings
+	echo "sched_mc enabled"
 else
 	echo "0" > /sys/devices/system/cpu/sched_mc_power_savings
+	echo "sched_mc disabled"
 fi;
 
 # Enable AFTR
@@ -97,7 +99,7 @@ do
 	fi;
 	if [ -e $i/queue/read_ahead_kb ];
 	then
-		echo "256" >  $i/queue/read_ahead_kb;
+		echo "512" >  $i/queue/read_ahead_kb;
 	fi;
 done;
 
