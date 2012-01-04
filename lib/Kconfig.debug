@@ -155,7 +155,7 @@ config DEBUG_SHIRQ
 config DETECT_SOFTLOCKUP
 	bool "Detect Soft Lockups"
 	depends on !S390
-	default n
+	default y
 	help
 	  Say Y here to enable the kernel to detect "soft lockups",
 	  which are bugs that cause the kernel to loop in kernel
