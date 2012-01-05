@@ -139,7 +139,7 @@ static int suspend_enter(suspend_state_t state)
 	if (suspend_ops->prepare) {
 		error = suspend_ops->prepare();
 		if (error)
-			goto Platform_finish;
+			return error;
 	}
 
 	error = dpm_suspend_noirq(PMSG_SUSPEND);
@@ -151,7 +151,7 @@ static int suspend_enter(suspend_state_t state)
 	if (suspend_ops->prepare_late) {
 		error = suspend_ops->prepare_late();
 		if (error)
-			goto Platform_wake;
+			goto Power_up_devices;
 	}
 
 	if (suspend_test(TEST_PLATFORM))
@@ -166,10 +166,11 @@ static int suspend_enter(suspend_state_t state)
 
 	error = sysdev_suspend(PMSG_SUSPEND);
 	if (!error) {
-		if (!suspend_test(TEST_CORE) && pm_check_wakeup_events()) {
+		if (!suspend_test(TEST_CORE))
 			error = suspend_ops->enter(state);
-			events_check_enabled = false;
-		}
+		/* Workaround for possible L2 cache coherency issue
+		   where preempt_count remains zero */ 
+		preempt_count() = 0;
 		sysdev_resume();
 	}
 
@@ -183,6 +184,7 @@ static int suspend_enter(suspend_state_t state)
 	if (suspend_ops->wake)
 		suspend_ops->wake();
 
+ Power_up_devices:
 	dpm_resume_noirq(PMSG_RESUME);
 
  Platform_finish:

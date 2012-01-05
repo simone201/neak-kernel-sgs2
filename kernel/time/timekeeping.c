@@ -33,7 +33,7 @@ struct timekeeper {
 	/* Number of clock shifted nano seconds in one NTP interval. */
 	u64	xtime_interval;
 	/* shifted nano seconds left over when rounding cycle_interval */
-	s64  xtime_remainder;
+	s64	xtime_remainder;
 	/* Raw nano seconds accumulated per NTP interval. */
 	u32	raw_interval;
 

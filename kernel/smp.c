@@ -158,7 +158,9 @@ void generic_exec_single(int cpu, struct call_single_data *data, int wait)
 	 * locking and barrier primitives. Generic code isn't really
 	 * equipped to do the right thing...
 	 */
-	if (ipi)
+	smp_mb();
+
+	if (ipi || wait)
 		arch_send_call_function_single_ipi(cpu);
 
 	if (wait)
@@ -220,6 +222,8 @@ void generic_smp_call_function_interrupt(void)
 		refs = atomic_dec_return(&data->refs);
 		WARN_ON(refs < 0);
 		if (!refs) {
+			WARN_ON(!cpumask_empty(data->cpumask));
+
 			raw_spin_lock(&call_function.lock);
 			list_del_rcu(&data->csd.list);
 			raw_spin_unlock(&call_function.lock);

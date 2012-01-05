@@ -530,7 +530,7 @@ static u64 clocksource_max_deferment(struct clocksource *cs)
 	 * note a margin of 12.5% is used because this can be computed with
 	 * a shift, versus say 10% which would require division.
 	 */
-	return max_nsecs - (max_nsecs >> 3);
+	return max_nsecs - (max_nsecs >> 5);
 }
 
 #ifdef CONFIG_GENERIC_TIME
