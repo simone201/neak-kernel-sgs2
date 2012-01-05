@@ -287,18 +287,9 @@ __ATTR(_name, 0444, show_##_name, NULL)
 static struct freq_attr _name =			\
 __ATTR(_name, _perm, show_##_name, NULL)
 
-#define cpufreq_freq_attr_ro_old(_name)		\
-static struct freq_attr _name##_old =		\
-__ATTR(_name, 0444, show_##_name##_old, NULL)
-
 #define cpufreq_freq_attr_rw(_name)		\
 static struct freq_attr _name =			\
 __ATTR(_name, 0644, show_##_name, store_##_name)
-
-#define cpufreq_freq_attr_rw_old(_name)		\
-static struct freq_attr _name##_old =		\
-__ATTR(_name, 0644, show_##_name##_old, store_##_name##_old)
-
 
 struct global_attr {
 	struct attribute attr;
@@ -428,24 +419,5 @@ void cpufreq_frequency_table_get_attr(struct cpufreq_frequency_table *table,
 
 void cpufreq_frequency_table_put_attr(unsigned int cpu);
 
-
-/*********************************************************************
- *                     UNIFIED DEBUG HELPERS                         *
- *********************************************************************/
-
-#define CPUFREQ_DEBUG_CORE	1
-#define CPUFREQ_DEBUG_DRIVER	2
-#define CPUFREQ_DEBUG_GOVERNOR	4
-
-#ifdef CONFIG_CPU_FREQ_DEBUG
-
-extern void cpufreq_debug_printk(unsigned int type, const char *prefix, 
-				 const char *fmt, ...);
-
-#else
-
-#define cpufreq_debug_printk(msg...) do { } while(0)
-
-#endif /* CONFIG_CPU_FREQ_DEBUG */
 
 #endif /* _LINUX_CPUFREQ_H */
