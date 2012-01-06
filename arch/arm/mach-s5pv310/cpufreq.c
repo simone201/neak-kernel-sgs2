@@ -2828,9 +2828,9 @@ ssize_t store_freq_table(struct cpufreq_policy *policy,
 	((250<<16)|(6<<8)|(0x2)),
 	((200<<16)|(6<<8)|(0x3)),
 	((100<<16)|(6<<8)|(0x3)),*/
-	for(i=0;i<6;i++) if(s5pv310_freq_table[i].frequency==policy->max) break;
+	for(i=0;i<CPUFREQ_LEVEL_END;i++) if(s5pv310_freq_table[i].frequency==policy->max) break;
 	max = i;
-	for(i=0;i<6;i++) if(s5pv310_freq_table[i].frequency==policy->min) break;
+	for(i=0;i<CPUFREQ_LEVEL_END;i++) if(s5pv310_freq_table[i].frequency==policy->min) break;
 	min = i;
 	policy->max = policy->min = s5pv310_freq_table[L2].frequency;
 

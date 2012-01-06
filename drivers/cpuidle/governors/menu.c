@@ -281,11 +281,10 @@ static int menu_select(struct cpuidle_device *dev)
 	if (data->expected_us > 5)
 		data->last_state_idx = CPUIDLE_DRIVER_STATE_START;
 
-
-	/* 
+	/*
 	 * Find the idle state with the lowest power while satisfying
-     * our constraints.
-     */
+	 * our constraints.
+	 */
 	for (i = CPUIDLE_DRIVER_STATE_START; i < dev->state_count; i++) {
 		struct cpuidle_state *s = &dev->states[i];
 
@@ -297,9 +296,8 @@ static int menu_select(struct cpuidle_device *dev)
 			continue;
 		if (s->exit_latency * multiplier > data->predicted_us)
 			continue;
-			
-		if (s->power_usage < power_usage) 
-		{
+
+		if (s->power_usage < power_usage) {
 			power_usage = s->power_usage;
 			data->last_state_idx = i;
 			data->exit_us = s->exit_latency;

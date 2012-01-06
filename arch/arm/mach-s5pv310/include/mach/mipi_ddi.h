@@ -53,8 +53,7 @@ struct mipi_ddi_platform_data {
 
 	unsigned char (*cmd_write) (unsigned int dsim_base, unsigned int data0,
 		unsigned int data1, unsigned int data2);
-	unsigned char (*cmd_read) (unsigned int dsim_base, unsigned int data0,
-		unsigned int data1, unsigned int data2);
+	int (*cmd_read) (unsigned int reg_base, u8 addr, u16 count, u8 *buf);
 
 	unsigned int reset_delay;
 	unsigned int power_on_delay;

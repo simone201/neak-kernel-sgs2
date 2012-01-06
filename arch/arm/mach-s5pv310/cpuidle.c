@@ -1322,7 +1322,6 @@ static int s5pv310_enter_lowpower(struct cpuidle_device *dev,
 				  struct cpuidle_state *state)
 {
 	struct cpuidle_state *new_state = state;
-	int ret;
 
 	/* This mode only can be entered when Core1 is offline */
 	if (cpu_online(1)) {
@@ -1331,20 +1330,17 @@ static int s5pv310_enter_lowpower(struct cpuidle_device *dev,
 	}
 	dev->last_state = new_state;
 
-	enter_idle();
 	if (new_state == &dev->states[0])
-		ret = s5pv310_enter_idle(dev, new_state);
-	else if (s5pv310_check_operation())
-		ret = (enable_mask & ENABLE_AFTR)
+		return s5pv310_enter_idle(dev, new_state);
+
+	if (s5pv310_check_operation())
+		return (enable_mask & ENABLE_AFTR)
 			? s5pv310_enter_core0_aftr(dev, new_state)
 			: s5pv310_enter_idle(dev, new_state);
-	else
-		ret = (enable_mask & ENABLE_LPA)
-			? s5pv310_enter_core0_lpa(dev, new_state)
-			: s5pv310_enter_idle(dev, new_state);
-	exit_idle();
 
-	return ret;
+	return (enable_mask & ENABLE_LPA)
+		? s5pv310_enter_core0_lpa(dev, new_state)
+		: s5pv310_enter_idle(dev, new_state);
 }
 
 static int s5pv310_init_cpuidle(void)
