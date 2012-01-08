@@ -111,11 +111,6 @@ echo "64000" > /proc/sys/kernel/msgmax;
 echo "10" > /proc/sys/fs/lease-break-time;
 echo "500 512000 64 2048" > /proc/sys/kernel/sem;
 
-# Lionheart tweaks - if enabled
-if [ -f /system/etc/lionheart ]; then
-	/sbin/busybox sh /sbin/near/lionheart.sh
-fi;
-
 ##### Install SU #####
 
 if [ -f /system/xbin/su ] || [ -f /system/bin/su ];
@@ -157,6 +152,12 @@ echo $(date) INIT.D SUPPORT START
 /sbin/busybox sh /sbin/near/init-support.sh
 echo $(date) INIT.D SUPPORT DONE
 
+# Modded BLN Liblights - thx to GM
 /sbin/busybox sh /sbin/near/bln.sh
+
+# Lionheart tweaks - if enabled
+if [ -f /system/etc/lionheart ]; then
+	/sbin/busybox sh /sbin/near/lionheart.sh
+fi;
 
 echo $(date) END of post-init.sh
