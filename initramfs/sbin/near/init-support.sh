@@ -1,6 +1,6 @@
 #!/sbin/busybox sh
 # Init.d support for N.E.A.K. Kernel
-# by Simone201
+# thx to GM
 
 if [ -d /system/etc/init.d ]; then
   /sbin/busybox run-parts /system/etc/init.d

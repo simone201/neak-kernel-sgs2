@@ -1,6 +1,6 @@
 #!/sbin/busybox sh
 # EFS Backup script
-# by simone201
+# thx to GM
 
 if ! [ -d /sdcard/near ]; then
 	mkdir  /sdcard/near
