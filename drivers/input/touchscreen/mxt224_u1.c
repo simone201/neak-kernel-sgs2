@@ -1092,7 +1092,8 @@ static irqreturn_t mxt224_irq_thread(int irq, void *ptr)
 	int id;
 	u8 msg[data->msg_object_size];
 	u8 touch_message_flag = 0;
-	u8 value, size_one,ret;
+	u8 value, ret;
+    u16 size_one;
 	u16 obj_address = 0;
 	unsigned int register_address = 0;
 

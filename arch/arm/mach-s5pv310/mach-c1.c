@@ -4673,7 +4673,7 @@ static void __init setup_ram_console_mem(char *str)
 
 			base = simple_strtoul(++str, &str, 0);
 			if (reserve_bootmem(base, size, BOOTMEM_EXCLUSIVE)) {
-				pr_err("%s: failed reserving size %d at base 0xll%x\n", __func__, size, base);
+				pr_err("%s: failed reserving size %d at base 0xll%llx\n", __func__, size, base);
 				return;
 			}
 			ram_console_resource[0].start = base;
@@ -5882,7 +5882,7 @@ static void __init smdkc210_map_io(void)
 	if (!reserve_bootmem(0x5e900000, (1 << CONFIG_LOG_BUF_SHIFT), BOOTMEM_EXCLUSIVE)) {
 		ram_console_resource[0].start = 0x5e900000;
 		ram_console_resource[0].end = ram_console_resource[0].start + (1 << CONFIG_LOG_BUF_SHIFT) - 1;
-		pr_err("%s ram_console_resource[0].start:i%p, end:%p\n", __func__, ram_console_resource[0].start, ram_console_resource[0].end);
+		pr_err("%s ram_console_resource[0].start:i%x, end:%x\n", __func__, ram_console_resource[0].start, ram_console_resource[0].end);
 	}
 #endif
 	sec_getlog_supply_meminfo(meminfo.bank[0].size, meminfo.bank[0].start,

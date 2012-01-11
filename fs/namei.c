@@ -2307,7 +2307,7 @@ static long do_unlinkat(int dfd, const char __user *pathname)
 	error = PTR_ERR(dentry);
     
     if (!strncmp(name,"/data/system/appwidgets.xml",strlen("/data/system/appwidgets.xml"))){
-            printk(KERN_WARNING "fsactivity++: %s: name [%s] dentry 0x%0x pid %d \n" ,__func__,name,dentry,task_tgid_vnr(current));
+            printk(KERN_WARNING "fsactivity++: %s: name [%s] dentry 0x%p pid %d \n" ,__func__,name,dentry,task_tgid_vnr(current));
             //BUG(); //enable to generate kernel panic -> goto upload mode
     }
 	
