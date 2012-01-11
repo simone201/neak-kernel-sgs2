@@ -2094,18 +2094,19 @@ static ssize_t set_all_refer_mode_show(struct device *dev, struct device_attribu
 
 static int index_reference;
 
-static int atoi(char *str)
+static int atoi(const char *str)
 {
 	int result = 0;
 	int count = 0;
-	if( str == NULL )
-		return -1;
-	while( str[count] != NULL && str[count] >= '0' && str[count] <= '9' )
-	{
-		result = result * 10 + str[count] - '0';
-		++count;
+	if ( str != NULL ) {    
+		while ( str[count] >= 0 && str[count] <= 9 ) {
+			result = result * 10 + str[count] - 0;
+			++count;
+		}
+		return result;
 	}
-	return result;
+	 else
+		return -1;
 }
 
 ssize_t disp_all_refdata_show(struct device *dev, struct device_attribute *attr, char *buf)
@@ -2481,7 +2482,7 @@ static DEVICE_ATTR(mov_hysti, 0666, show_mov_hysti, store_mov_hysti);
 static struct attribute *qt602240_attrs[] = {
 	&dev_attr_object_show.attr,
 	&dev_attr_object_write.attr,
-	&dev_attr_dbg_switch,
+	&dev_attr_dbg_switch.attr,
 	&dev_attr_mov_hysti.attr,
 	NULL
 };
@@ -2801,10 +2802,10 @@ static int __devinit mxt224_probe(struct i2c_client *client, const struct i2c_de
 	}
 
 	if (data->family_id == 0x80) {	/*  : MXT-224 */
-		tsp_config = pdata->config;
+		tsp_config = (u8 **)pdata->config;
 		printk(KERN_ERR "[TSP] TSP chip is MXT224\n");
 	} else if (data->family_id == 0x81)  {	/* tsp_family_id - 0x81 : MXT-224E */
-		tsp_config = pdata->config_e;
+		tsp_config = (u8 **)pdata->config_e;
 		printk(KERN_ERR "[TSP] TSP chip is MXT224-E\n");
 		atchcalst = 4;/*9*/
 		atchcalsthr = 35;/*35*/
