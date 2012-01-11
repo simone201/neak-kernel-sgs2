@@ -2860,6 +2860,46 @@ ssize_t show_UV_mV_table(struct cpufreq_policy *policy, char *buf) {
 		s5pv310_freq_table[5].frequency/1000,exp_UV_mV[5]/1000);
 }
 
+#define VREF_SEL     1	/* 0: 0.625V (50mV step), 1: 0.3125V (25mV step). */
+#define V_STEP       (25 * (2 - VREF_SEL)) /* Minimum voltage step size. */
+#define VREG_DATA    (VREG_CONFIG | (VREF_SEL << 5))
+#define VREG_CONFIG  (BIT(7) | BIT(6)) /* Enable VREG, pull-down if disabled. */
+/* Cause a compile error if the voltage is not a multiple of the step size. */
+#define MV(mv)      ((mv) / (!((mv) % V_STEP)))
+
+ssize_t acpuclk_get_vdd_levels_str(char *buf)
+{
+	int i, len = 0;
+	
+	if (buf)
+	{
+		for (i = 0; i<CPUFREQ_LEVEL_END; i++)
+		{
+			len += sprintf(buf + len, "%8u: %4d\n", s5pv310_freq_table[i].frequency, exp_UV_mV[i]);
+		}
+	}
+
+	return len;
+}
+
+void acpuclk_set_vdd(unsigned int khz, int vdd)
+{
+	int i;
+	unsigned int new_vdd;
+	vdd = vdd / V_STEP * V_STEP;
+	
+	for (i = 0; i<CPUFREQ_LEVEL_END; i++)
+	{
+		if (khz == 0)
+			new_vdd = min(max((exp_UV_mV[i] + vdd), CPU_UV_MV_MIN), CPU_UV_MV_MAX);
+		else if (s5pv310_freq_table[i].frequency == khz)
+			new_vdd = min(max((unsigned int)vdd, CPU_UV_MV_MIN), CPU_UV_MV_MAX);
+		else continue;
+		
+		exp_UV_mV[i] = new_vdd;
+	}
+}
+
 ssize_t store_UV_mV_table(struct cpufreq_policy *policy,
                                       const char *buf, size_t count) {
 
