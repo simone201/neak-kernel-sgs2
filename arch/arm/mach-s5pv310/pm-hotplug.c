@@ -83,18 +83,19 @@ static void hotplug_timer(struct work_struct *work)
 
 	mutex_lock(&hotplug_lock);
 
-	// exit if we turned off dynamic hotplug by tegrak
-	// cancel the timer
+	/* screen_off event is more likely */  
+	if (screen_off && !cpu_online(1)) {
+		printk(KERN_INFO "pm-hotplug: disable cpu auto-hotplug\n");
+		goto out;
+	}
+
+	/* exit if we turned off dynamic hotplug by tegrak cancel the timer - by tegrak */ 
 	if (!hotplug_on) {
 		if (!second_core_on && cpu_online(1) == 1)
 			cpu_down(1);
 		goto off_hotplug;
 	}
 
-	if (screen_off && !cpu_online(1)) {
-		printk(KERN_INFO "pm-hotplug: disable cpu auto-hotplug\n");
-		goto off_hotplug;
-	}
 	if (user_lock == 1)
 		goto no_hotplug;
 
