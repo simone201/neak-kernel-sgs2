@@ -260,7 +260,7 @@ static const struct dev_pm_ops s5pv210_ehci_dev_pm_ops = {
 #define S5PV210_DEV_PM_OPS NULL
 #endif
 
-static void s5pv210_wait_for_cp_resume(struct usb_hcd *hcd)
+static int s5pv210_wait_for_cp_resume(struct usb_hcd *hcd)
 {
 	struct ehci_hcd *ehci = hcd_to_ehci(hcd);
 	u32 __iomem	*portsc ;
@@ -275,6 +275,7 @@ static void s5pv210_wait_for_cp_resume(struct usb_hcd *hcd)
 		val32 = ehci_readl(ehci, portsc);
 	} while (++retry_cnt < RETRY_CNT_LIMIT && !(val32 & PORT_CONNECT));
 	printk(KERN_DEBUG "%s: retry_cnt = %d\n", __func__, retry_cnt);
+	return 0;
 }
 
 static void s5pv210_start_ehc(void)
@@ -441,10 +442,16 @@ static DEVICE_ATTR(ehci_runtime, 0664, ehci_runtime_show, ehci_runtime_store);
 
 static inline int create_ehci_sys_file(struct ehci_hcd *ehci)
 {
-	device_create_file(ehci_to_hcd(ehci)->self.controller,
+	int ret;
+	ret = device_create_file(ehci_to_hcd(ehci)->self.controller,
 			&dev_attr_ehci_power);
-	return device_create_file(ehci_to_hcd(ehci)->self.controller,
-			&dev_attr_ehci_runtime);
+	if (ret < 0)
+		return ret;
+  
+	ret = device_create_file(ehci_to_hcd(ehci)->self.controller,
+		&dev_attr_ehci_runtime);
+
+	return ret;
 }
 
 static inline void remove_ehci_sys_file(struct ehci_hcd *ehci)
@@ -569,8 +576,10 @@ static int ehci_hcd_s5pv210_drv_probe(struct platform_device *pdev)
 	writel(0x03C00000, hcd->regs + 0x90);
 #endif
 
-	create_ehci_sys_file(ehci);
-
+	if (create_ehci_sys_file(ehci) < 0) {
+		dev_err(&pdev->dev, "Failed to create ehci sysfs\n");
+	}
+	
 	retval = usb_add_hcd(hcd, pdev->resource[1].start,
 				IRQF_DISABLED | IRQF_SHARED);
 

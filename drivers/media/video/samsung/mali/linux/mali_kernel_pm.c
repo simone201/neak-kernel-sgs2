@@ -168,13 +168,13 @@ static void mali_pm_late_resume(struct early_suspend *mali_dev);
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(LINUX_KERNEL_MAJOR_VERSION,LINUX_KERNEL_MINOR_VERSION,LINUX_KERNEL_DEVELOPMENT_VERSION))
 static int mali_pm_os_suspend(struct platform_device *pdev, pm_message_t state);
 #else
-static int mali_pm_os_suspend(struct device *dev);
+int mali_pm_os_suspend(struct device *dev);
 #endif
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(LINUX_KERNEL_MAJOR_VERSION,LINUX_KERNEL_MINOR_VERSION,LINUX_KERNEL_DEVELOPMENT_VERSION))
 static int mali_pm_os_resume(struct platform_device *pdev);
 #else
-static int mali_pm_os_resume(struct device *dev);
+int mali_pm_os_resume(struct device *dev);
 #endif
 #endif //CONFIG_HAS_EARLYSUSPEND
 

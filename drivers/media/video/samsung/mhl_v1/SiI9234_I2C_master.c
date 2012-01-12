@@ -63,7 +63,14 @@ when              who                         what, where, why
 
 ===========================================================================*/
 
+#ifdef READ
+#undef READ
+#endif
 #define READ   1
+
+#ifdef WRITE
+#undef WRITE
+#endif
 #define WRITE  0
 
 #define LAST_BYTE      1

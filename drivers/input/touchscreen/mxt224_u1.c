@@ -1116,12 +1116,12 @@ static irqreturn_t mxt224_irq_thread(int irq, void *ptr)
 		*/
 
 		if ((msg[0] == 0x1) && ((msg[1]&0x10) == 0x10)) /* caliration */
-			printk(KERN_ERR"[TSP] Calibration!!!!!!");
+			printk(KERN_ERR"[TSP] Calibration!");
 		else if ((msg[0] == 0x1) && ((msg[1]&0x40) == 0x40)) /* overflow */
-			printk(KERN_ERR"[TSP] Overflow!!!!!!");
+			printk(KERN_ERR"[TSP] Overflow!");
 		else if ((msg[0] == 0x1) && ((msg[1]&0x10) == 0x00)) {/* caliration */
 			/* Doing_calibration_falg = 0; */
-			printk(KERN_ERR"[TSP] Calibration End!!!!!!");
+			printk(KERN_ERR"[TSP] Calibration End!");
 
 			if(cal_check_flag == 0)
 			{

@@ -709,6 +709,7 @@ int usbsvn_cmd_rx(struct sipc4_rx_data *data, struct usbsvn *svn)
 		data_size -= sizeof(unsigned short);
 		cmd++;
 	}
+	return 0;
 }
 
 static int rx_submit(struct usbsvn *svn, int dev_id, struct urb *req,
