@@ -88,7 +88,7 @@ echo "75" > /sys/module/pm_hotplug/parameters/loadh
 echo "200" > /sys/module/pm_hotplug/parameters/rate
 
 # Renice kswapd0 - kernel thread responsible for managing the memory
-renice 18 `pidof kswapd0`
+renice 2 `pidof kswapd0`
 
 # New scheduler tweaks + readahead tweaks
 for k in $MMC;
@@ -99,7 +99,7 @@ do
 	fi;
 	if [ -e $i/queue/read_ahead_kb ];
 	then
-		echo "512" >  $i/queue/read_ahead_kb;
+		echo "256" >  $i/queue/read_ahead_kb;
 	fi;
 done;
 
@@ -110,11 +110,6 @@ echo "64000" > /proc/sys/kernel/msgmni;
 echo "64000" > /proc/sys/kernel/msgmax;
 echo "10" > /proc/sys/fs/lease-break-time;
 echo "500 512000 64 2048" > /proc/sys/kernel/sem;
-
-# Lionheart tweaks - if enabled
-if [ -f /system/etc/lionheart ]; then
-	/sbin/busybox sh /sbin/near/lionheart.sh
-fi;
 
 ##### Install SU #####
 
@@ -196,6 +191,12 @@ if cd /data/init.d >/dev/null 2>&1 ; then
     done
 fi
 echo $(date) USER INIT DONE from /data/init.d
+
+# Lionheart tweaks - if enabled
+if [ -f /system/etc/lionheart ]; then
+	echo "lionheart tweaks enabled"
+	/sbin/busybox sh /sbin/near/lionheart.sh
+fi;
 
 /sbin/busybox sh /sbin/near/bln.sh
 

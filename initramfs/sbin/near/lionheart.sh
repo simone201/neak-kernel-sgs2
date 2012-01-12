@@ -1,6 +1,6 @@
 #!/sbin/busybox sh
 # Lionheart tweaks for conservative gov
-# by Simone201
+# thx to GM
 
 echo "conservative" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 echo "5" > /sys/devices/system/cpu/cpufreq/conservative/freq_step
