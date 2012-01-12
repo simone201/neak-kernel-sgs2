@@ -111,6 +111,11 @@ echo "64000" > /proc/sys/kernel/msgmax;
 echo "10" > /proc/sys/fs/lease-break-time;
 echo "500 512000 64 2048" > /proc/sys/kernel/sem;
 
+# Lionheart tweaks - if enabled
+if [ -f /system/etc/lionheart ]; then
+	/sbin/busybox sh /sbin/near/lionheart.sh
+fi;
+
 ##### Install SU #####
 
 if [ -f /system/xbin/su ] || [ -f /system/bin/su ];
@@ -148,16 +153,50 @@ echo $(date) PRE-INIT DONE of post-init.sh
 sleep 10
 
 # init.d support
-echo $(date) INIT.D SUPPORT START
-/sbin/busybox sh /sbin/near/init-support.sh
-echo $(date) INIT.D SUPPORT DONE
+echo $(date) USER EARLY INIT START from /system/etc/init.d
+if cd /system/etc/init.d >/dev/null 2>&1 ; then
+    for file in E* ; do
+        if ! cat "$file" >/dev/null 2>&1 ; then continue ; fi
+        echo "START '$file'"
+        /system/bin/sh "$file"
+        echo "EXIT '$file' ($?)"
+    done
+fi
+echo $(date) USER EARLY INIT DONE from /system/etc/init.d
 
-# Modded BLN Liblights - thx to GM
+echo $(date) USER EARLY INIT START from /data/init.d
+if cd /data/init.d >/dev/null 2>&1 ; then
+    for file in E* ; do
+        if ! cat "$file" >/dev/null 2>&1 ; then continue ; fi
+        echo "START '$file'"
+        /system/bin/sh "$file"
+        echo "EXIT '$file' ($?)"
+    done
+fi
+echo $(date) USER EARLY INIT DONE from /data/init.d
+
+echo $(date) USER INIT START from /system/etc/init.d
+if cd /system/etc/init.d >/dev/null 2>&1 ; then
+    for file in S* ; do
+        if ! ls "$file" >/dev/null 2>&1 ; then continue ; fi
+        echo "START '$file'"
+        /system/bin/sh "$file"
+        echo "EXIT '$file' ($?)"
+    done
+fi
+echo $(date) USER INIT DONE from /system/etc/init.d
+
+echo $(date) USER INIT START from /data/init.d
+if cd /data/init.d >/dev/null 2>&1 ; then
+    for file in S* ; do
+        if ! ls "$file" >/dev/null 2>&1 ; then continue ; fi
+        echo "START '$file'"
+        /system/bin/sh "$file"
+        echo "EXIT '$file' ($?)"
+    done
+fi
+echo $(date) USER INIT DONE from /data/init.d
+
 /sbin/busybox sh /sbin/near/bln.sh
-
-# Lionheart tweaks - if enabled
-if [ -f /system/etc/lionheart ]; then
-	/sbin/busybox sh /sbin/near/lionheart.sh
-fi;
 
 echo $(date) END of post-init.sh

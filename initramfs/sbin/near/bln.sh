@@ -1,6 +1,6 @@
 #!/sbin/busybox sh
 # Installing BLN modded liblights
-# thx to GM
+# by Simone201
 
 mount -o remount,rw /system
 
