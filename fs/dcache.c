@@ -1119,23 +1119,6 @@ struct dentry * d_alloc_root(struct inode * root_inode)
 }
 EXPORT_SYMBOL(d_alloc_root);
 
-struct dentry *d_make_root(struct inode *root_inode)
-{
-  struct dentry *res = NULL;
-
-  if (root_inode) {
-    static const struct qstr name = { .name = "/", .len = 1 };
-
-    res = __d_alloc(root_inode->i_sb, &name);
-    if (res)
-      d_instantiate(res, root_inode);
-    else
-      iput(root_inode);
-  }
-  return res;
-}
-EXPORT_SYMBOL(d_make_root);
-
 static inline struct hlist_head *d_hash(struct dentry *parent,
 					unsigned long hash)
 {

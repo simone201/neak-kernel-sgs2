@@ -86,7 +86,7 @@ static void hotplug_timer(struct work_struct *work)
 	/* screen_off event is more likely */  
 	if (screen_off && !cpu_online(1)) {
 		printk(KERN_INFO "pm-hotplug: disable cpu auto-hotplug\n");
-		goto out;
+		goto off_hotplug;
 	}
 
 	/* exit if we turned off dynamic hotplug by tegrak cancel the timer - by tegrak */ 
