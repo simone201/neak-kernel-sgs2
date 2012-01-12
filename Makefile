@@ -334,8 +334,7 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 NEAK_FLAGS   = -marm -mtune=cortex-a9 -march=armv7-a -mfloat-abi=hard \
 			   -fsched-spec-load -floop-interchange -floop-strip-mine -floop-block \
 			   -funswitch-loops -fpredictive-commoning -fgcse-after-reload -fno-tree-vectorize \
-			   -fipa-cp-clone -pipe \
-			   -Wno-array-bounds
+			   -fipa-cp-clone -pipe
 MODFLAGS	= -DMODULE
 CFLAGS_MODULE   = $(MODFLAGS)
 AFLAGS_MODULE   = $(MODFLAGS)

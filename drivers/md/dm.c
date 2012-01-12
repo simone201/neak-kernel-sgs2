@@ -1115,6 +1115,7 @@ static struct bio *split_bvec(struct bio *bio, sector_t sector,
 	clone->bi_flags |= 1 << BIO_CLONED;
 
 	if (bio_integrity(bio)) {
+		bio_integrity_clone(clone, bio, GFP_NOIO, bs);
 		bio_integrity_trim(clone,
 				   bio_sector_offset(bio, idx, offset), len);
 	}
@@ -1141,9 +1142,12 @@ static struct bio *clone_bio(struct bio *bio, sector_t sector,
 	clone->bi_size = to_bytes(len);
 	clone->bi_flags &= ~(1 << BIO_SEG_VALID);
 
-	if (idx != bio->bi_idx || clone->bi_size < bio->bi_size) {
-		bio_integrity_trim(clone,
-			   bio_sector_offset(bio, idx, 0), len);
+	if (bio_integrity(bio)) {
+		bio_integrity_clone(clone, bio, GFP_NOIO, bs);
+
+		if (idx != bio->bi_idx || clone->bi_size < bio->bi_size)
+			bio_integrity_trim(clone,
+					   bio_sector_offset(bio, idx, 0), len);
 	}
 
 	return clone;

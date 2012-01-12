@@ -29,7 +29,7 @@
  * 15 : S5P_PA_SYSMMU_MFC_R		(0x13630000)
 */
 
-extern int g2d_sysmmu_fault(unsigned int bla, unsigned int blubb);
+extern int g2d_sysmmu_fault();
 
 static char *sysmmu_ips_name[S5P_SYSMMU_TOTAL_IPNUM] = {
 	"SYSMMU_MDMA"	,
