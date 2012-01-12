@@ -2279,7 +2279,7 @@ REGULATOR_INIT(ldo17, "CAM_AF_2.8V", 2800000, 2800000, 0,
 REGULATOR_INIT(ldo18, "TOUCH_LED_3.3V", 2500000, 2800000, 0,
 		REGULATOR_CHANGE_STATUS | REGULATOR_CHANGE_VOLTAGE, 1);
 
-REGULATOR_INIT(ldo21, "VDDQ_M1M2_1.2V", 1100000, 1100000, 1,
+REGULATOR_INIT(ldo21, "VDDQ_M1M2_1.2V", 1200000, 1200000, 1,
 		REGULATOR_CHANGE_STATUS, 1);
 
 static struct regulator_init_data buck1_init_data = {
@@ -4673,7 +4673,7 @@ static void __init setup_ram_console_mem(char *str)
 
 			base = simple_strtoul(++str, &str, 0);
 			if (reserve_bootmem(base, size, BOOTMEM_EXCLUSIVE)) {
-				pr_err("%s: failed reserving size %d at base 0xll%llx\n", __func__, size, base);
+				pr_err("%s: failed reserving size %d at base 0xll%x\n", __func__, size, base);
 				return;
 			}
 			ram_console_resource[0].start = base;
@@ -5882,7 +5882,7 @@ static void __init smdkc210_map_io(void)
 	if (!reserve_bootmem(0x5e900000, (1 << CONFIG_LOG_BUF_SHIFT), BOOTMEM_EXCLUSIVE)) {
 		ram_console_resource[0].start = 0x5e900000;
 		ram_console_resource[0].end = ram_console_resource[0].start + (1 << CONFIG_LOG_BUF_SHIFT) - 1;
-		pr_err("%s ram_console_resource[0].start:i%x, end:%x\n", __func__, ram_console_resource[0].start, ram_console_resource[0].end);
+		pr_err("%s ram_console_resource[0].start:i%p, end:%p\n", __func__, ram_console_resource[0].start, ram_console_resource[0].end);
 	}
 #endif
 	sec_getlog_supply_meminfo(meminfo.bank[0].size, meminfo.bank[0].start,
@@ -6479,7 +6479,7 @@ static void __init s5pv310_reserve(void)
 }
 #endif
 
-MACHINE_START(C1, "SMDKC310")
+MACHINE_START(C1, "SMDKC210")
 	/* Maintainer: Kukjin Kim <kgene.kim@samsung.com> */
 	.phys_io	= S3C_PA_UART & 0xfff00000,
 	.io_pg_offst	= (((u32)S3C_VA_UART) >> 18) & 0xfffc,
@@ -6490,7 +6490,7 @@ MACHINE_START(C1, "SMDKC310")
 	.timer		= &s5pv310_timer,
 MACHINE_END
 
-MACHINE_START(SMDKC210, "SMDKC310")
+MACHINE_START(SMDKC210, "SMDKC210")
 	/* Maintainer: Kukjin Kim <kgene.kim@samsung.com> */
 	.phys_io	= S3C_PA_UART & 0xfff00000,
 	.io_pg_offst	= (((u32)S3C_VA_UART) >> 18) & 0xfffc,
