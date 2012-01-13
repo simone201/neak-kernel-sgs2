@@ -2,7 +2,7 @@
 # EFS Backup script
 # by simone201 & GM
 
-if ! [ -d /sdcard/near ]; then
+if [ ! -d /sdcard/near ]; then
 	mkdir  /sdcard/near
 else
 	echo "near folder already exists"

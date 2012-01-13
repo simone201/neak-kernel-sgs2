@@ -111,6 +111,9 @@ echo "64000" > /proc/sys/kernel/msgmax;
 echo "10" > /proc/sys/fs/lease-break-time;
 echo "500 512000 64 2048" > /proc/sys/kernel/sem;
 
+# Doing some cleanup before init.d support
+/sbin/busybox sh /sbin/near/cleanup.sh
+
 ##### Install SU #####
 
 if [ -f /system/xbin/su ] || [ -f /system/bin/su ];
