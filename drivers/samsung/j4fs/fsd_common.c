@@ -283,6 +283,8 @@ error1:
   */
 int fsd_write(j4fs_ctrl *ctl)
 {
+	j4fs_transaction *transaction;
+	
 	DWORD offset, last_object_offset=0xffffffff, last_object_length=0xffffffff, matching_latest_object_length=0xffffffff, buffer_index=0, len1, len2;
 	DWORD matching_latest_offset=0xffffffff, new_header_offset=0xffffffff, is_it_last_object=0;
 	j4fs_header *header = 0;
@@ -297,7 +299,6 @@ int fsd_write(j4fs_ctrl *ctl)
 
 #ifdef J4FS_TRANSACTION_LOGGING
 #ifdef __KERNEL__
-	j4fs_transaction *transaction;
 	transaction=kmalloc(J4FS_TRANSACTION_SIZE,GFP_NOFS);
 #else
 	BYTE buf1[J4FS_TRANSACTION_SIZE];
@@ -1254,6 +1255,7 @@ int fsd_reclaim()
 	int i;
 	int ret=-1;
 	int first_unused_area_offset=0xffffffff;
+	j4fs_transaction *transaction;
 
 #ifdef __KERNEL__
 	BYTE *buf_mst, *buf_header, *buf_data;
@@ -1267,7 +1269,6 @@ int fsd_reclaim()
 
 #ifdef J4FS_TRANSACTION_LOGGING
 #ifdef __KERNEL__
-	j4fs_transaction *transaction;
 	transaction=kmalloc(J4FS_TRANSACTION_SIZE,GFP_NOFS);
 #else
 	BYTE buf[J4FS_TRANSACTION_SIZE];
