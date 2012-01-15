@@ -122,7 +122,7 @@ loglevel 3
     insmod /lib/modules/Si4709_driver.ko
 
 # ko files for j4fs
-	insmod /lib/modules/j4fs.ko    
+#	insmod /lib/modules/j4fs.ko    
 
 on fs
     # mount mtd partitions
