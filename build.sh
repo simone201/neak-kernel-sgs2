@@ -15,10 +15,10 @@ VOODOO_PATH="/home/simone/neak-kernel/voodoo-mods"
 TOOLCHAIN="/home/simone/arm-2011.03/bin/arm-none-eabi-"
 ROOTFS_PATH="/home/simone/neak-kernel/initramfs"
 
-export KBUILD_BUILD_VERSION="N.E.A.K-1.3.1x"
+export KBUILD_BUILD_VERSION="N.E.A.K-1.3.2x"
 export KERNELDIR=$KERNEL_PATH
 
-ZIP_NAME="N.E.A.K-1.3.1x.zip"
+ZIP_NAME="N.E.A.K-1.3.2x.zip"
 
 echo "Cleaning latest build"
 make ARCH=arm CROSS_COMPILE=$TOOLCHAIN -j`grep 'processor' /proc/cpuinfo | wc -l` mrproper
