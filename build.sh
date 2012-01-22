@@ -29,14 +29,14 @@ make neak_defconfig
 make -j`grep 'processor' /proc/cpuinfo | wc -l` ARCH=arm CROSS_COMPILE=$TOOLCHAIN CONFIG_INITRAMFS_SOURCE="$ROOTFS_PATH" >> compile.log 2>&1 || exit -1
 
 # Copying Voodoo Modules
-cd $VOODOO_PATH
-cd mc1n2_voodoo
-make default ARCH=arm CROSS_COMPILE=$TOOLCHAIN
-cp mc1n2_voodoo.ko $ROOTFS_PATH/lib/modules/mc1n2_voodoo.ko
-cd ..
-cd ld9040_voodoo_exynos_galaxysii
-make default ARCH=arm CROSS_COMPILE=$TOOLCHAIN
-cp ld9040_voodoo.ko $ROOTFS_PATH/lib/modules/ld9040_voodoo.ko
+#cd $VOODOO_PATH
+#cd mc1n2_voodoo
+#make default ARCH=arm CROSS_COMPILE=$TOOLCHAIN
+#cp mc1n2_voodoo.ko $ROOTFS_PATH/lib/modules/mc1n2_voodoo.ko
+#cd ..
+#cd ld9040_voodoo_exynos_galaxysii
+#make default ARCH=arm CROSS_COMPILE=$TOOLCHAIN
+#cp ld9040_voodoo.ko $ROOTFS_PATH/lib/modules/ld9040_voodoo.ko
 
 # Copying kernel modules
 cd $KERNEL_PATH
