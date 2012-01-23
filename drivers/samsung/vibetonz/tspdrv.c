@@ -104,7 +104,7 @@ static int g_nMajor;
 #endif
 
 /* timed_output */
-#define VIBRATOR_PERIOD 38022 /* 128 * 205 = 26.240 */
+#define VIBRATOR_PERIOD  44643  /* 128 * 175 = 22.4KHz */
 #define VIBRATOR_DUTY 34220 /* 90% of period */
 
 static const int vibrator_duty_levels[] = { 26000, 28000, 30000, 32000, 34000, 36000, 38000 };
