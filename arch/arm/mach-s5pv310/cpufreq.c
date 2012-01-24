@@ -173,7 +173,7 @@ static unsigned int fix_busfreq_level;
 static unsigned int pre_fix_busfreq_level;
 
 static unsigned int calc_bus_utilization(struct s5pv310_dmc_ppmu_hw *ppmu);
-static void busfreq_target(unsigned int);
+static void busfreq_target(void);
 
 static DEFINE_MUTEX(set_bus_freq_change);
 static DEFINE_MUTEX(set_bus_freq_lock);
@@ -1261,7 +1261,7 @@ if(policy->governor->enableSmoothScaling && index <= smooth_target)
 bus_freq:
 	mutex_unlock(&set_cpu_freq_change);
 #ifdef CONFIG_S5PV310_BUSFREQ
-	busfreq_target(index);
+	busfreq_target();
 #endif
 	return ret;
 
@@ -1364,14 +1364,16 @@ int busfreq_static_level[6] = {
 static int busload_observor(struct busfreq_table *freq_table,
 			unsigned int bus_load,
 			unsigned int cpu_bus_load,
-			unsigned int pre_idx, unsigned int freqindex,
+			unsigned int pre_idx,
 			unsigned int *index)
 {
 	unsigned int i, target_freq, idx = 0;
 
 	if(is_busfreq_static)
 	{
-		*index = busfreq_static_level[freqindex];
+		//find the step
+		for(i=0;freqs.new < s5pv310_freq_table[i].frequency;i++);
+		idx = busfreq_static_level[i];
 		goto observerout;
 	}
 	
@@ -1436,7 +1438,7 @@ observerout:
 	return 0;
 }
 
-static void busfreq_target(unsigned int freqindex)
+static void busfreq_target(void)
 {
 	unsigned int i, index = 0, ret, voltage;
 	unsigned int bus_load, cpu_bus_load;
@@ -1473,7 +1475,7 @@ static void busfreq_target(unsigned int freqindex)
 
 	/* Change bus frequency */
 	ret = busload_observor(s5pv310_busfreq_table,
-				bus_load, cpu_bus_load, p_idx, freqindex, &index);
+				bus_load, cpu_bus_load, p_idx, &index);
 	if (ret < 0)
 		printk(KERN_ERR "%s:fail to check load (%d)\n", __func__, ret);
 
@@ -1673,7 +1675,7 @@ int s5pv310_busfreq_lock(unsigned int nId,
 	if (busfreq_level < g_busfreq_lock_level) {
 		g_busfreq_lock_level = busfreq_level;
 		mutex_unlock(&set_bus_freq_lock);
-		busfreq_target(0);
+		busfreq_target();
 	} else
 		mutex_unlock(&set_bus_freq_lock);
 
@@ -1761,7 +1763,9 @@ static int s5pv310_cpufreq_notifier_event(struct notifier_block *this,
 
 static struct notifier_block s5pv310_cpufreq_notifier = {
 	.notifier_call = s5pv310_cpufreq_notifier_event,
+#ifdef ARIGHI_SMOOTH_SCALING
 	.priority = INT_MIN, /* done last */
+#endif
 };
 
 static int s5pv310_cpufreq_reboot_notifier_call(struct notifier_block *this,
@@ -2319,6 +2323,14 @@ static void s5pv310_asv_set_voltage(void)
 	case 200000:
 		asv_arm_index = 4;
 		break;
+	case 100000:
+		asv_arm_index = 5;
+		break;
+	default:
+		for(asv_arm_index=5;asv_arm_index>0;asv_arm_index--)
+			if(freqs.old == s5pv310_freq_table[asv_arm_index].frequency) break;
+		break;
+
 	}
 
 	if (s5pv310_max_armclk != ARMCLOCK_1200MHZ)
@@ -2327,8 +2339,6 @@ static void s5pv310_asv_set_voltage(void)
 	asv_arm_volt = s5pv310_volt_table[asv_arm_index].arm_volt;
 #endif
 
-	for(asv_arm_index=7;asv_arm_index>0;asv_arm_index--)
-		if(freqs.old == s5pv310_freq_table[asv_arm_index].frequency) break;
 	asv_arm_volt = exp_UV_mV[asv_arm_index];
 
 #if defined(CONFIG_REGULATOR)
@@ -2352,6 +2362,9 @@ static void s5pv310_asv_set_voltage(void)
 	case 133000:
 	case 133333:
 		asv_int_index = 2;
+		break;
+	default:
+		asv_int_index = 0;
 		break;
 	}
 	asv_int_volt = s5pv310_busfreq_table[asv_int_index].volt;
