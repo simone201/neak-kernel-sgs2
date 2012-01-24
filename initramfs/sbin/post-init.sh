@@ -14,6 +14,9 @@ echo $(date) START of post-init.sh
 
 ##### Early-init phase #####
 
+# Voodoo ScreenTuner Module
+  insmod /lib/modules/ld9040_voodoo.ko
+
 # IPv6 privacy tweak
   echo "2" > /proc/sys/net/ipv6/conf/all/use_tempaddr
 
