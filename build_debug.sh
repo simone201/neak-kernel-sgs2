@@ -12,7 +12,8 @@ KERNEL_PATH="/home/simone/neak-kernel"
 VOODOO_PATH="/home/simone/neak-kernel/voodoo-mods"
 
 # Set toolchain and root filesystem path
-TOOLCHAIN="/home/simone/arm-2011.03/bin/arm-none-eabi-"
+#TOOLCHAIN="/home/simone/arm-2011.03/bin/arm-none-eabi-"
+TOOLCHAIN="/home/simone/android-toolchain-eabi/bin/arm-eabi-"
 ROOTFS_PATH="/home/simone/neak-kernel/initramfs"
 
 export KBUILD_BUILD_VERSION="N.E.A.K-1.3x"
