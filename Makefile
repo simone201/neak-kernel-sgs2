@@ -333,6 +333,7 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
 NEAK_FLAGS   = -marm -mtune=cortex-a9 -march=armv7-a -mfloat-abi=hard \
 			   -fsched-spec-load -floop-interchange -floop-strip-mine -floop-block \
+			   -ffast-math -ftree-vectorize \
 			   -funswitch-loops -fpredictive-commoning -fgcse-after-reload -fno-tree-vectorize \
 			   -fipa-cp-clone -pipe \
 			   -Wno-array-bounds
@@ -956,7 +957,7 @@ define filechk_utsrelease.h
 	  echo '"$(KERNELRELEASE)" exceeds $(uts_len) characters' >&2;    \
 	  exit 1;                                                         \
 	fi;                                                               \
-	(echo \#define UTS_RELEASE \"2.6.35.14-g9aae3db\";)
+	(echo \#define UTS_RELEASE \"2.6.35.14-N.E.A.K-1.3.2x\";)
 endef
 
 define filechk_version.h
