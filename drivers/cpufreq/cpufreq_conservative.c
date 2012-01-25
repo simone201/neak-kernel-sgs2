@@ -29,8 +29,8 @@
  * It helps to keep variable names smaller, simpler
  */
 
-#define DEF_FREQUENCY_UP_THRESHOLD		(60)
-#define DEF_FREQUENCY_DOWN_THRESHOLD		(30)
+#define DEF_FREQUENCY_UP_THRESHOLD		(70)
+#define DEF_FREQUENCY_DOWN_THRESHOLD		(35)
 
 /*
  * The polling frequency of this governor depends on the capability of
@@ -46,7 +46,7 @@
 
 static unsigned int min_sampling_rate;
 
-#define LATENCY_MULTIPLIER			(1000)
+#define LATENCY_MULTIPLIER			(400)
 #define MIN_LATENCY_MULTIPLIER			(100)
 #define DEF_SAMPLING_DOWN_FACTOR		(1)
 #define MAX_SAMPLING_DOWN_FACTOR		(10)
@@ -450,7 +450,7 @@ static void do_dbs_timer(struct work_struct *work)
 	/* We want all CPUs to do sampling nearly on same jiffy */
 	int delay = usecs_to_jiffies(dbs_tuners_ins.sampling_rate);
 
-	delay -= jiffies % delay;
+//	delay -= jiffies % delay;
 
 	mutex_lock(&dbs_info->timer_mutex);
 
@@ -464,7 +464,7 @@ static inline void dbs_timer_init(struct cpu_dbs_info_s *dbs_info)
 {
 	/* We want all CPUs to do sampling nearly on same jiffy */
 	int delay = usecs_to_jiffies(dbs_tuners_ins.sampling_rate);
-	delay -= jiffies % delay;
+//	delay -= jiffies % delay;
 
 	dbs_info->enable = 1;
 	INIT_DELAYED_WORK_DEFERRABLE(&dbs_info->work, do_dbs_timer);
@@ -534,7 +534,7 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 			 * governor, thus we are bound to jiffes/HZ
 			 */
 			min_sampling_rate =
-				MIN_SAMPLING_RATE_RATIO * jiffies_to_usecs(10);
+				MIN_SAMPLING_RATE_RATIO * jiffies_to_usecs(1);
 			/* Bring kernel and HW constraints together */
 			min_sampling_rate = max(min_sampling_rate,
 					MIN_LATENCY_MULTIPLIER * latency);
