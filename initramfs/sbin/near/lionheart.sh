@@ -12,4 +12,4 @@ echo "80000" > /sys/devices/system/cpu/cpufreq/conservative/sampling_rate
 echo "60000" > /sys/devices/system/cpu/cpufreq/conservative/sampling_rate
 echo "50000" > /sys/devices/system/cpu/cpufreq/conservative/sampling_rate
 echo "20000" > /sys/devices/system/cpu/cpufreq/conservative/sampling_rate
-echo "10000" > /sys/devices/system/cpu/cpufreq/conservative/sampling_rate
+#echo "10000" > /sys/devices/system/cpu/cpufreq/conservative/sampling_rate

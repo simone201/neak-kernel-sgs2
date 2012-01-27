@@ -14,9 +14,6 @@ echo $(date) START of post-init.sh
 
 ##### Early-init phase #####
 
-# Voodoo ScreenTuner Module
-  insmod /lib/modules/ld9040_voodoo.ko
-
 # IPv6 privacy tweak
   echo "2" > /proc/sys/net/ipv6/conf/all/use_tempaddr
 
@@ -73,15 +70,6 @@ setprop debug.performance.tuning 1;
 setprop video.accelerate.hw 1;
 setprop debug.sf.hw 1;
 
-# Enable SCHED_MC
-if [ -f /system/etc/schedmc ]; then
-	echo "1" > /sys/devices/system/cpu/sched_mc_power_savings
-	echo "sched_mc enabled"
-else
-	echo "0" > /sys/devices/system/cpu/sched_mc_power_savings
-	echo "sched_mc disabled"
-fi;
-
 # Enable AFTR
 echo "3" > /sys/module/cpuidle/parameters/enable_mask
 
@@ -116,6 +104,9 @@ echo "500 512000 64 2048" > /proc/sys/kernel/sem;
 
 # Doing some cleanup before init.d support
 /sbin/busybox sh /sbin/near/cleanup.sh
+
+# Voodoo ScreenTuner Module
+  insmod /lib/modules/ld9040_voodoo.ko
 
 ##### Install SU #####
 
@@ -198,12 +189,10 @@ if cd /data/init.d >/dev/null 2>&1 ; then
 fi
 echo $(date) USER INIT DONE from /data/init.d
 
-# Lionheart tweaks - if enabled
-if [ -f /system/etc/lionheart ]; then
-	echo "lionheart tweaks enabled"
-	/sbin/busybox sh /sbin/near/lionheart.sh
-fi;
+# NEAK Options
+	/sbin/busybox sh /sbin/near/neak-options.sh
 
-/sbin/busybox sh /sbin/near/bln.sh
+# BLN liblights installer
+	/sbin/busybox sh /sbin/near/bln.sh
 
 echo $(date) END of post-init.sh
