@@ -3,13 +3,15 @@
 # Only compatible with NEAK app/cwm
 # by Simone201
 
+/sbin/busybox mount -o rw,remount /dev/block/mmcblk0p10 /data
+
 # Check if our folder is there...
-if [ ! -d /data/neak]; then
+if [ ! -d /data/neak ]; then
 	mkdir /data/neak
 fi;
 
 # Conservative Module
-if [ -f /data/neak/conservative]; then
+if [ -f /data/neak/conservative ]; then
 	insmod /lib/modules/cpufreq_conservative.ko
 fi;
 
@@ -17,13 +19,13 @@ fi;
 if [ -f /data/neak/lionheart]; then
 	/sbin/busybox sh /sbin/near/lionheart.sh
 else
-	if[ ! -f /data/neak/conservative] && [ -f /data/neak/lionheart]; then
+	if[ ! -f /data/neak/conservative ] && [ -f /data/neak/lionheart ]; then
 		rm /data/neak/lionheart
 	fi;
 fi;
 
 # Lazy Governor
-if [ -f /data/neak/lazy]; then
+if [ -f /data/neak/lazy ]; then
 	insmod /lib/modules/cpufreq_lazy.ko
 fi;
 

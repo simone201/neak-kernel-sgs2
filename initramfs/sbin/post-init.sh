@@ -138,6 +138,12 @@ else
 	/sbin/busybox mount /system -o remount,ro
 fi
 
+# NEAK Options
+	/sbin/busybox sh /sbin/near/neak-options.sh
+
+# BLN liblights installer
+	/sbin/busybox sh /sbin/near/bln.sh
+
 echo $(date) PRE-INIT DONE of post-init.sh
 
 ##### Post-init phase #####
@@ -188,11 +194,5 @@ if cd /data/init.d >/dev/null 2>&1 ; then
     done
 fi
 echo $(date) USER INIT DONE from /data/init.d
-
-# NEAK Options
-	/sbin/busybox sh /sbin/near/neak-options.sh
-
-# BLN liblights installer
-	/sbin/busybox sh /sbin/near/bln.sh
 
 echo $(date) END of post-init.sh
