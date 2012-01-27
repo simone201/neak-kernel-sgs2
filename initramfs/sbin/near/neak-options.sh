@@ -3,7 +3,7 @@
 # Only compatible with NEAK app/cwm
 # by Simone201
 
-/sbin/busybox mount -o rw,remount /dev/block/mmcblk0p10 /data
+mount -o remount,rw /system
 
 # Check if our folder is there...
 if [ ! -d /data/neak ]; then
