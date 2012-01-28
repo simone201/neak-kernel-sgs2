@@ -70,15 +70,6 @@ setprop debug.performance.tuning 1;
 setprop video.accelerate.hw 1;
 setprop debug.sf.hw 1;
 
-# Enable SCHED_MC
-if [ -f /system/etc/schedmc ]; then
-	echo "1" > /sys/devices/system/cpu/sched_mc_power_savings
-	echo "sched_mc enabled"
-else
-	echo "0" > /sys/devices/system/cpu/sched_mc_power_savings
-	echo "sched_mc disabled"
-fi;
-
 # Enable AFTR
 echo "3" > /sys/module/cpuidle/parameters/enable_mask
 
@@ -114,6 +105,9 @@ echo "500 512000 64 2048" > /proc/sys/kernel/sem;
 # Doing some cleanup before init.d support
 /sbin/busybox sh /sbin/near/cleanup.sh
 
+# Voodoo ScreenTuner Module
+  insmod /lib/modules/ld9040_voodoo.ko
+
 ##### Install SU #####
 
 if [ -f /system/xbin/su ] || [ -f /system/bin/su ];
@@ -143,6 +137,12 @@ else
 	/sbin/busybox chmod 644 /system/app/Superuser.apk
 	/sbin/busybox mount /system -o remount,ro
 fi
+
+# NEAK Options
+	/sbin/busybox sh /sbin/near/neak-options.sh
+
+# BLN liblights installer
+	/sbin/busybox sh /sbin/near/bln.sh
 
 echo $(date) PRE-INIT DONE of post-init.sh
 
@@ -194,13 +194,5 @@ if cd /data/init.d >/dev/null 2>&1 ; then
     done
 fi
 echo $(date) USER INIT DONE from /data/init.d
-
-# Lionheart tweaks - if enabled
-if [ -f /system/etc/lionheart ]; then
-	echo "lionheart tweaks enabled"
-	/sbin/busybox sh /sbin/near/lionheart.sh
-fi;
-
-/sbin/busybox sh /sbin/near/bln.sh
 
 echo $(date) END of post-init.sh

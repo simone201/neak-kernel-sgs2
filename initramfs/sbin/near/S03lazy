@@ -1,6 +1,0 @@
-#!/system/bin/sh
-# N.E.A.K. Kernel
-# Enabling Lazy GOV Module
-# by simone201
-
-insmod /lib/modules/cpufreq_lazy.ko
