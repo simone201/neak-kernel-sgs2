@@ -3,7 +3,7 @@
 # Only compatible with NEAK app/cwm
 # by Simone201
 
-mount -o remount,rw /system
+mount -o remount,rw /data
 
 # Check if our folder is there...
 if [ ! -d /data/neak ]; then
@@ -32,9 +32,7 @@ fi;
 # SCHED_MC Feature
 if [ -f /data/neak/schedmc ]; then
 	echo "1" > /sys/devices/system/cpu/sched_mc_power_savings
-	echo "sched_mc enabled"
 else
 	echo "0" > /sys/devices/system/cpu/sched_mc_power_savings
-	echo "sched_mc disabled"
 fi;
 	
