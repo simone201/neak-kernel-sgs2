@@ -102,9 +102,6 @@ echo "64000" > /proc/sys/kernel/msgmax;
 echo "10" > /proc/sys/fs/lease-break-time;
 echo "500 512000 64 2048" > /proc/sys/kernel/sem;
 
-# Doing some cleanup before init.d support
-/sbin/busybox sh /sbin/near/cleanup.sh
-
 # Voodoo ScreenTuner Module
   insmod /lib/modules/ld9040_voodoo.ko
 
@@ -138,11 +135,14 @@ else
 	/sbin/busybox mount /system -o remount,ro
 fi
 
-# NEAK Options
-	/sbin/busybox sh /sbin/near/neak-options.sh
+# Doing some cleanup before init.d support & neak options
+    /sbin/busybox sh /sbin/near/cleanup.sh
 
 # BLN liblights installer
 	/sbin/busybox sh /sbin/near/bln.sh
+	
+# NEAK Options
+	/sbin/busybox sh /sbin/near/neak-options.sh
 
 echo $(date) PRE-INIT DONE of post-init.sh
 

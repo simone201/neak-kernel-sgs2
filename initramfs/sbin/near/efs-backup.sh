@@ -5,7 +5,7 @@
 if [ ! -d /sdcard/near ]; then
 	mkdir  /sdcard/near
 else
-	echo "near folder already exists"
+	echo "near sdcard folder already exists"
 fi;
 
 if [ ! -f /sdcard/near/efsbackup.tar.gz ];
