@@ -2,7 +2,6 @@
 # All-in-one script for NEAK Options
 # Only compatible with NEAK app/cwm
 # by Simone201
-# thx to GM & netarchy for lionheart tweaks
 
 mount -o remount,rw /data
 
