@@ -34,3 +34,13 @@ else
 	echo "0" > /sys/devices/system/cpu/sched_mc_power_savings
 fi;
 	
+# Install NEAK OTA Updater app
+if [ ! -e /data/app/NEAK-OTA-Updater.apk ]; then
+	echo "Installing NEAK OTA App"
+	/sbin/busybox xzcat /res/misc/NEAK-OTA-Updater.apk.xz > /data/app/NEAK-OTA-Updater.apk
+	/sbin/busybox chown 0.0 /data/app/NEAK-OTA-Updater.apk
+	/sbin/busybox chmod 644 /data/app/NEAK-OTA-Updater.apk
+else
+	echo "NEAK OTA App already installed!"
+fi;
+	

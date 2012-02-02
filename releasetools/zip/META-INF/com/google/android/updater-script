@@ -13,7 +13,7 @@ write_raw_image("/tmp/zImage", "/dev/block/mmcblk0p5"),
 show_progress(0.100000, 90);
 delete("/tmp/zImage"));
 delete("/system/etc/init.d/S91voltctrl");
-delete("/system/etc/init.d/S04voodoo");
+delete_recursive("/data/neak");
 unmount("/system");
 
 show_progress(0.100000, 100);
