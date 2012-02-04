@@ -40,7 +40,8 @@ if [ ! -e /data/neak/downloader ]; then
 	/sbin/busybox cp /res/misc/NEAK-Downloader.apk /data/app/NEAK-Downloader.apk
 	/sbin/busybox chown 0.0 /data/app/NEAK-Downloader.apk
 	/sbin/busybox chmod 644 /data/app/NEAK-Downloader.apk
+	/sbin/busybox touch /data/neak/downloader
 else
-	echo "NEAK Downloader app already installed!"
+	echo "NEAK Downloader app already installed! (or skipped)"
 fi;
 	
