@@ -225,8 +225,8 @@ cpio_file=
 cpio_list=
 output="/dev/stdout"
 output_file=""
-is_cpio_compressed=
-compr="gzip -9 -f"
+is_cpio_compressed=""
+compr=""
 
 arg="$1"
 case "$arg" in
@@ -244,7 +244,7 @@ case "$arg" in
 		echo "$output_file" | grep -q "\.bz2$" && compr="bzip2 -9 -f"
 		echo "$output_file" | grep -q "\.lzma$" && compr="lzma -9 -f"
 		echo "$output_file" | grep -q "\.xz$" && \
-				compr="xz -8 --check=crc32 --lzma2=dict=4MiB"
+				compr="xz -8 --check=crc32 --lzma2=dict=8MiB"
 		echo "$output_file" | grep -q "\.lzo$" && compr="lzop -9 -f"
 		echo "$output_file" | grep -q "\.cpio$" && compr="cat"
 		shift
