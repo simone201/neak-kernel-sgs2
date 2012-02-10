@@ -403,6 +403,19 @@ static inline int qdisc_enqueue_root(struct sk_buff *skb, struct Qdisc *sch)
 	return qdisc_enqueue(skb, sch) & NET_XMIT_MASK;
 }
 
+static inline void bstats_update(struct gnet_stats_basic_packed *bstats,
+                                 const struct sk_buff *skb)
+{
+    bstats->bytes += qdisc_pkt_len(skb);
+    bstats->packets += skb_is_gso(skb) ? skb_shinfo(skb)->gso_segs : 1;
+}
+
+static inline void qdisc_bstats_update(struct Qdisc *sch,
+									   const struct sk_buff *skb)
+{
+    bstats_update(&sch->bstats, skb);
+}
+
 static inline void __qdisc_update_bstats(struct Qdisc *sch, unsigned int len)
 {
 	sch->bstats.bytes += len;
