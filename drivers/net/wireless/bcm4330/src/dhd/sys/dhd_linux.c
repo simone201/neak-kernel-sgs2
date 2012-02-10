@@ -632,7 +632,7 @@ extern bool   ap_fw_loaded;
 #if defined(CONFIG_HAS_EARLYSUSPEND)
 int dhd_set_suspend(int value, dhd_pub_t *dhd)
 {
-#ifndef CONFIG_MACH_C1
+#ifndef CUSTOMER_HW_SAMSUNG
 	int power_mode = PM_MAX;
 #endif
 #ifndef DTIM_CNT1    // for DTIM 1
@@ -651,7 +651,7 @@ int dhd_set_suspend(int value, dhd_pub_t *dhd)
 
 				/* Kernel suspended */
 				DHD_TRACE(("%s: force extra Suspend setting \n", __FUNCTION__));
-#ifndef CONFIG_MACH_C1
+#ifndef CUSTOMER_HW_SAMSUNG
 				dhdcdc_set_ioctl(dhd, 0, WLC_SET_PM, (char *)&power_mode, sizeof(power_mode), 1);
 #endif
 				/* Enable packet filter, only allow unicast packet to send up */
@@ -684,7 +684,7 @@ int dhd_set_suspend(int value, dhd_pub_t *dhd)
 				
 				/* Kernel resumed  */
 				DHD_TRACE(("%s: Remove extra suspend setting \n", __FUNCTION__));
-#ifndef CONFIG_MACH_C1
+#ifndef CUSTOMER_HW_SAMSUNG
 				power_mode = PM_FAST;
 				dhdcdc_set_ioctl(dhd, 0, WLC_SET_PM, (char *)&power_mode, sizeof(power_mode), 1);
 #endif
