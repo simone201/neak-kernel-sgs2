@@ -70,9 +70,6 @@ setprop debug.performance.tuning 1;
 setprop video.accelerate.hw 1;
 setprop debug.sf.hw 1;
 
-# Enable AFTR
-echo "3" > /sys/module/cpuidle/parameters/enable_mask
-
 # Hotplug thresholds
 echo "35" > /sys/module/pm_hotplug/parameters/loadl
 echo "75" > /sys/module/pm_hotplug/parameters/loadh
