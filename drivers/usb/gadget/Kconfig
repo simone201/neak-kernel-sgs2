@@ -959,6 +959,12 @@ config USB_ANDROID_RNDIS_WCEIS
 
          If you enable this option, the device is no longer CDC ethernet
          compatible.
+         
+config USB_ANDROID_SAMSUNGROM
+	boolean "USB Support for Sammy Roms"
+	depends on USB_ANDROID
+	help
+		Provides support for USB on Samsung Roms (Galaxy S2)
 
 config USB_ANDROID_SAMSUNG_COMPOSITE
 	boolean "Samsung Composite function"

@@ -119,7 +119,7 @@ loglevel 3
     insmod /lib/modules/bthid.ko
 
 # ko files for FM Radio
-    insmod /lib/modules/Si4709_driver.ko 
+    insmod /lib/modules/Si4709_driver.ko
 
 on fs
     # mount mtd partitions
@@ -869,7 +869,7 @@ on property:encryption.bootmode=remount
     stop tvout
     stop media
     stop immvibed
-    stop zygote   
+    stop zygote
 
     mount ext4 /dev/block/mmcblk0p10 /data nosuid nodev noatime wait usedm discard,noauto_da_alloc
     chown system system /data
@@ -915,7 +915,7 @@ on property:encryption.bootmode=remount
     chmod 0664 /sys/class/sec/gps/GPS_PWR_EN/value
     
     chown root system /sys/class/sec/gps/GPS_nRST/value
-    chmod 0664 /sys/class/sec/gps/GPS_nRST/value    
+    chmod 0664 /sys/class/sec/gps/GPS_nRST/value
 
     mkdir /data/gps 771 system system
     chown system system /data/gps
@@ -945,7 +945,7 @@ on property:encryption.bootmode=remount
 
     #over-wirte-permission.
     chmod 0771 /data/app
-    chown system system /data/app    
+    chown system system /data/app
 
     # create log system
     mkdir /data/log 0777 system system

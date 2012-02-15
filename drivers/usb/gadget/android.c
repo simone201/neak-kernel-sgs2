@@ -653,12 +653,16 @@ void android_enable_function(struct usb_function *f, int enable)
 			dev->cdev->desc.idProduct = device_desc.idProduct;
 	//	usb_composite_force_reset(dev->cdev);
 	/* force reenumeration */
+#ifdef CONFIG_USB_ANDROID_SAMSUNGROM
 		if (dev->cdev && dev->cdev->gadget &&
 				dev->cdev->gadget->speed != USB_SPEED_UNKNOWN) {
 			usb_gadget_disconnect(dev->cdev->gadget);
 			msleep(10);
 			usb_gadget_connect(dev->cdev->gadget);
 		}
+#else
+		usb_composite_force_reset(dev->cdev);
+#endif
 	}
 }
 #endif /* CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE */

@@ -1,5 +1,10 @@
 menu "Device Drivers"
 
+config SAMSUNG_ROM
+	bool "Samsung ROM Kernel Support"
+	help
+	 Enable support for Samsung ROMs (Galaxy S2)
+
 source "drivers/base/Kconfig"
 
 source "drivers/connector/Kconfig"

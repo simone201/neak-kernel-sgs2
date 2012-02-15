@@ -2,6 +2,7 @@
  * Driver for keys on GPIO lines capable of generating interrupts.
  *
  * Copyright 2005 Phil Blundell
+ * Modified by DvTonder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -45,8 +46,8 @@
 #include <plat/gpio-cfg.h>
 
 /*
-Melfas touchkey register
-*/
+ * Melfas touchkey register
+ */
 #define KEYCODE_REG 0x00
 #define FIRMWARE_VERSION 0x01
 #define TOUCHKEY_MODULE_VERSION 0x02
@@ -63,13 +64,33 @@ Melfas touchkey register
 #define DOOSUNGTECH_TOUCH_V1_2  0x0C
 
 /*
-#define TEST_JIG_MODE
-*/
-
-#define CONFIG_TOUCHKEY_BLN
-#ifdef CONFIG_TOUCHKEY_BLN
+ * Standard CM7 LED Notification functionality.
+ */
 #include <linux/miscdevice.h>
 #include <linux/wakelock.h>
+
+#define ENABLE_BL	1
+#define DISABLE_BL	2
+#define BL_ALWAYS_ON	-1
+#define BL_ALWAYS_OFF	-2
+
+int led_on = 0;
+int screen_on = 1;
+int led_timeout = BL_ALWAYS_ON; /* never time out */
+int notification_timeout = -1; /* never time out */
+int notification_enabled = -1; /* Disabled by default */
+
+static struct wake_lock led_wake_lock;
+static DECLARE_MUTEX(enable_sem);
+
+/* timer related declares */
+static struct timer_list led_timer;
+static void bl_off(struct work_struct *bl_off_work);
+static DECLARE_WORK(bl_off_work, bl_off);
+static struct timer_list notification_timer;
+static void notification_off(struct work_struct *notification_off_work);
+static DECLARE_WORK(notification_off_work, notification_off);
+
 #define BLN_VERSION 9
 
 bool bln_enabled = false;
@@ -81,7 +102,6 @@ static void enable_led_notification(void);
 static void disable_led_notification(void);
 
 static struct wake_lock bln_wake_lock;
-#endif
 
 #if defined(CONFIG_TARGET_LOCALE_NAATT)
 static int touchkey_keycode[5] = { 0, KEY_MENU, KEY_ENTER, KEY_BACK, KEY_END };
@@ -90,7 +110,6 @@ static int touchkey_keycode[5] = { NULL, KEY_SEARCH, KEY_BACK, KEY_HOME, KEY_MEN
 #else
 static int touchkey_keycode[3] = { 0, KEY_MENU, KEY_BACK };
 #endif
-
 static u8 menu_sensitivity = 0;
 static u8 back_sensitivity = 0;
 #ifdef CONFIG_TARGET_LOCALE_NA
@@ -116,10 +135,6 @@ struct workqueue_struct *touchkey_wq;
 struct work_struct touch_update_work;
 struct delayed_work touch_resume_work;
 
-#ifdef WHY_DO_WE_NEED_THIS
-static void __iomem *gpio_pend_mask_mem;
-#define		INT_PEND_BASE	0xE0200A54
-#endif
 
 static const struct i2c_device_id melfas_touchkey_id[] = {
 	{"melfas_touchkey", 0},
@@ -138,16 +153,18 @@ static int touchled_cmd_reversed=0;
 
 struct i2c_driver touchkey_i2c_driver = {
 	.driver = {
-		   .name = "melfas_touchkey_driver",
-		   },
+		.name = "melfas_touchkey_driver",
+	},
 	.id_table = melfas_touchkey_id,
 	.probe = i2c_touchkey_probe,
 };
 
 static int touchkey_debug_count = 0;
 static char touchkey_debug[104];
-static int touch_version = 0;
-static int module_version = 0;
+/* these are not used
+   static int touch_version = 0;
+   static int module_version = 0;
+*/
 extern int touch_is_pressed;
 
 static void touch_forced_release(void)
@@ -304,6 +321,7 @@ void touchkey_work_func(struct work_struct *p)
 	u8 data[10];
 	int ret;
 	int retry = 10;
+	int status;
 
 #if 0
 	if (gpio_get_value(_3_GPIO_TOUCH_INT)) {
@@ -318,38 +336,21 @@ void touchkey_work_func(struct work_struct *p)
 #ifdef CONFIG_CPU_FREQ
 	/* set_dvfs_target_level(LEV_800MHZ); */
 #endif
-#ifdef TEST_JIG_MODE
-	ret = i2c_touchkey_read(KEYCODE_REG, data, 10);
-#else
 	ret = i2c_touchkey_read(KEYCODE_REG, data, 3);
-#endif
-
-
-#ifdef TEST_JIG_MODE
-#ifdef CONFIG_TARGET_LOCALE_NA
-	menu_sensitivity = data[6];
-	home_sensitivity = data[7];
-    search_sensitivity = data[8];
-    back_sensitivity = data[9];
-#else
-	menu_sensitivity = data[7];
-	back_sensitivity = data[9];
-#endif /* CONFIG_TARGET_LOCALE_NA  */
-#endif
 
 	/******************************************************************
-	typedef struct I2CReg
-	{
-		unsigned char	 BtnStatus;							 // 0 :
-		unsigned char	 Version;								  // 1 :FW Version
-		unsigned char	 PcbStatus;							 // 2 :Module Version
-		unsigned char	 Cmd;									  // 3 :
-		unsigned char	 Chip_id;								  // 4 :0x55(DEFAULT_CHIP_ID) 0
-		unsigned char	 Sens;									   // 5 :sensitivity grade(0x00(slow),0x01(mid),0x02(fast))
-		WORD			 DiffData[CSD_TotalSensorCount];   //  6, 7 - 8, 9
-		WORD			 RawData[CSD_TotalSensorCount];  // 10,11 - 12,13
-		WORD			 Baseline[CSD_TotalSensorCount];   // 14,15 - 16,17
-	}I2CReg;
+    typedef struct I2CReg
+    {
+	unsigned char    BtnStatus;                          // 0 :
+	unsigned char    Version;                                 // 1 :FW Version
+	unsigned char    PcbStatus;                          // 2 :Module Version
+	unsigned char    Cmd;                                     // 3 :
+	unsigned char    Chip_id;                                 // 4 :0x55(DEFAULT_CHIP_ID) 0
+	unsigned char    Sens;                                     // 5 :sensitivity grade(0x00(slow),0x01(mid),0x02(fast))
+	WORD             DiffData[CSD_TotalSensorCount];   //  6, 7 - 8, 9
+	WORD             RawData[CSD_TotalSensorCount];  // 10,11 - 12,13
+	WORD             Baseline[CSD_TotalSensorCount];   // 14,15 - 16,17
+    }I2CReg;
 	******************************************************************/
 	set_touchkey_debug(data[0]);
 	if ((data[0] & ESD_STATE_BIT) || (ret != 0)) {
@@ -430,27 +431,6 @@ void touchkey_work_func(struct work_struct *p)
 		       touchkey_keycode[data[0] & KEYCODE_BIT]);
 		*/
 
-#ifdef TEST_JIG_MODE
-#ifdef CONFIG_TARGET_LOCALE_NA
-                if(touchkey_keycode[data[0] & KEYCODE_BIT] == touchkey_keycode[1])
-                        printk("search key sensitivity = %d\n", search_sensitivity);
-
-                if(touchkey_keycode[data[0] & KEYCODE_BIT] == touchkey_keycode[2])
-                        printk("back key sensitivity = %d\n",back_sensitivity);
-
-                if(touchkey_keycode[data[0] & KEYCODE_BIT] == touchkey_keycode[3])
-                        printk("home key sensitivity = %d\n", home_sensitivity);
-
-                if(touchkey_keycode[data[0] & KEYCODE_BIT] == touchkey_keycode[4])
-                        printk("menu key sensitivity = %d\n", menu_sensitivity);
-#else
-		if(touchkey_keycode[data[0] & KEYCODE_BIT] == touchkey_keycode[1])
-			printk("menu key sensitivity = %d\n", menu_sensitivity);
-
-		if (touchkey_keycode[data[0] & KEYCODE_BIT] == touchkey_keycode[2])
-			printk("back key sensitivity = %d\n",back_sensitivity);
-#endif /*CONFIG_TARGET_LOCALE_NA */
-#endif
 	} else {
 		if (touch_is_pressed) {
 			printk(KERN_DEBUG
@@ -471,48 +451,27 @@ void touchkey_work_func(struct work_struct *p)
 			       "[TouchKey] press keycode:%d \n",
 			       touchkey_keycode[data[0] & KEYCODE_BIT]);
 			*/
-
-#ifdef TEST_JIG_MODE
-#ifdef CONFIG_TARGET_LOCALE_NA
-	                if(touchkey_keycode[data[0] & KEYCODE_BIT] == touchkey_keycode[1])
-	                        printk("search key sensitivity = %d\n", search_sensitivity);
-
-	                if(touchkey_keycode[data[0] & KEYCODE_BIT] == touchkey_keycode[2])
-	                        printk("back key sensitivity = %d\n",back_sensitivity);
-
-	                if(touchkey_keycode[data[0] & KEYCODE_BIT] == touchkey_keycode[3])
-	                        printk("home key sensitivity = %d\n", home_sensitivity);
-
-	                if(touchkey_keycode[data[0] & KEYCODE_BIT] == touchkey_keycode[4])
-	                        printk("menu key sensitivity = %d\n", menu_sensitivity);
-#else
-
-			if(touchkey_keycode[data[0] & KEYCODE_BIT] == touchkey_keycode[1])
-				printk("menu key sensitivity = %d\n",menu_sensitivity);
-
-			if(touchkey_keycode[data[0] & KEYCODE_BIT] == touchkey_keycode[2])
-				printk("back key sensitivity = %d\n",back_sensitivity);
-#endif /*CONFIG_TARGET_LOCALE_NA */
-#endif
 		}
 	}
 
-#ifdef WHY_DO_WE_NEED_THIS
-	/* clear interrupt */
-	if (readl(gpio_pend_mask_mem) & (0x1 << 1)) {
-		writel(readl(gpio_pend_mask_mem) | (0x1 << 1),
-		       gpio_pend_mask_mem);
+#ifndef CONFIG_SAMSUNG_ROM
+	/* we have timed out or the lights should be on */
+	if (led_timer.expires > jiffies || led_timeout != BL_ALWAYS_OFF) {
+		status = 1;
+		i2c_touchkey_write((u8 *)&status, 1); /* turn on */
+	}
+	/* restart the timer */
+	if (led_timeout > 0) {
+		mod_timer(&led_timer, jiffies + msecs_to_jiffies(led_timeout));
 	}
 #endif
+
 	set_touchkey_debug('A');
 	enable_irq(IRQ_TOUCH_INT);
 }
 
 static irqreturn_t touchkey_interrupt(int irq, void *dummy)
 {
-#ifdef CONFIG_TOUCHKEY_BLN
-        printk(KERN_ERR "[TouchKey] interrupt touchkey\n");
-#endif
 	set_touchkey_debug('I');
 	disable_irq_nosync(IRQ_TOUCH_INT);
 	queue_work(touchkey_wq, &touchkey_work);
@@ -520,12 +479,212 @@ static irqreturn_t touchkey_interrupt(int irq, void *dummy)
 	return IRQ_HANDLED;
 }
 
+/*
+ * Start of the main LED Notify code block
+ */
+static void bl_off(struct work_struct *bl_off_work)
+{
+	int status;
+
+	/* do nothing if there is an active notification */
+	if (led_on == 1 || touchkey_enable != 1)
+		return;
+
+	/* we have timed out, turn the lights off */
+	status = 2;
+	i2c_touchkey_write((u8 *)&status, 1);
+
+	return;
+}
+
+static void handle_led_timeout(unsigned long data)
+{
+	/* we cannot call the timeout directly as it causes a kernel spinlock BUG, schedule it instead */
+	schedule_work(&bl_off_work);
+}
+
+static void notification_off(struct work_struct *notification_off_work)
+{
+	int status;
+
+	/* do nothing if there is no active notification */
+	if (led_on != 1 || touchkey_enable != 1)
+		return;
+
+	/* we have timed out, turn the lights off */
+	/* disable the regulators */
+	touchkey_led_ldo_on(0);	/* "touch_led" regulator */
+	touchkey_ldo_on(0);	/* "touch" regulator */
+
+	/* turn off the backlight */
+	status = 2; /* light off */
+	i2c_touchkey_write((u8 *)&status, 1);
+	touchkey_enable = 0;
+	led_on = 0;
+
+	/* we were using a wakelock, unlock it */
+	if (wake_lock_active(&led_wake_lock)) {
+		wake_unlock(&led_wake_lock);
+	}
+
+	return;
+}
+
+static void handle_notification_timeout(unsigned long data)
+{
+	/* we cannot call the timeout directly as it causes a kernel spinlock BUG, schedule it instead */
+	schedule_work(&notification_off_work);
+}
+
+
+static ssize_t led_status_read( struct device *dev, struct device_attribute *attr, char *buf )
+{
+	return sprintf(buf,"%u\n", led_on);
+}
+
+static ssize_t led_status_write( struct device *dev, struct device_attribute *attr, const char *buf, size_t size )
+{
+	unsigned int data;
+	int status;
+
+	if(sscanf(buf,"%u\n", &data ) == 1) {
+
+		switch (data) {
+		case ENABLE_BL:
+			printk(KERN_DEBUG "[LED] ENABLE_BL\n");
+			if (notification_enabled > 0) {
+				/* we are using a wakelock, activate it */
+				if (!wake_lock_active(&led_wake_lock)) {
+					wake_lock(&led_wake_lock);
+				}
+
+				if (!screen_on) {
+					/* enable regulators */
+					touchkey_ldo_on(1);         /* "touch" regulator */
+					touchkey_led_ldo_on(1);		/* "touch_led" regulator */
+					touchkey_enable = 1;
+				}
+
+				/* enable the backlight */
+				status = 1;
+				i2c_touchkey_write((u8 *)&status, 1);
+				led_on = 1;
+
+				/* See if a timeout value has been set for the notification */
+				if (notification_timeout > 0) {
+					mod_timer(&notification_timer, jiffies + msecs_to_jiffies(notification_timeout));	/* restart the timer */
+				}
+			}
+			break;
+
+		case DISABLE_BL:
+			printk(KERN_DEBUG "[LED] DISABLE_BL\n");
+
+		        /* prevent race with late resume*/
+            		down(&enable_sem);
+
+			/* only do this if a notification is on already, do nothing if not */
+			if (led_on == 1) {
+
+				/* turn off the backlight */
+				status = 2; /* light off */
+				i2c_touchkey_write((u8 *)&status, 1);
+				led_on = 0;
+
+				if (!screen_on) {
+					/* disable the regulators */
+					touchkey_led_ldo_on(0);	/* "touch_led" regulator */
+					touchkey_ldo_on(0);	/* "touch" regulator */
+					touchkey_enable = 0;
+				}
+
+				/* a notification timeout was set, disable the timer */
+				if (notification_timeout > 0) {
+					del_timer(&notification_timer);
+				}
+
+				/* we were using a wakelock, unlock it */
+				if (wake_lock_active(&led_wake_lock)) {
+					wake_unlock(&led_wake_lock);
+				}
+			}
+
+            		/* prevent race */
+            		up(&enable_sem);
+
+			break;
+		}
+	}
+
+	return size;
+}
+
+static ssize_t led_timeout_read( struct device *dev, struct device_attribute *attr, char *buf )
+{
+	return sprintf(buf,"%d\n", led_timeout);
+}
+
+static ssize_t led_timeout_write( struct device *dev, struct device_attribute *attr, const char *buf, size_t size )
+{
+	sscanf(buf,"%d\n", &led_timeout);
+	return size;
+}
+
+static ssize_t notification_timeout_read( struct device *dev, struct device_attribute *attr, char *buf )
+{
+	return sprintf(buf,"%d\n", notification_timeout);
+}
+
+static ssize_t notification_timeout_write( struct device *dev, struct device_attribute *attr, const char *buf, size_t size )
+{
+	sscanf(buf,"%d\n", &notification_timeout);
+	return size;
+}
+
+static ssize_t notification_enabled_read( struct device *dev, struct device_attribute *attr, char *buf )
+{
+	return sprintf(buf,"%d\n", notification_enabled);
+}
+
+static ssize_t notification_enabled_write( struct device *dev, struct device_attribute *attr, const char *buf, size_t size )
+{
+	sscanf(buf,"%d\n", &notification_enabled);
+	return size;
+}
+
+static DEVICE_ATTR(led, S_IRUGO | S_IWUGO, led_status_read, led_status_write );
+static DEVICE_ATTR(led_timeout, S_IRUGO | S_IWUGO, led_timeout_read, led_timeout_write );
+static DEVICE_ATTR(notification_timeout, S_IRUGO | S_IWUGO, notification_timeout_read, notification_timeout_write );
+static DEVICE_ATTR(notification_enabled, S_IRUGO | S_IWUGO, notification_enabled_read, notification_enabled_write );
+
+static struct attribute *bl_led_attributes[] = {
+	&dev_attr_led.attr,
+	&dev_attr_led_timeout.attr,
+	&dev_attr_notification_timeout.attr,
+	&dev_attr_notification_enabled.attr,
+	NULL
+};
+
+static struct attribute_group bl_notification_group = {
+	.attrs = bl_led_attributes,
+};
+
+static struct miscdevice led_device = {
+	.minor = MISC_DYNAMIC_MINOR,
+	.name  = "notification",
+};
+
+/*
+ * End of the main LED Notification code block, minor ones below
+ */
+
 #ifdef CONFIG_HAS_EARLYSUSPEND
 static int melfas_touchkey_early_suspend(struct early_suspend *h)
 {
 	touchkey_enable = 0;
 	set_touchkey_debug('S');
 	printk(KERN_DEBUG "[TouchKey] melfas_touchkey_early_suspend\n");
+
 	if (touchkey_enable < 0) {
 		printk(KERN_DEBUG "[TouchKey] ---%s---touchkey_enable: %d\n",
 		       __func__, touchkey_enable);
@@ -547,19 +706,18 @@ static int melfas_touchkey_early_suspend(struct early_suspend *h)
 
 	/* disable ldo11 */
 	touchkey_ldo_on(0);
-
-
+	screen_on = 0;
 	return 0;
 }
 
 static int melfas_touchkey_late_resume(struct early_suspend *h)
 {
-#ifdef TEST_JIG_MODE
-	unsigned char get_touch = 0x40;
-#endif
-
+	int status;
 	set_touchkey_debug('R');
 	printk(KERN_DEBUG "[TouchKey] melfas_touchkey_late_resume\n");
+
+	/* Avoid race condition with LED notification disable */
+	down(&enable_sem);
 
 	/* enable ldo11 */
 	touchkey_ldo_on(1);
@@ -567,8 +725,10 @@ static int melfas_touchkey_late_resume(struct early_suspend *h)
 	if (touchkey_enable < 0) {
 		printk(KERN_DEBUG "[TouchKey] ---%s---touchkey_enable: %d\n",
 		       __func__, touchkey_enable);
+		up(&enable_sem);
 		return 0;
 	}
+
 	gpio_direction_output(_3_GPIO_TOUCH_EN, 1);
 	gpio_direction_output(_3_TOUCH_SDA_28V, 1);
 	gpio_direction_output(_3_TOUCH_SCL_28V, 1);
@@ -580,15 +740,7 @@ static int melfas_touchkey_late_resume(struct early_suspend *h)
 	msleep(50);
 
 	touchkey_led_ldo_on(1);
-
-#ifdef WHY_DO_WE_NEED_THIS
-	/* clear interrupt */
-	if (readl(gpio_pend_mask_mem) & (0x1 << 1)) {
-		writel(readl(gpio_pend_mask_mem) | (0x1 << 1),
-		       gpio_pend_mask_mem);
-	}
-#endif
-
+#ifdef CONFIG_SAMSUNG_ROM
 	enable_irq(IRQ_TOUCH_INT);
 	touchkey_enable = 1;
 
@@ -597,11 +749,42 @@ static int melfas_touchkey_late_resume(struct early_suspend *h)
 		i2c_touchkey_write(&touchkey_led_status, 1);
 		printk("LED returned on\n");
 	}
+#else
+	touchkey_enable = 1;
 
-#ifdef TEST_JIG_MODE
-	i2c_touchkey_write(&get_touch, 1);
+	screen_on = 1;
+	/* see if late_resume is running before DISABLE_BL */
+	if (led_on) {
+		/* if a notification timeout was set, disable the timer */
+		if (notification_timeout > 0) {
+			del_timer(&notification_timer);
+		}
+
+		/* we were using a wakelock, unlock it */
+		if (wake_lock_active(&led_wake_lock)) {
+			wake_unlock(&led_wake_lock);
+		}
+
+		led_on = 0; /* force DISABLE_BL to ignore the led state because we want it left on */
+	}
+
+	if (led_timeout != BL_ALWAYS_OFF) {
+		/* ensure the light is ON */
+		status = 1;
+		i2c_touchkey_write((u8 *)&status, 1);
+	}
+
+	/* restart the timer if needed */
+	if (led_timeout > 0) {
+		mod_timer(&led_timer, jiffies + msecs_to_jiffies(led_timeout));
+	}
+
+	/* all done, turn on IRQ */
+	enable_irq(IRQ_TOUCH_INT);
+
+	/* Avoid race condition with LED notification disable */
 #endif
-
+	up(&enable_sem);
 	return 0;
 }
 #endif
@@ -820,6 +1003,7 @@ static int i2c_touchkey_probe(struct i2c_client *client,
 	struct device *dev = &client->dev;
 	struct input_dev *input_dev;
 	int err = 0;
+	int status;
 	unsigned char data;
 	/*struct regulator *regulator;*/
 
@@ -869,10 +1053,6 @@ static int i2c_touchkey_probe(struct i2c_client *client,
 		return err;
 	}
 
-#ifdef WHY_DO_WE_NEED_THIS
-	gpio_pend_mask_mem = ioremap(INT_PEND_BASE, 0x10);
-#endif
-
 #ifdef CONFIG_HAS_EARLYSUSPEND
 	touchkey_driver->early_suspend.suspend = (void *) melfas_touchkey_early_suspend;
 	touchkey_driver->early_suspend.resume = (void *) melfas_touchkey_late_resume;
@@ -885,10 +1065,6 @@ static int i2c_touchkey_probe(struct i2c_client *client,
 	msleep(50);
 
 	touchkey_enable = 1;
-	data = 1;
-#if 0
-	i2c_touchkey_write(&data, 1);
-#endif
 
 	if (request_irq
 	    (IRQ_TOUCH_INT, touchkey_interrupt, IRQF_TRIGGER_FALLING, DEVICE_NAME,
@@ -903,6 +1079,27 @@ static int i2c_touchkey_probe(struct i2c_client *client,
 
 	set_touchkey_debug('K');
 
+	err = misc_register(&led_device);
+	if( err ){
+		printk(KERN_ERR "[LED Notify] sysfs misc_register failed.\n");
+	}else{
+		if( sysfs_create_group( &led_device.this_device->kobj, &bl_notification_group) < 0){
+			printk(KERN_ERR "[LED Notify] sysfs create group failed.\n");
+		}
+	}
+
+	/* Setup the timer for the timeouts */
+	setup_timer(&led_timer, handle_led_timeout, 0);
+	setup_timer(&notification_timer, handle_notification_timeout, 0);
+
+	/* wake lock for LED Notify */
+	wake_lock_init(&led_wake_lock, WAKE_LOCK_SUSPEND, "led_wake_lock");
+
+	/* turn on the LED if it is not supposed to be allways off */
+	if (led_timeout != BL_ALWAYS_OFF) {
+		status = 1;
+		i2c_touchkey_write((u8 *)&status, 1);
+	}
 #ifdef CONFIG_TOUCHKEY_BLN
         err = misc_register( &bln_device );
         if( err ){
@@ -1066,10 +1263,6 @@ static ssize_t touch_led_control(struct device *dev,
 	int data;
 	int errnum;
 
-#ifdef CONFIG_TOUCHKEY_BLN
-        printk(KERN_ERR "[TouchKey] system calling LED Notification control\n");
-#endif
-
 	if (sscanf(buf, "%d\n", &data) == 1) {
 		errnum = i2c_touchkey_write((u8 *)&data, 1);
 		if (errnum == -ENODEV) {
@@ -1176,10 +1369,6 @@ static ssize_t set_touchkey_update_show(struct device *dev, struct device_attrib
 	int retry = 3;
 	touchkey_update_status = 1;
 
-#ifdef TEST_JIG_MODE
-	unsigned char get_touch = 0x40;
-#endif
-
 	while (retry--) {
 			if (ISSP_main() == 0) {
 				printk(KERN_ERR"[TOUCHKEY]Touchkey_update succeeded\n");
@@ -1200,10 +1389,6 @@ static ssize_t set_touchkey_update_show(struct device *dev, struct device_attrib
 	}
 
 	init_hw();	/* after update, re initalize. */
-
-#ifdef TEST_JIG_MODE
-	i2c_touchkey_write(&get_touch, 1);
-#endif
 
 	return count;
 
@@ -1273,10 +1458,6 @@ static DEVICE_ATTR(touchkey_brightness, S_IRUGO | S_IWUSR | S_IWGRP, NULL, brigh
 static int __init touchkey_init(void)
 {
 	int ret = 0;
-
-#ifdef TEST_JIG_MODE
-	unsigned char get_touch = 0x40;
-#endif
 
 	gpio_request(_3_TOUCH_SDA_28V, "_3_TOUCH_SDA_28V");
 	gpio_request(_3_TOUCH_SCL_28V, "_3_TOUCH_SCL_28V");
@@ -1451,10 +1632,6 @@ static int __init touchkey_init(void)
 
 	 <<<<<<<<<<<<<< Cypress Firmware Update */
 
-#ifdef TEST_JIG_MODE
-	i2c_touchkey_write(&get_touch, 1);
-#endif
-
 	return ret;
 }
 
@@ -1464,6 +1641,10 @@ static void __exit touchkey_exit(void)
 	i2c_del_driver(&touchkey_i2c_driver);
 	misc_deregister(&touchkey_update_device);
 
+	misc_deregister(&led_device);
+	wake_lock_destroy(&led_wake_lock);
+	del_timer(&led_timer);
+	del_timer(&notification_timer);
 #ifdef CONFIG_TOUCHKEY_BLN
         misc_deregister(&bln_device);
         wake_lock_destroy(&bln_wake_lock);

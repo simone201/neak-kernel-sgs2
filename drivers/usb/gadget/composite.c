@@ -179,8 +179,10 @@ void usb_composite_force_reset(struct usb_composite_dev *cdev)
 	/* force reenumeration */
 	if (cdev && cdev->gadget &&
 			cdev->gadget->speed != USB_SPEED_UNKNOWN) {
+#ifdef CONFIG_SAMSUNG_ROM
 		/* avoid sending a disconnect switch event until after we disconnect */
 		cdev->mute_switch = 1;
+#endif
 		spin_unlock_irqrestore(&cdev->lock, flags);
 		CSY_DBG_ESS("disconnect usb\n");
 		usb_gadget_disconnect(cdev->gadget);
