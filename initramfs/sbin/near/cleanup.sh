@@ -4,6 +4,14 @@
 
 mount -o remount,rw /system
 
+if [ -e /data/app/NEAK-Downloader.apk ]; then
+	rm /data/app/NEAK-Downloader.apk
+fi;
+
+if [ -e /data/neak/downloader ]; then
+	rm /data/neak/downloader
+fi;
+
 if [ -e /system/etc/init.d/S98bolt_siyah ]; then
 	rm /system/etc/init.d/S98bolt_siyah
 fi;
