@@ -33,7 +33,6 @@
 #ifndef __LINUX_RCUPDATE_H
 #define __LINUX_RCUPDATE_H
 
-#include <linux/types.h>
 #include <linux/rcu_types.h>
 #include <linux/cache.h>
 #include <linux/spinlock.h>
@@ -42,8 +41,6 @@
 #include <linux/seqlock.h>
 #include <linux/lockdep.h>
 #include <linux/completion.h>
-#include <linux/debugobjects.h>
-#include <linux/compiler.h>
 
 #ifdef CONFIG_RCU_TORTURE_TEST
 extern int rcutorture_runnable; /* for sysctl */
@@ -543,66 +540,5 @@ extern void call_rcu_bh(struct rcu_head *head,
  */
 #define rcu_dereference_index_check(p, c) \
 	__rcu_dereference_index_check((p), (c))
-
-/**
-* RCU_INIT_POINTER() - initialize an RCU protected pointer
-*
-* Initialize an RCU-protected pointer in special cases where readers
-* do not need ordering constraints on the CPU or the compiler. These
-* special cases are:
-*
-* 1. This use of RCU_INIT_POINTER() is NULLing out the pointer -or-
-* 2. The caller has taken whatever steps are required to prevent
-* RCU readers from concurrently accessing this pointer -or-
-* 3. The referenced data structure has already been exposed to
-* readers either at compile time or via rcu_assign_pointer() -and-
-* a. You have not made -any- reader-visible changes to
-* this structure since then -or-
-* b. It is OK for readers accessing this structure from its
-* new location to see the old state of the structure. (For
-* example, the changes were to statistical counters or to
-* other state where exact synchronization is not required.)
-*
-* Failure to follow these rules governing use of RCU_INIT_POINTER() will
-* result in impossible-to-diagnose memory corruption. As in the structures
-* will look OK in crash dumps, but any concurrent RCU readers might
-* see pre-initialized values of the referenced data structure. So
-* please be very careful how you use RCU_INIT_POINTER()!!!
-*
-* If you are creating an RCU-protected linked structure that is accessed
-* by a single external-to-structure RCU-protected pointer, then you may
-* use RCU_INIT_POINTER() to initialize the internal RCU-protected
-* pointers, but you must use rcu_assign_pointer() to initialize the
-* external-to-structure pointer -after- you have completely initialized
-* the reader-accessible portions of the linked structure.
-*/
-#define RCU_INIT_POINTER(p, v) \
-		p = (typeof(*v) __force /*__rcu*/ *)(v)
-
-/**
-* kfree_rcu() - kfree an object after a grace period.
-* @ptr: pointer to kfree
-* @rcu_head: the name of the struct rcu_head within the type of @ptr.
-*
-* Many rcu callbacks functions just call kfree() on the base structure.
-* These functions are trivial, but their size adds up, and furthermore
-* when they are used in a kernel module, that module must invoke the
-* high-latency rcu_barrier() function at module-unload time.
-*
-* The kfree_rcu() function handles this issue. Rather than encoding a
-* function address in the embedded rcu_head structure, kfree_rcu() instead
-* encodes the offset of the rcu_head structure within the base structure.
-* Because the functions are not allowed in the low-order 4096 bytes of
-* kernel virtual memory, offsets up to 4095 bytes can be accommodated.
-* If the offset is larger than 4095 bytes, a compile-time error will
-* be generated in __kfree_rcu(). If this error is triggered, you can
-* either fall back to use of call_rcu() or rearrange the structure to
-* position the rcu_head structure into the first 4096 bytes.
-*
-* Note that the allowable offset might decrease in the future, for example,
-* to allow something like kmem_cache_free_rcu().
-*/
-#define kfree_rcu(ptr, rcu_head) \
-		__kfree_rcu(&((ptr)->rcu_head), offsetof(typeof(*(ptr)), rcu_head))
 
 #endif /* __LINUX_RCUPDATE_H */
