@@ -25,7 +25,7 @@ make ARCH=arm CROSS_COMPILE=$TOOLCHAIN -j`grep 'processor' /proc/cpuinfo | wc -l
 # Making our .config
 make neak_debug_defconfig
 
-make -j`grep 'processor' /proc/cpuinfo | wc -l` ARCH=arm CROSS_COMPILE=$TOOLCHAIN CONFIG_INITRAMFS_SOURCE="$ROOTFS_PATH" >> compile.log 2>&1 || exit -1
+make -j`grep 'processor' /proc/cpuinfo | wc -l` ARCH=arm CROSS_COMPILE=$TOOLCHAIN CONFIG_INITRAMFS_SOURCE="$ROOTFS_PATH" CONFIG_DEBUG_SECTION_MISMATCH=y >> compile.log 2>&1 || exit -1
 
 # Copying Voodoo Modules
 cd $VOODOO_PATH
