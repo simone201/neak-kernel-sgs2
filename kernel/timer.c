@@ -679,12 +679,17 @@ __mod_timer(struct timer_list *timer, unsigned long expires,
 	cpu = smp_processor_id();
 
 #if defined(CONFIG_NO_HZ) && defined(CONFIG_SMP)
+#ifdef CONFIG_SCHED_BFS
 	if (!pinned && get_sysctl_timer_migration() && idle_cpu(cpu)) {
 		int preferred_cpu = get_nohz_load_balancer();
 
 		if (preferred_cpu >= 0)
 			cpu = preferred_cpu;
 	}
+#else
+	if (!pinned && get_sysctl_timer_migration() && idle_cpu(cpu))
+		cpu = get_nohz_timer_target();
+#endif
 #endif
 	new_base = per_cpu(tvec_bases, cpu);
 
@@ -1009,7 +1014,11 @@ static int cascade(struct tvec_base *base, struct tvec *tv, int index)
 	 * don't have to detach them individually.
 	 */
 	list_for_each_entry_safe(timer, tmp, &tv_list, entry) {
-		BUG_ON(tbase_get_base(timer->base) != base);
+		if (unlikely(tbase_get_base(timer->base) != base)) {
+			pr_err("%s: %p %p %p %p\n", __func__,
+					timer, timer->function, timer->base, base);
+			BUG();
+		}
 		internal_add_timer(base, timer);
 	}
 
