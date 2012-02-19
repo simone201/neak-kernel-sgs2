@@ -1582,12 +1582,8 @@ static inline bool iso_task(struct task_struct *p)
 {
 	return (p->policy == SCHED_ISO);
 }
-<<<<<<< HEAD
-extern void remove_cpu(unsigned long cpu);
-=======
 extern void remove_cpu(int cpu);
 extern bool above_background_load(void);
->>>>>>> 0d5efbe... Update BFS to V413 for kernel 3.0 - modified for DHD by LorD ClockaN
 #else /* CFS */
 extern int runqueue_is_locked(int cpu);
 static inline void cpu_scaling(int cpu)

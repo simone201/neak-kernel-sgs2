@@ -556,8 +556,6 @@ static inline void __task_grq_unlock(void)
 	grq_unlock();
 }
 
-<<<<<<< HEAD
-=======
 /*
  * Look for any tasks *anywhere* that are running nice 0 or better. We do
  * this lockless for overhead reasons since the occasional wrong result
@@ -578,7 +576,6 @@ bool above_background_load(void)
 	return 0;
 }
 
->>>>>>> 0d5efbe... Update BFS to V413 for kernel 3.0 - modified for DHD by LorD ClockaN
 #ifndef __ARCH_WANT_UNLOCKED_CTXSW
 static inline void prepare_lock_switch(struct rq *rq, struct task_struct *next)
 {
