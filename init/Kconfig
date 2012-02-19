@@ -23,16 +23,15 @@ config CONSTRUCTORS
 
 menu "General setup"
 
-<<<<<<< HEAD
 config GPU_UNDERVOLTING
 	bool "gpu undervolting"
 	default n
 	help
 	 enable undervolting. if unsure, say n.
-=======
+
 config SCHED_BFS
 	bool "BFS cpu scheduler"
-	---help---
+	help
 	  The Brain Fuck CPU Scheduler for excellent interactivity and
 	  responsiveness on the desktop and solid scalability on normal
           hardware. Not recommended for 4096 CPUs.
@@ -42,7 +41,6 @@ config SCHED_BFS
 
           Say Y here.
 	default y
->>>>>>> 40f5f3d... ADD: BFS-2.6.35.13 - V404 (taken from LeeDroid)
 
 config EXPERIMENTAL
 	bool "Prompt for development and/or incomplete code/drivers"
