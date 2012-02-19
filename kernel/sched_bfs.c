@@ -127,7 +127,7 @@
  * Value is in ms and set to a minimum of 6ms. Scales with number of cpus.
  * Tunable via /proc interface.
  */
-int rr_interval __read_mostly = 2;
+int rr_interval __read_mostly = 6;
 
 /*
  * sched_iso_cpu - sysctl which determines the cpu percentage SCHED_ISO tasks
@@ -3869,11 +3869,6 @@ recheck:
 				case SCHED_BATCH:
 					if (policy == SCHED_BATCH)
 						goto out;
-					/*
-					*ANDROID: Allow tasks to move between
-					*/
-					if (policy == SCHED_NORMAL)
-					break;
 					if (policy != SCHED_IDLEPRIO)
 						return -EPERM;
 					break;
@@ -7279,29 +7274,5 @@ unsigned long default_scale_smt_power(struct sched_domain *sd, int cpu)
 	smt_gain /= weight;
 
 	return smt_gain;
-}
-#endif
-
-#ifdef CONFIG_NO_HZ
-/*
- * In the semi idle case, use the nearest busy cpu for migrating timers
- * from an idle cpu.  This is good for power-savings.
- *
- * We don't do similar optimization for completely idle system, as
- * selecting an idle cpu will add more delays to the timers than intended
- * (as that cpu's timer base may not be uptodate wrt jiffies etc).
- */
-int get_nohz_timer_target(void)
-{
-	int cpu = smp_processor_id();
-	int i;
-	struct sched_domain *sd;
-
-	for_each_domain(cpu, sd) {
-		for_each_cpu(i, sched_domain_span(sd))
-			if (!idle_cpu(i))
-				return i;
-	}
-	return cpu;
 }
 #endif
