@@ -38,9 +38,9 @@
 #define SCHED_BATCH		3
 /* SCHED_ISO: Implemented on BFS only */
 #define SCHED_IDLE		5
-#define SCHED_IDLEPRIO		SCHED_IDLE
 #ifdef CONFIG_SCHED_BFS
 #define SCHED_ISO		4
+#define SCHED_IDLEPRIO		SCHED_IDLE
 #define SCHED_MAX		(SCHED_IDLEPRIO)
 #define SCHED_RANGE(policy)	((policy) <= SCHED_MAX)
 #endif
@@ -277,20 +277,10 @@ extern void init_idle_bootup_task(struct task_struct *idle);
 
 extern cpumask_var_t nohz_cpu_mask;
 #if defined(CONFIG_SMP) && defined(CONFIG_NO_HZ)
-#ifndef CONFIG_SCHED_BFS
-extern void select_nohz_load_balancer(int stop_tick);
-#else
 extern int select_nohz_load_balancer(int stop_tick);
-#endif
 extern int get_nohz_load_balancer(void);
-extern int nohz_ratelimit(int cpu);
 #else
-static inline int select_nohz_load_balancer(int cpu)
-{
-	return 0;
-}
-
-static inline int nohz_ratelimit(int cpu)
+static inline void select_nohz_load_balancer(int stop_tick)
 {
 	return 0;
 }
@@ -1218,11 +1208,8 @@ struct task_struct {
 #ifndef CONFIG_SCHED_BFS
 #ifdef CONFIG_SMP
 #ifdef __ARCH_WANT_UNLOCKED_CTXSW
-	bool oncpu;
+	int oncpu;
 #endif
-#endif
-#ifndef CONFIG_SCHED_BFS
-	bool on_rq;
 #endif
 #else /* CONFIG_SCHED_BFS */
 	int oncpu;
@@ -1237,7 +1224,7 @@ struct task_struct {
 	u64 last_ran;
 	u64 sched_time; /* sched_clock time spent running */
 #ifdef CONFIG_SMP
-	bool sticky; /* Soft affined flag */
+	int sticky; /* Soft affined flag */
 #endif
 	unsigned long rt_timeout;
 #else /* CONFIG_SCHED_BFS */
@@ -1565,7 +1552,7 @@ struct task_struct {
 };
 
 #ifdef CONFIG_SCHED_BFS
-extern bool grunqueue_is_locked(void);
+extern int grunqueue_is_locked(void);
 extern void grq_unlock_wait(void);
 extern void cpu_scaling(int cpu);
 extern void cpu_nonscaling(int cpu);
@@ -1585,15 +1572,14 @@ static inline void tsk_cpus_current(struct task_struct *p)
 
 static inline void print_scheduler_version(void)
 {
-	printk(KERN_INFO"BFS CPU scheduler v0.413 by Con Kolivas.\n");
+	printk(KERN_INFO"BFS CPU scheduler v0.404 by Con Kolivas.\n");
 }
 
-static inline bool iso_task(struct task_struct *p)
+static inline int iso_task(struct task_struct *p)
 {
 	return (p->policy == SCHED_ISO);
 }
-extern void remove_cpu(int cpu);
-extern bool above_background_load(void);
+extern void remove_cpu(unsigned long cpu);
 #else /* CFS */
 extern int runqueue_is_locked(int cpu);
 static inline void cpu_scaling(int cpu)
@@ -1625,19 +1611,13 @@ static inline void print_scheduler_version(void)
 	printk(KERN_INFO"CFS CPU scheduler.\n");
 }
 
-static inline bool iso_task(struct task_struct *p)
+static inline int iso_task(struct task_struct *p)
 {
-	return false;
+	return 0;
 }
 
-static inline void remove_cpu(int cpu)
+static inline void remove_cpu(unsigned long cpu)
 {
-}
-
-/* Anyone feel like implementing this? */
-static inline int above_background_load(void)
-{
-	return 1;
 }
 #endif /* CONFIG_SCHED_BFS */
 
@@ -2567,7 +2547,7 @@ extern void signal_wake_up(struct task_struct *t, int resume_stopped);
  */
 #ifdef CONFIG_SMP
 
-static inline int task_cpu(const struct task_struct *p)
+static inline unsigned int task_cpu(const struct task_struct *p)
 {
 	return task_thread_info(p)->cpu;
 }
@@ -2576,12 +2556,12 @@ extern void set_task_cpu(struct task_struct *p, unsigned int cpu);
 
 #else
 
-static inline int task_cpu(const struct task_struct *p)
+static inline unsigned int task_cpu(const struct task_struct *p)
 {
 	return 0;
 }
 
-static inline void set_task_cpu(struct task_struct *p, int cpu)
+static inline void set_task_cpu(struct task_struct *p, unsigned int cpu)
 {
 }
 

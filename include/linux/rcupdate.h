@@ -50,6 +50,7 @@ extern int rcutorture_runnable; /* for sysctl */
 extern void rcu_barrier(void);
 extern void rcu_barrier_bh(void);
 extern void rcu_barrier_sched(void);
+extern void synchronize_sched_expedited(void);
 extern int sched_expedited_torture_stats(char *page);
 
 /* Internal to kernel */

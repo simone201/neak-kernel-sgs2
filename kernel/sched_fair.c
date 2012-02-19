@@ -2275,12 +2275,8 @@ unsigned long scale_rt_power(int cpu)
 	sched_avg_update(rq);
 
 	total = sched_avg_period() + (rq->clock - rq->age_stamp);
-	if (unlikely(total < rq->rt_avg)) {
-		/* Ensures that power won't end up being negative */
-		available = 0;
-	} else {
-		available = total - rq->rt_avg;
-	}
+	available = total - rq->rt_avg;
+
 	if (unlikely((s64)total < SCHED_LOAD_SCALE))
 		total = SCHED_LOAD_SCALE;
 
@@ -2645,7 +2641,6 @@ static inline void calculate_imbalance(struct sd_lb_stats *sds, int this_cpu,
 		return fix_small_imbalance(sds, this_cpu, imbalance);
 
 }
-
 /******* find_busiest_group() helpers end here *********************/
 
 /**

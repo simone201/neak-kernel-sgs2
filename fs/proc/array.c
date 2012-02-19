@@ -464,7 +464,7 @@ static int do_task_stat(struct seq_file *m, struct pid_namespace *ns,
 
 	seq_printf(m, "%d (%s) %c %d %d %d %d %d %u %lu \
 %lu %lu %lu %lu %lu %ld %ld %ld %ld %d 0 %llu %lu %ld %lu %lu %lu %lu %lu \
-%lu %lu %lu %lu %lu %lu %lu %lu %d %d %u %u %llu %lu %ld %llu\n",
+%lu %lu %lu %lu %lu %lu %lu %lu %d %d %u %u %llu %lu %ld\n",
 		pid_nr_ns(pid, ns),
 		tcomm,
 		state,
@@ -511,14 +511,7 @@ static int do_task_stat(struct seq_file *m, struct pid_namespace *ns,
 		task->policy,
 		(unsigned long long)delayacct_blkio_ticks(task),
 		cputime_to_clock_t(gtime),
-		cputime_to_clock_t(cgtime),
-#if defined(CONFIG_SCHEDSTATS) && !defined(CONFIG_SCHED_BFS)
-		nsec_to_clock_t(task->se.statistics.iowait_sum)
-#else
-		(unsigned long long)0UL
-#endif
-	);
-
+		cputime_to_clock_t(cgtime));
 	if (mm)
 		mmput(mm);
 	return 0;
