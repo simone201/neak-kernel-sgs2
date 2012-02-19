@@ -2562,7 +2562,11 @@ static inline int task_cpu(const struct task_struct *p)
 	return task_thread_info(p)->cpu;
 }
 
+#ifdef CONFIG_SCHED_BFS
 extern void set_task_cpu(struct task_struct *p, int cpu);
+#else
+extern void set_task_cpu(struct task_struct *p, unsigned int new_cpu);
+#endif
 
 #else
 
