@@ -4988,7 +4988,7 @@ void move_task_off_dead_cpu(int dead_cpu, struct task_struct *p)
 
 /* Run through task list and find tasks affined to just the dead cpu, then
  * allocate a new affinity */
-static void break_sole_affinity(int src_cpu)
+static void break_sole_affinity(int src_cpu, struct task_struct *idle)
 {
 	struct task_struct *p, *t;
 
