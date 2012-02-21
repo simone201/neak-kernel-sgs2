@@ -53,7 +53,7 @@ if [ -e /data/neak/aftridle ]; then
 fi;
 	
 # Install NEAK Configurator app
-if [ ! -e /data/app/configurator ]; then
+if [ ! -e /data/neak/configurator ]; then
 	echo "Installing NEAK Configurator"
 	/sbin/busybox cp /res/misc/NEAK_Configurator.apk /data/app/NEAK_Configurator.apk
 	/sbin/busybox chown 0.0 /data/app/NEAK_Configurator.apk
