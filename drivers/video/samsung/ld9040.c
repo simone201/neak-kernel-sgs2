@@ -164,7 +164,7 @@ static int get_gamma_value_from_bl(int bl)
 		struct device *dev, struct device_attribute *attr, const char *buf, size_t size)
 
 declare_show(author) {
-	return sprintf(buf, "Siyah\n");
+	return sprintf(buf, "NEAK (from Siyah)\n");
 }
 
 declare_show(min_gamma) {
