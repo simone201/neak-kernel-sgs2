@@ -34,6 +34,10 @@
 #include <plat/regs-serial.h>
 #include <plat/s5pv310.h>
 #include <linux/ld9040.h>
+
+#include <linux/device.h> 
+#include <linux/miscdevice.h>
+
 #ifdef CONFIG_HAS_EARLYSUSPEND
 #include <linux/earlysuspend.h>
 #endif
@@ -133,20 +137,107 @@ static int ld9040_panel_send_sequence(struct ld9040 *lcd,
 
 	return ret;
 }
+
+int min_gamma = 0, max_gamma = 24, min_bl = 30;
 static int get_gamma_value_from_bl(int bl)
 {
 	int gamma_value =0;
 	int gamma_val_x10 =0;
 
-	if(bl >= MIN_BL){
-		gamma_val_x10 = 10 *(MAX_GAMMA_VALUE-1)*bl/(MAX_BL-MIN_BL) + (10 - 10*(MAX_GAMMA_VALUE-1)*(MIN_BL)/(MAX_BL-MIN_BL));
-		gamma_value=(gamma_val_x10 +5)/10;
+	if(bl >= min_bl){
+		gamma_val_x10 = 10 *(max_gamma-1-min_gamma)*bl/(MAX_BL-min_bl) 
+		    + (10 - 10*(max_gamma-1-min_gamma)*(min_bl)/(MAX_BL-min_bl));
+		gamma_value=(gamma_val_x10 +5)/10 + min_gamma;
 	}else{
-		gamma_value =0;
+		gamma_value =min_gamma;
 	}
-
+	if(gamma_value > 24) gamma_value = 24;
+	else if(gamma_value < 0) gamma_value = min_gamma;
 	return gamma_value;
 }
+
+#define declare_show(filename) \
+	static ssize_t show_##filename(struct device *dev, struct device_attribute *attr, char *buf)
+
+#define declare_store(filename) \
+	static ssize_t store_##filename(\
+		struct device *dev, struct device_attribute *attr, const char *buf, size_t size)
+
+declare_show(author) {
+	return sprintf(buf, "Siyah\n");
+}
+
+declare_show(min_gamma) {
+	return sprintf(buf, "%d\n", min_gamma);
+}
+declare_show(max_gamma) {
+	return sprintf(buf, "%d\n", max_gamma);
+}
+declare_show(min_bl) {
+	return sprintf(buf, "%d\n", min_bl);
+}
+
+declare_store(min_gamma) {	
+	int val;
+	if(sscanf(buf,"%d",&val)==1) {
+		if(val>23) val=23;
+		else if(val<0) val=0;
+		min_gamma = val;
+	}
+	return size;
+}
+declare_store(max_gamma) {	
+	int val;
+	if(sscanf(buf,"%d",&val)==1) {
+		if(val>24) val=24;
+		else if(val<0) val=0;
+		max_gamma = val;
+	}
+	return size;
+}
+declare_store(min_bl) {	
+	int val;
+	if(sscanf(buf,"%d",&val)==1) {
+		if(val>200) val=200;
+		else if(val<0) val=0;
+		min_bl = val;
+	}
+	return size;
+}
+
+
+/****************************************
+ * DEVICE ATTRIBUTE by tegrak
+ ****************************************/
+#define declare_attr_rw(filename, perm) \
+	static DEVICE_ATTR(filename, perm, show_##filename, store_##filename)
+#define declare_attr_ro(filename, perm) \
+	static DEVICE_ATTR(filename, perm, show_##filename, NULL)
+#define declare_attr_wo(filename, perm) \
+	static DEVICE_ATTR(filename, perm, NULL, store_##filename)
+
+declare_attr_ro(author, 0444);
+declare_attr_rw(min_gamma, 0666);
+declare_attr_rw(max_gamma, 0666);
+declare_attr_rw(min_bl, 0666);
+
+static struct attribute *brightness_curve_attributes[] = {
+	&dev_attr_min_gamma.attr,
+	&dev_attr_max_gamma.attr,
+	&dev_attr_min_bl.attr,
+	&dev_attr_author.attr,
+	NULL
+};
+
+static struct attribute_group brightness_curve_group = {
+		.attrs  = brightness_curve_attributes,
+};
+
+static struct miscdevice brightness_curve_device = {
+		.minor = MISC_DYNAMIC_MINOR,
+		.name = "brightness_curve",
+};
+
 static int ld9040_gamma_ctl(struct ld9040 *lcd)
 {
 	int ret = 0;
@@ -1018,6 +1109,20 @@ static struct spi_driver ld9040_driver = {
 
 static int __init ld9040_init(void)
 {
+	int ret;
+	
+	ret = misc_register(&brightness_curve_device);
+	if (ret) {
+	   printk(KERN_ERR "failed at(%d)\n", __LINE__);
+	}
+
+	ret = sysfs_create_group(&brightness_curve_device.this_device->kobj, 
+			&brightness_curve_group);
+	if (ret)
+	{
+		printk(KERN_ERR "failed at(%d)\n", __LINE__);
+	}
+
 	return spi_register_driver(&ld9040_driver);
 }
 

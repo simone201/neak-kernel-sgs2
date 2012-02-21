@@ -1532,32 +1532,58 @@ static const unsigned short ld9040_22_30_dimming[] = {
   ENDDEF, 0x00
 };
 
-static const unsigned short *p22Gamma_set[] = {
-	ld9040_22_30_dimming,
-	ld9040_22_40,
-	ld9040_22_70,
-	ld9040_22_90,
-	ld9040_22_100,
-	ld9040_22_110,
-	ld9040_22_120,
-	ld9040_22_130,
-	ld9040_22_140,
-	ld9040_22_150,
-	ld9040_22_160,
-	ld9040_22_170,
-	ld9040_22_180,
-	ld9040_22_190,
-	ld9040_22_200,
-	ld9040_22_210,
-	ld9040_22_220,
-	ld9040_22_230,
-	ld9040_22_240,
-	ld9040_22_250,
-	ld9040_22_260,
-	ld9040_22_270,
-	ld9040_22_280,
-	ld9040_22_290,
-	ld9040_22_300,
+static const unsigned short ld9040_22_20[] = {
+  0xF9, 0x00,
+  DATA_ONLY, 0xD9,
+  DATA_ONLY, 0xD3,
+  DATA_ONLY, 0xCC,
+  DATA_ONLY, 0xDA,
+  DATA_ONLY, 0x00,
+  DATA_ONLY,  0x41, //R
+  DATA_ONLY, 0x00,
+  DATA_ONLY, 0xB1,
+  DATA_ONLY, 0xC9,
+  DATA_ONLY, 0xC9,
+  DATA_ONLY, 0xD9,
+  DATA_ONLY, 0x00,
+  DATA_ONLY, 0x53, //G
+  DATA_ONLY, 0x00,
+  DATA_ONLY, 0xD2,
+  DATA_ONLY, 0xD0,
+  DATA_ONLY, 0xC9,
+  DATA_ONLY, 0xD8,
+  DATA_ONLY, 0x00,
+  DATA_ONLY, 0x59, //B
+  0xFB, 0x02,
+  DATA_ONLY, 0x5A,
+  ENDDEF, 0x00
+};
+
+static const unsigned short ld9040_22_10[] = {
+  0xF9, 0x00,
+  DATA_ONLY, 0xD9,
+  DATA_ONLY, 0xD3,
+  DATA_ONLY, 0xCC,
+  DATA_ONLY, 0xDA,
+  DATA_ONLY, 0x00,
+  DATA_ONLY,  0x3C, //R
+  DATA_ONLY, 0x00,
+  DATA_ONLY, 0xB1,
+  DATA_ONLY, 0xC9,
+  DATA_ONLY, 0xC9,
+  DATA_ONLY, 0xD9,
+  DATA_ONLY, 0x00,
+  DATA_ONLY, 0x4E, //G
+  DATA_ONLY, 0x00,
+  DATA_ONLY, 0xD2,
+  DATA_ONLY, 0xD0,
+  DATA_ONLY, 0xC9,
+  DATA_ONLY, 0xD8,
+  DATA_ONLY, 0x00,
+  DATA_ONLY, 0x54, //B
+  0xFB, 0x02,
+  DATA_ONLY, 0x5A,
+  ENDDEF, 0x00
 };
 
 /*  OCTA 4.52 XVGA - gamma value: 1.9 */
@@ -2321,34 +2347,32 @@ static const unsigned short ld9040_19_30_dimming[] = {
 	ENDDEF, 0x00
 };
 
-static const unsigned short *p19Gamma_set[] = {
-	ld9040_19_30_dimming,
-	ld9040_19_40,
-	ld9040_19_70,
-	ld9040_19_90,
-	ld9040_19_100,
-	ld9040_19_110,
-	ld9040_19_120,
-	ld9040_19_130,
-	ld9040_19_140,
-	ld9040_19_150,
-	ld9040_19_160,
-	ld9040_19_170,
-	ld9040_19_180,
-	ld9040_19_190,
-	ld9040_19_200,
-	ld9040_19_210,
-	ld9040_19_220,
-	ld9040_19_230,
-	ld9040_19_240,
-	ld9040_19_250,
-	ld9040_19_260,
-	ld9040_19_270,
-	ld9040_19_280,
-	ld9040_19_290,
-	ld9040_19_300,
+static const unsigned short ld9040_19_10[] = {
+	0xF9, 0x00,
+	DATA_ONLY, 0xDC,
+	DATA_ONLY, 0xD5,
+	DATA_ONLY, 0xD2,
+	DATA_ONLY, 0xDE,
+	DATA_ONLY, 0x00,
+	DATA_ONLY, 0x3C,
+	DATA_ONLY,0x00,
+	DATA_ONLY, 0xC3,
+	DATA_ONLY, 0xD2,
+	DATA_ONLY, 0xCF,
+	DATA_ONLY,0xDE,
+	DATA_ONLY, 0x00,
+	DATA_ONLY,0x4E,
+	DATA_ONLY,0x00,
+	DATA_ONLY,0xD3,
+	DATA_ONLY, 0xD4,
+	DATA_ONLY, 0xCF,
+	DATA_ONLY,0xDD,
+	DATA_ONLY, 0x00,
+	DATA_ONLY, 0x54,
+	0xFB, 0x02,
+	DATA_ONLY, 0x5A,
+	ENDDEF, 0x00
 };
-
 
 
 static const unsigned short ld9040_sm2_a1_22_300[] = {
@@ -3116,33 +3140,58 @@ static const unsigned short ld9040_sm2_a1_22_30_dimming[] = {
 	ENDDEF, 0x00
 };
 
+static const unsigned short ld9040_sm2_a1_22_20[] = {
+	0xF9, 0x2E,
+	DATA_ONLY,0x81,
+	DATA_ONLY,0xB7,
+	DATA_ONLY,0xBA,
+	DATA_ONLY,0xCD,
+	DATA_ONLY,0x00,
+	DATA_ONLY,0x3C,
+	DATA_ONLY,0x36,
+	DATA_ONLY,0x80,
+	DATA_ONLY,0xA7,
+	DATA_ONLY,0xB1,
+	DATA_ONLY,0xCB,
+	DATA_ONLY,0x00,
+	DATA_ONLY,0x47,
+	DATA_ONLY,0x2E,
+	DATA_ONLY,0xAB,
+	DATA_ONLY,0xB1,
+	DATA_ONLY,0xB2,
+	DATA_ONLY,0xCC,
+	DATA_ONLY,0x00,
+	DATA_ONLY,0x51,
+	0xFB, 0x02,
+	DATA_ONLY, 0x5A,
+	ENDDEF, 0x00
+};
 
-static const unsigned short *psm2_a1_22Gamma_set[] = {
-	ld9040_sm2_a1_22_30_dimming,
-	ld9040_sm2_a1_22_40,
-	ld9040_sm2_a1_22_70,
-	ld9040_sm2_a1_22_90,
-	ld9040_sm2_a1_22_100,
-	ld9040_sm2_a1_22_110,
-	ld9040_sm2_a1_22_120,
-	ld9040_sm2_a1_22_130,
-	ld9040_sm2_a1_22_140,
-	ld9040_sm2_a1_22_150,
-	ld9040_sm2_a1_22_160,
-	ld9040_sm2_a1_22_170,
-	ld9040_sm2_a1_22_180,
-	ld9040_sm2_a1_22_190,
-	ld9040_sm2_a1_22_200,
-	ld9040_sm2_a1_22_210,
-	ld9040_sm2_a1_22_220,
-	ld9040_sm2_a1_22_230,
-	ld9040_sm2_a1_22_240,
-	ld9040_sm2_a1_22_250,
-	ld9040_sm2_a1_22_260,
-	ld9040_sm2_a1_22_270,
-	ld9040_sm2_a1_22_280,
-	ld9040_sm2_a1_22_290,
-	ld9040_sm2_a1_22_300,
+static const unsigned short ld9040_sm2_a1_22_10[] = {
+	0xF9, 0x2E,
+	DATA_ONLY,0x81,
+	DATA_ONLY,0xB7,
+	DATA_ONLY,0xBA,
+	DATA_ONLY,0xCD,
+	DATA_ONLY,0x00,
+	DATA_ONLY,0x37,
+	DATA_ONLY,0x36,
+	DATA_ONLY,0x80,
+	DATA_ONLY,0xA7,
+	DATA_ONLY,0xB1,
+	DATA_ONLY,0xCB,
+	DATA_ONLY,0x00,
+	DATA_ONLY,0x42,
+	DATA_ONLY,0x2E,
+	DATA_ONLY,0xAB,
+	DATA_ONLY,0xB1,
+	DATA_ONLY,0xB2,
+	DATA_ONLY,0xCC,
+	DATA_ONLY,0x00,
+	DATA_ONLY,0x4C,
+	0xFB, 0x02,
+	DATA_ONLY, 0x5A,
+	ENDDEF, 0x00
 };
 
 //////////////////////////////
@@ -3924,35 +3973,32 @@ static const unsigned short ld9040_sm2_a1_19_30_dimming[] = {
 	ENDDEF, 0x00
 };
 
-
-static const unsigned short *psm2_a1_19Gamma_set[] = {
-	ld9040_sm2_a1_19_30_dimming,
-	ld9040_sm2_a1_19_40,
-	ld9040_sm2_a1_19_70,
-	ld9040_sm2_a1_19_90,
-	ld9040_sm2_a1_19_100,
-	ld9040_sm2_a1_19_110,
-	ld9040_sm2_a1_19_120,
-	ld9040_sm2_a1_19_130,
-	ld9040_sm2_a1_19_140,
-	ld9040_sm2_a1_19_150,
-	ld9040_sm2_a1_19_160,
-	ld9040_sm2_a1_19_170,
-	ld9040_sm2_a1_19_180,
-	ld9040_sm2_a1_19_190,
-	ld9040_sm2_a1_19_200,
-	ld9040_sm2_a1_19_210,
-	ld9040_sm2_a1_19_220,
-	ld9040_sm2_a1_19_230,
-	ld9040_sm2_a1_19_240,
-	ld9040_sm2_a1_19_250,
-	ld9040_sm2_a1_19_260,
-	ld9040_sm2_a1_19_270,
-	ld9040_sm2_a1_19_280,
-	ld9040_sm2_a1_19_290,
-	ld9040_sm2_a1_19_300,
+static const unsigned short ld9040_sm2_a1_19_10[] = {
+	0xF9, 0x2E,
+	DATA_ONLY,0xA7,
+	DATA_ONLY,0xC5,
+	DATA_ONLY,0xC0,
+	DATA_ONLY,0xD5,
+	DATA_ONLY,0x00,
+	DATA_ONLY,0x36,
+	DATA_ONLY,0x36,
+	DATA_ONLY,0x93,
+	DATA_ONLY,0xB7,
+	DATA_ONLY,0xB8,
+	DATA_ONLY,0xD2,
+	DATA_ONLY,0x00,
+	DATA_ONLY,0x42,
+	DATA_ONLY,0x2E,
+	DATA_ONLY,0xB5,
+	DATA_ONLY,0xB9,
+	DATA_ONLY,0xBA,
+	DATA_ONLY,0xD2,
+	DATA_ONLY,0x00,
+	DATA_ONLY,0x4C,
+	0xFB, 0x02,
+	DATA_ONLY, 0x5A,
+	ENDDEF, 0x00
 };
-
 
 
 
@@ -4722,37 +4768,59 @@ static const unsigned short ld9040_sm2_a2_22_30_dimming[] = {
 	ENDDEF, 0x00
 };
 
-
-static const unsigned short *psm2_a2_22Gamma_set[] = {
-	ld9040_sm2_a2_22_30_dimming,
-	ld9040_sm2_a2_22_40,
-	ld9040_sm2_a2_22_70,
-	ld9040_sm2_a2_22_90,
-	ld9040_sm2_a2_22_100,
-	ld9040_sm2_a2_22_110,
-	ld9040_sm2_a2_22_120,
-	ld9040_sm2_a2_22_130,
-	ld9040_sm2_a2_22_140,
-	ld9040_sm2_a2_22_150,
-	ld9040_sm2_a2_22_160,
-	ld9040_sm2_a2_22_170,
-	ld9040_sm2_a2_22_180,
-	ld9040_sm2_a2_22_190,
-	ld9040_sm2_a2_22_200,
-	ld9040_sm2_a2_22_210,
-	ld9040_sm2_a2_22_220,
-	ld9040_sm2_a2_22_230,
-	ld9040_sm2_a2_22_240,
-	ld9040_sm2_a2_22_250,
-	ld9040_sm2_a2_22_260,
-	ld9040_sm2_a2_22_270,
-	ld9040_sm2_a2_22_280,
-	ld9040_sm2_a2_22_290,
-	ld9040_sm2_a2_22_300,
+static const unsigned short ld9040_sm2_a2_22_20[] = {
+	0xF9, 0x0C,
+	DATA_ONLY, 0xA6,
+	DATA_ONLY, 0xAE,
+	DATA_ONLY, 0xA9,
+	DATA_ONLY, 0xCD,
+	DATA_ONLY, 0x00,
+	DATA_ONLY, 0x35,
+	DATA_ONLY, 0x0C,
+	DATA_ONLY, 0x7E,
+	DATA_ONLY, 0xB0,
+	DATA_ONLY, 0xAB,
+	DATA_ONLY, 0xCC,
+	DATA_ONLY, 0x00,
+	DATA_ONLY, 0x44,
+	DATA_ONLY, 0x0C,
+	DATA_ONLY, 0xA9,
+	DATA_ONLY, 0xBB,
+	DATA_ONLY, 0xAF,
+	DATA_ONLY, 0xCC,
+	DATA_ONLY, 0x00,
+	DATA_ONLY, 0x44,
+	0xFB, 0x02,
+	DATA_ONLY, 0x5A,
+	ENDDEF, 0x00
 };
 
-//////////////////////////////
-/////////////////////////////
+static const unsigned short ld9040_sm2_a2_22_10[] = {
+	0xF9, 0x0C,
+	DATA_ONLY, 0xA6,
+	DATA_ONLY, 0xAE,
+	DATA_ONLY, 0xA9,
+	DATA_ONLY, 0xCD,
+	DATA_ONLY, 0x00,
+	DATA_ONLY, 0x30,
+	DATA_ONLY, 0x0C,
+	DATA_ONLY, 0x7E,
+	DATA_ONLY, 0xB0,
+	DATA_ONLY, 0xAB,
+	DATA_ONLY, 0xCC,
+	DATA_ONLY, 0x00,
+	DATA_ONLY, 0x3F,
+	DATA_ONLY, 0x0C,
+	DATA_ONLY, 0xA9,
+	DATA_ONLY, 0xBB,
+	DATA_ONLY, 0xAF,
+	DATA_ONLY, 0xCC,
+	DATA_ONLY, 0x00,
+	DATA_ONLY, 0x3F,
+	0xFB, 0x02,
+	DATA_ONLY, 0x5A,
+	ENDDEF, 0x00
+};
 
 static const unsigned short ld9040_sm2_a2_19_300[] = {
 	0xF9, 0x0C,
@@ -4780,8 +4848,6 @@ static const unsigned short ld9040_sm2_a2_19_300[] = {
 	DATA_ONLY, 0x5A,
 	ENDDEF, 0x00
 };
-
-
 
 static const unsigned short ld9040_sm2_a2_19_290[] = {
 	0xF9, 0x0C,
@@ -4864,7 +4930,6 @@ static const unsigned short ld9040_sm2_a2_19_270[] = {
 	ENDDEF, 0x00
 };
 
-
 static const unsigned short ld9040_sm2_a2_19_260[] = {
 	0xF9, 0x0C,
 	DATA_ONLY, 0xB4,
@@ -4891,7 +4956,6 @@ static const unsigned short ld9040_sm2_a2_19_260[] = {
 	DATA_ONLY, 0x5A,
 	ENDDEF, 0x00
 };
-
 
 static const unsigned short ld9040_sm2_a2_19_250[] = {
 	0xF9, 0x0C,
@@ -4920,8 +4984,6 @@ static const unsigned short ld9040_sm2_a2_19_250[] = {
 	ENDDEF, 0x00
 };
 
-
-
 static const unsigned short ld9040_sm2_a2_19_240[] = {
 	0xF9, 0x0C,
 	DATA_ONLY, 0xB4,
@@ -4948,7 +5010,6 @@ static const unsigned short ld9040_sm2_a2_19_240[] = {
 	DATA_ONLY, 0x5A,
 	ENDDEF, 0x00
 };
-
 
 static const unsigned short ld9040_sm2_a2_19_230[] = {
 	0xF9, 0x0C,
@@ -5031,7 +5092,6 @@ static const unsigned short ld9040_sm2_a2_19_210[] = {
 	ENDDEF, 0x00
 };
 
-
 static const unsigned short ld9040_sm2_a2_19_200[] = {
 	0xF9, 0x0C,
 	DATA_ONLY, 0xB5,
@@ -5086,7 +5146,6 @@ static const unsigned short ld9040_sm2_a2_19_190[] = {
 	ENDDEF, 0x00
 };
 
-
 static const unsigned short ld9040_sm2_a2_19_180[] = {
 	0xF9, 0x0C,
 	DATA_ONLY, 0xB3,
@@ -5114,7 +5173,6 @@ static const unsigned short ld9040_sm2_a2_19_180[] = {
 	ENDDEF, 0x00
 };
 
-
 static const unsigned short ld9040_sm2_a2_19_170[] = {
 	0xF9, 0x0C,
 	DATA_ONLY, 0xB3,
@@ -5141,7 +5199,6 @@ static const unsigned short ld9040_sm2_a2_19_170[] = {
 	DATA_ONLY, 0x5A,
 	ENDDEF, 0x00
 };
-
 
 static const unsigned short ld9040_sm2_a2_19_160[] = {
 	0xF9, 0x0C,
@@ -5197,8 +5254,6 @@ static const unsigned short ld9040_sm2_a2_19_150[] = {
 	ENDDEF, 0x00
 };
 
-
-
 static const unsigned short ld9040_sm2_a2_19_140[] = {
 	0xF9, 0x0C,
 	DATA_ONLY, 0xB3,
@@ -5225,7 +5280,6 @@ static const unsigned short ld9040_sm2_a2_19_140[] = {
 	DATA_ONLY, 0x5A,
 	ENDDEF, 0x00
 };
-
 
 static const unsigned short ld9040_sm2_a2_19_130[] = {
 	0xF9, 0x0C,
@@ -5308,7 +5362,6 @@ static const unsigned short ld9040_sm2_a2_19_110[] = {
 	ENDDEF, 0x00
 };
 
-
 static const unsigned short ld9040_sm2_a2_19_100[] = {
 	0xF9, 0x0C,
 	DATA_ONLY, 0xB2,
@@ -5335,7 +5388,6 @@ static const unsigned short ld9040_sm2_a2_19_100[] = {
 	DATA_ONLY, 0x5A,
 	ENDDEF, 0x00
 };
-
 
 static const unsigned short ld9040_sm2_a2_19_90[] = {
 	0xF9, 0x0C,
@@ -5418,8 +5470,6 @@ static const unsigned short ld9040_sm2_a2_19_70[] = {
 	ENDDEF, 0x00
 };
 
-
-
 static const unsigned short ld9040_sm2_a2_19_60[] = {
 	0xF9, 0x0C,
 	DATA_ONLY, 0xB1,
@@ -5447,7 +5497,6 @@ static const unsigned short ld9040_sm2_a2_19_60[] = {
 	ENDDEF, 0x00
 };
 
-
 static const unsigned short ld9040_sm2_a2_19_50[] = {
 	0xF9, 0x0C,
 	DATA_ONLY, 0xB1,
@@ -5474,8 +5523,6 @@ static const unsigned short ld9040_sm2_a2_19_50[] = {
 	DATA_ONLY, 0x5A,
 	ENDDEF, 0x00
 };
-
-
 
 static const unsigned short ld9040_sm2_a2_19_40[] = {
 	0xF9, 0x0C,
@@ -5531,29 +5578,171 @@ static const unsigned short ld9040_sm2_a2_19_30_dimming[] = {
 	ENDDEF, 0x00
 };
 
+/* LD9040, 4.27", SM2 M2 Panel Gamma Table : Useless - too old */
+static const unsigned short *p22Gamma_set[] = {
+	ld9040_22_10,
+	ld9040_22_30_dimming,
+	ld9040_22_40,
+	ld9040_22_50,
+	ld9040_22_60,
+	ld9040_22_80,
+	ld9040_22_90,
+	ld9040_22_100,
+	ld9040_22_110,
+	ld9040_22_120,
+	ld9040_22_130,
+	ld9040_22_150,
+	ld9040_22_160,
+	ld9040_22_170,
+	ld9040_22_180,
+	ld9040_22_190,
+	ld9040_22_210,
+	ld9040_22_220,
+	ld9040_22_230,
+	ld9040_22_240,
+	ld9040_22_250,
+	ld9040_22_270,
+	ld9040_22_280,
+	ld9040_22_290,
+	ld9040_22_300,
+};
+
+static const unsigned short *p19Gamma_set[] = {
+	ld9040_19_10,
+	ld9040_19_30_dimming,
+	ld9040_19_40,
+	ld9040_19_50,
+	ld9040_19_60,
+	ld9040_19_80,
+	ld9040_19_90,
+	ld9040_19_100,
+	ld9040_19_110,
+	ld9040_19_120,
+	ld9040_19_130,
+	ld9040_19_150,
+	ld9040_19_160,
+	ld9040_19_170,
+	ld9040_19_180,
+	ld9040_19_190,
+	ld9040_19_210,
+	ld9040_19_220,
+	ld9040_19_230,
+	ld9040_19_240,
+	ld9040_19_250,
+	ld9040_19_270,
+	ld9040_19_280,
+	ld9040_19_290,
+	ld9040_19_300,
+};
+
+/* LD9040, 4.27", SM2 A1 Panel Gamma Table */
+static const unsigned short *psm2_a1_22Gamma_set[] = {
+	ld9040_sm2_a1_22_10,
+	ld9040_sm2_a1_22_30_dimming,
+	ld9040_sm2_a1_22_40,
+	ld9040_sm2_a1_22_50,
+	ld9040_sm2_a1_22_60,
+	ld9040_sm2_a1_22_80,
+	ld9040_sm2_a1_22_90,
+	ld9040_sm2_a1_22_100,
+	ld9040_sm2_a1_22_110,
+	ld9040_sm2_a1_22_120,
+	ld9040_sm2_a1_22_130,
+	ld9040_sm2_a1_22_150,
+	ld9040_sm2_a1_22_160,
+	ld9040_sm2_a1_22_170,
+	ld9040_sm2_a1_22_180,
+	ld9040_sm2_a1_22_190,
+	ld9040_sm2_a1_22_210,
+	ld9040_sm2_a1_22_220,
+	ld9040_sm2_a1_22_230,
+	ld9040_sm2_a1_22_240,
+	ld9040_sm2_a1_22_250,
+	ld9040_sm2_a1_22_270,
+	ld9040_sm2_a1_22_280,
+	ld9040_sm2_a1_22_290,
+	ld9040_sm2_a1_22_300,
+};
+
+static const unsigned short *psm2_a1_19Gamma_set[] = {
+	ld9040_sm2_a1_19_10,
+	ld9040_sm2_a1_19_30_dimming,
+	ld9040_sm2_a1_19_40,
+	ld9040_sm2_a1_19_50,
+	ld9040_sm2_a1_19_60,
+	ld9040_sm2_a1_19_80,
+	ld9040_sm2_a1_19_90,
+	ld9040_sm2_a1_19_100,
+	ld9040_sm2_a1_19_110,
+	ld9040_sm2_a1_19_120,
+	ld9040_sm2_a1_19_130,
+	ld9040_sm2_a1_19_150,
+	ld9040_sm2_a1_19_160,
+	ld9040_sm2_a1_19_170,
+	ld9040_sm2_a1_19_180,
+	ld9040_sm2_a1_19_190,
+	ld9040_sm2_a1_19_210,
+	ld9040_sm2_a1_19_220,
+	ld9040_sm2_a1_19_230,
+	ld9040_sm2_a1_19_240,
+	ld9040_sm2_a1_19_250,
+	ld9040_sm2_a1_19_270,
+	ld9040_sm2_a1_19_280,
+	ld9040_sm2_a1_19_290,
+	ld9040_sm2_a1_19_300,
+};
+
+/* LD9040, 4.27", SM2 A2 Panel Gamma Table */
+static const unsigned short *psm2_a2_22Gamma_set[] = {
+	ld9040_sm2_a2_22_30_dimming,
+	ld9040_sm2_a2_22_40,
+	ld9040_sm2_a2_22_50,
+	ld9040_sm2_a2_22_60,
+	ld9040_sm2_a2_22_70,
+	ld9040_sm2_a2_22_80,
+	ld9040_sm2_a2_22_90,
+	ld9040_sm2_a2_22_100,
+	ld9040_sm2_a2_22_110,
+	ld9040_sm2_a2_22_120,
+	ld9040_sm2_a2_22_130,
+	ld9040_sm2_a2_22_150,
+	ld9040_sm2_a2_22_160,
+	ld9040_sm2_a2_22_170,
+	ld9040_sm2_a2_22_180,
+	ld9040_sm2_a2_22_190,
+	ld9040_sm2_a2_22_210,
+	ld9040_sm2_a2_22_220,
+	ld9040_sm2_a2_22_230,
+	ld9040_sm2_a2_22_240,
+	ld9040_sm2_a2_22_250,
+	ld9040_sm2_a2_22_270,
+	ld9040_sm2_a2_22_280,
+	ld9040_sm2_a2_22_290,
+	ld9040_sm2_a2_22_300,
+};
 
 static const unsigned short *psm2_a2_19Gamma_set[] = {
 	ld9040_sm2_a2_19_30_dimming,
 	ld9040_sm2_a2_19_40,
+	ld9040_sm2_a2_19_50,
+	ld9040_sm2_a2_19_60,
 	ld9040_sm2_a2_19_70,
+	ld9040_sm2_a2_19_80,
 	ld9040_sm2_a2_19_90,
 	ld9040_sm2_a2_19_100,
 	ld9040_sm2_a2_19_110,
 	ld9040_sm2_a2_19_120,
 	ld9040_sm2_a2_19_130,
-	ld9040_sm2_a2_19_140,
 	ld9040_sm2_a2_19_150,
 	ld9040_sm2_a2_19_160,
 	ld9040_sm2_a2_19_170,
 	ld9040_sm2_a2_19_180,
 	ld9040_sm2_a2_19_190,
-	ld9040_sm2_a2_19_200,
 	ld9040_sm2_a2_19_210,
 	ld9040_sm2_a2_19_220,
 	ld9040_sm2_a2_19_230,
 	ld9040_sm2_a2_19_240,
 	ld9040_sm2_a2_19_250,
-	ld9040_sm2_a2_19_260,
 	ld9040_sm2_a2_19_270,
 	ld9040_sm2_a2_19_280,
 	ld9040_sm2_a2_19_290,
