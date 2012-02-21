@@ -31,10 +31,6 @@ echo $(date) START of post-init.sh
         /sbin/busybox mount -o remount,commit=15 $k
   done
   
-# EXT4 Speed Tweaks
-/sbin/busybox mount -o noatime,remount,rw,discard,barrier=0,commit=60,noauto_da_alloc,delalloc /cache /cache;
-/sbin/busybox mount -o noatime,remount,rw,discard,barrier=0,commit=60,noauto_da_alloc,delalloc /data /data;
-  
 # Miscellaneous tweaks
   echo "1500" > /proc/sys/vm/dirty_writeback_centisecs
   echo "200" > /proc/sys/vm/dirty_expire_centisecs
@@ -107,7 +103,7 @@ echo "500 512000 64 2048" > /proc/sys/kernel/sem;
 
 # Doing some cleanup before init.d support & neak options
     /sbin/busybox sh /sbin/near/cleanup.sh
-	
+
 # NEAK Options
 	/sbin/busybox sh /sbin/near/neak-options.sh
 

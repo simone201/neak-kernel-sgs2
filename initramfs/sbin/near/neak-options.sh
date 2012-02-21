@@ -51,6 +51,13 @@ if [ -e /data/neak/aftridle ]; then
 	echo "aftr idle mode enabled"
 	echo "3" > /sys/module/cpuidle/parameters/enable_mask
 fi;
+
+# EXT4 Speed Tweaks
+if [ -e /data/neak/ext4boost ]; then
+	echo "ext4 boost tweaks enabled"
+	/sbin/busybox mount -o noatime,remount,rw,discard,barrier=0,commit=60,noauto_da_alloc,delalloc /cache /cache;
+	/sbin/busybox mount -o noatime,remount,rw,discard,barrier=0,commit=60,noauto_da_alloc,delalloc /data /data;
+fi;
 	
 # Install NEAK Configurator app
 if [ ! -e /data/neak/configurator ]; then
