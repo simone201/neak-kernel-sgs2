@@ -2279,7 +2279,7 @@ REGULATOR_INIT(ldo17, "CAM_AF_2.8V", 2800000, 2800000, 0,
 REGULATOR_INIT(ldo18, "TOUCH_LED_3.3V", 2500000, 2800000, 0,
 		REGULATOR_CHANGE_STATUS | REGULATOR_CHANGE_VOLTAGE, 1);
 
-REGULATOR_INIT(ldo21, "VDDQ_M1M2_1.2V", 1100000, 1100000, 1,
+REGULATOR_INIT(ldo21, "VDDQ_M1M2_1.2V", 1200000, 1200000, 1,
 		REGULATOR_CHANGE_STATUS, 1);
 
 static struct regulator_init_data buck1_init_data = {
@@ -2357,8 +2357,8 @@ static struct regulator_init_data buck4_init_data = {
 static struct regulator_init_data buck5_init_data = {
 	.constraints	= {
 		.name		= "VMEM_1.2V",
-		.min_uV		= 1100000,
-		.max_uV		= 1100000,
+		.min_uV		= 1200000,
+		.max_uV		= 1200000,
 		.apply_uV	= 1,
 		.always_on	= 1,
 		.state_mem	= {
