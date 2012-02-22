@@ -1384,6 +1384,10 @@ static void composite_disconnect(struct usb_gadget *gadget)
 		CSY_DBG_ESS("composite_disconnect -> mute_switch\n");
 	}
 	else {
+#ifndef CONFIG_USB_ANDROID_SAMSUNGROM
+		// Below line added for compatability with usb legacy in AOSP
+		cdev->connected = 0;
+#endif		
 		schedule_work(&cdev->switch_work);
 		CSY_DBG_ESS("composite_disconnect -> switch_work\n");
 	}
