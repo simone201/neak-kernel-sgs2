@@ -107,7 +107,7 @@ static unsigned long inc_cpu_load;
  * CPU freq will be decreased if measured load < dec_cpu_load;
  * not implemented yet.
  */
-#define DEFAULT_DEC_CPU_LOAD 30
+#define DEFAULT_DEC_CPU_LOAD 35
 static unsigned long dec_cpu_load;
 
 /*
