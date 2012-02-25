@@ -964,7 +964,13 @@ config USB_ANDROID_SAMSUNGROM
 	boolean "USB Support for Sammy Roms"
 	depends on USB_ANDROID
 	help
-		Provides support for USB on Samsung Roms (Galaxy S2)
+	  Provides support for USB on Samsung Roms (Galaxy S2)
+		
+config USB_ANDROID_ACCESSORY
+	boolean "Android USB accessory function"
+	depends on USB_ANDROID
+	help
+	  Provides Android USB Accessory support for android gadget driver.
 
 config USB_ANDROID_SAMSUNG_COMPOSITE
 	boolean "Samsung Composite function"
