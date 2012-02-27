@@ -58,15 +58,3 @@ if [ -e /data/neak/ext4boost ]; then
 	/sbin/busybox mount -o noatime,remount,rw,discard,barrier=0,commit=60,noauto_da_alloc,delalloc /cache /cache;
 	/sbin/busybox mount -o noatime,remount,rw,discard,barrier=0,commit=60,noauto_da_alloc,delalloc /data /data;
 fi;
-	
-# Install NEAK Configurator app
-if [ ! -e /data/neak/configurator ]; then
-	echo "Installing NEAK Configurator"
-	/sbin/busybox cp /res/misc/NEAK_Configurator.apk /data/app/NEAK_Configurator.apk
-	/sbin/busybox chown 0.0 /data/app/NEAK_Configurator.apk
-	/sbin/busybox chmod 644 /data/app/NEAK_Configurator.apk
-	/sbin/busybox touch /data/neak/configurator
-else
-	echo "NEAK Configurator already installed! (or skipped)"
-fi;
-	
