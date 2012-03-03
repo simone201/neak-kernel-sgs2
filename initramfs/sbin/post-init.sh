@@ -1,6 +1,6 @@
 #!/sbin/busybox sh
 # thanks to hardcore and nexxx
-# some parameters are taken from http://forum.xda-developers.com/showthread.php?t=1292743 (highly recommended to read)
+# thanks to knzo, gokhanmoral, pikachu01
 # modded by simone201 for NEAK Kernel
 
 MMC=`ls -d /sys/block/mmc*`;
@@ -44,6 +44,7 @@ echo $(date) START of post-init.sh
 # SD cards (mmcblk) read ahead tweaks
   echo "1024" > /sys/devices/virtual/bdi/179:0/read_ahead_kb
   echo "1024" > /sys/devices/virtual/bdi/179:16/read_ahead_kb
+  echo "256" > /sys/devices/virtual/bdi/default/read_ahead_kb
 
 # TCP tweaks
   echo "0" > /proc/sys/net/ipv4/tcp_timestamps;
@@ -72,11 +73,19 @@ echo "75" > /sys/module/pm_hotplug/parameters/loadh
 echo "200" > /sys/module/pm_hotplug/parameters/rate
 
 # Renice kswapd0 - kernel thread responsible for managing the memory
-renice 2 `pidof kswapd0`
+renice 6 `pidof kswapd0`
 
-# New scheduler tweaks + readahead tweaks
+# New scheduler tweaks + readahead tweaks (thx to Pikachu01)
 for k in $MMC;
 do
+	if [ -e $i/queue/rotational ]; 
+	then
+		echo "0" > $i/queue/rotational; 
+	fi;
+	if [ -e $i/queue/nr_requests ];
+	then
+		echo "8192" > $i/queue/nr_requests;
+	fi;
 	if [ -e $i/queue/iostats ];
 	then
 		echo "0" > $k/queue/iostats;
@@ -93,7 +102,8 @@ echo "8" > /proc/sys/vm/page-cluster;
 echo "64000" > /proc/sys/kernel/msgmni;
 echo "64000" > /proc/sys/kernel/msgmax;
 echo "10" > /proc/sys/fs/lease-break-time;
-echo "500 512000 64 2048" > /proc/sys/kernel/sem;
+sysctl -w kernel.sem="500 512000 100 2048";
+sysctl -w kernel.shmmax=268435456;
 
 # Voodoo ScreenTuner Module
   insmod /lib/modules/ld9040_voodoo.ko
