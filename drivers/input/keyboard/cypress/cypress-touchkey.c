@@ -1095,9 +1095,9 @@ static int i2c_touchkey_probe(struct i2c_client *client,
 	/* wake lock for LED Notify */
 	wake_lock_init(&led_wake_lock, WAKE_LOCK_SUSPEND, "led_wake_lock");
 
-	/* turn on the LED if it is not supposed to be allways off */
-	if (led_timeout != BL_ALWAYS_OFF) {
-		status = 1;
+	/* turn off the LED if it is not supposed to be always on */
+	if (led_timeout != BL_ALWAYS_ON) {
+		status = 2;
 		i2c_touchkey_write((u8 *)&status, 1);
 	}
 #ifdef CONFIG_TOUCHKEY_BLN
