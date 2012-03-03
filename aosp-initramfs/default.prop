@@ -10,3 +10,15 @@ persist.service.adb.enable=0
 ro.kernel.id=Kernel Version-1.4
 # For NEAK Configurator
 ro.neak.version=1.4x
+
+# For CWM Manager
+customkernel.cf-root=true
+customkernel.base.cf-root=true
+customkernel.name=NEAKernel
+customkernel.namedisplay=NEAKernel
+customkernel.version.number=100
+customkernel.version.name=5.0
+customkernel.bootani.zip=true
+customkernel.bootani.bin=true
+customkernel.cwm=true
+customkernel.cwm.version=5.0.2.8
