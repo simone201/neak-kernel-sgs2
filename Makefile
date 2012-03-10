@@ -959,7 +959,7 @@ define filechk_utsrelease.h
 	  echo '"$(KERNELRELEASE)" exceeds $(uts_len) characters' >&2;    \
 	  exit 1;                                                         \
 	fi;                                                               \
-	(echo \#define UTS_RELEASE \"2.6.35.14-N.E.A.K-1.4x\";)
+	(echo \#define UTS_RELEASE \"2.6.35.14-N.E.A.K-1.4.1x\";)
 endef
 
 define filechk_version.h
