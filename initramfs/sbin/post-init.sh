@@ -76,7 +76,7 @@ echo "200" > /sys/module/pm_hotplug/parameters/rate
 renice 6 `pidof kswapd0`
 
 # New scheduler tweaks + readahead tweaks (thx to Pikachu01)
-for k in $MMC;
+for i in $MMC;
 do
 	if [ -e $i/queue/rotational ]; 
 	then
