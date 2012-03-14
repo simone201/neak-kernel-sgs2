@@ -31,12 +31,6 @@ if [ -e /data/neak/lazy ]; then
 	insmod /lib/modules/cpufreq_lazy.ko
 fi;
 
-# Lagfree Governor
-if [ -e /data/neak/lagfree ]; then
-	echo "lagfree module enabled"
-	insmod /lib/modules/cpufreq_lagfree.ko
-fi;
-
 # SCHED_MC Feature
 if [ -e /data/neak/schedmc ]; then
 	echo "schedmc enabled"
