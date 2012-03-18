@@ -12,6 +12,10 @@ if [ -e /data/neak/downloader ]; then
 	rm /data/neak/downloader
 fi;
 
+if [ -e /data/neak/lagfree ]; then
+	rm /data/neak/lagfree
+fi;
+
 if [ -e /system/etc/init.d/S98bolt_siyah ]; then
 	rm /system/etc/init.d/S98bolt_siyah
 fi;
